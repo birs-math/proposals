@@ -1,0 +1,9 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  proposal_type: one
+  status: 1
+
+two:
+  proposal_type: two
+  status: 1

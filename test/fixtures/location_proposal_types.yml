@@ -1,0 +1,9 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  localtion: one
+  proposal_type: one
+
+two:
+  localtion: two
+  proposal_type: two
