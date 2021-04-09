@@ -10,7 +10,6 @@ AllCops:
     - 'app/helpers/**/*'
     - 'app/jobs/**/*'
     - 'app/channels/**/*'
-    - 'app/views/**/*'
     - 'spec/**/*.rb'
   TargetRubyVersion: 2.7
   SuggestExtensions: false
