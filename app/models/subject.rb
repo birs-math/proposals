@@ -1,6 +1,6 @@
 class Subject < ApplicationRecord
-  validates_uniqueness_of :code
-  
+  validates :code, uniqueness: true
+
   belongs_to :subject_category
   has_many :ams_subjects
 end
