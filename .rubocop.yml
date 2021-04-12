@@ -16,7 +16,10 @@ AllCops:
 
 Rails:
   Enabled: true
-
+Documentation:
+  Enabled: false
+Rails/HasManyOrHasOneDependent:
+  Enabled: false
 Style/FrozenStringLiteralComment:
   Enabled: false
 Style/BlockComments:

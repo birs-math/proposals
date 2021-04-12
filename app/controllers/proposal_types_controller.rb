@@ -14,6 +14,6 @@ class ProposalTypesController < ApplicationController
   private
 
   def set_proposal_type
-  	@proposal_type = ProposalType.find(params[:id])
+    @proposal_type = ProposalType.find(params[:id])
   end
 end
