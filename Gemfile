@@ -12,6 +12,7 @@ gem 'stimulus-rails'
 gem 'turbolinks', '~> 5'
 gem 'webpacker', '~> 5.0'
 gem 'devise'
+gem 'cancancan'
 
 group :development, :test do
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
