@@ -1,5 +1,3 @@
 class SubmitProposalsController < ApplicationController
-  def new
-    @location = Location.new
-  end
+  def new;  end
 end

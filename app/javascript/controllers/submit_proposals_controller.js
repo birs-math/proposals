@@ -1,28 +1,18 @@
 import { Controller } from "stimulus"
 
 export default class extends Controller {
-  static targets = ['locationId', 'proposalTypes', 'form']
+  static targets = ['locationId', 'proposalTypes', 'locationSpecificQuestions', 'typeSpecificQuestions']
 
   connect() {
-    this.locationIdTarget.options[0].disabled = true
+    this.handlProposalTypeChange()
   }
 
   handleLocationChange() {
-    fetch(`/locations/${this.locationIdTarget.value}/proposal_types.json`)
-      .then(response => response.json())
-      .then(data => {
-        this.proposalTypesTarget.selected = data[0].id
-        this.proposalTypesTarget.disabled = false
-        const selectBox = this.proposalTypesTarget;
-        var _this = this
-        selectBox.innerHTML = '';
-        data.forEach(item => {
-          const opt = document.createElement('option');
-          opt.value = item.id;
-          opt.innerHTML = item.name;
-          selectBox.appendChild(opt);
-        });
-        this.handlProposalTypeChange();
+    let locations = [...event.target.selectedOptions].map(opt => opt.value)
+    fetch(`/proposal_types/${this.proposalTypesTarget.value}/location_based_fields?ids=${locations}`)
+      .then(response => response.text())
+      .then(html => {
+        this.locationSpecificQuestionsTarget.innerHTML = html
       });
   }
 
@@ -30,7 +20,7 @@ export default class extends Controller {
     fetch(`/proposal_types/${this.proposalTypesTarget.value}.html`)
       .then(response => response.text())
       .then(html => {
-        this.formTarget.innerHTML = html
+        this.typeSpecificQuestionsTarget.innerHTML = html
       });
   }
 }

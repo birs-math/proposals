@@ -1,12 +1,10 @@
 <fieldset>
   <legend>Proposal fields</legend>
-  <div class="col-lg-8">
     <% proposal_fields&.each do |field| %>
       <% if field.type.eql?('ProposalFields::Text') %>
         <%= render  partial: 'proposal_fields/text', locals: { filed: field } %>
       <% else %>
-        <%=  render partial: 'proposal_fields/text', locals: { filed: field } %>
+        <%=  render partial: 'proposal_fields/radio', locals: { filed: field } %>
       <% end %>
     <% end %>
-  </div>
 </fieldset>

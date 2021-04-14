@@ -8,7 +8,11 @@ Rails.application.routes.draw do
 
   resources :dashboards
   resources :submit_proposals
-  resources :proposal_types
+  resources :proposal_types do
+    member do 
+      get :location_based_fields
+    end
+  end
   resources :locations do
     member do
       get :proposal_types

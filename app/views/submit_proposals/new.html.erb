@@ -1,7 +1,6 @@
 <%= render partial: 'layouts/sidebar' %>
-<!-- Main content -->
+
 <div class="main-content" id="panel">
-  <!-- Page content -->
   <div class="container-fluid mt--6">
     <div class="row">
       <div data-controller="submit-proposals">
@@ -10,16 +9,17 @@
         <fieldset class="mt-8">
           <legend>Basic</legend>
           <div class="col-lg-8">
-            <div class="form-group">
-              <%= f.label :location %>
-              <%= select_tag "location", options_for_select(Location.all.map {|l| [l.name, l.id]}), :include_blank => 'Select Location', data: { target: 'submit-proposals.locationId',action: 'change->submit-proposals#handleLocationChange'}, class: 'form-control' %>
-            </div>
             <div class="form-group my-3">
               <%= f.label :proposal_types %>
-              <%= select_tag "location", options_for_select([]), data: { target: 'submit-proposals.proposalTypes', action: 'change->submit-proposals#handlProposalTypeChange'}, disabled: true, class: 'form-control' %>
+              <%= select_tag "location", options_for_select(ProposalType.all.map { |pt| [pt.name, pt.id]  }), data: {target: 'submit-proposals.proposalTypes', action: 'change->submit-proposals#handlProposalTypeChange'}, class: 'form-control' %>
             </div>
+            <div data-submit-proposals-target='typeSpecificQuestions'></div>
+            <div class="form-group">
+              <%= f.label :location %>
+              <%= select_tag "location", options_for_select(Location.all.map {|l| [l.name, l.id]}), :include_blank => 'Select Location', data: { target: 'submit-proposals.locationId',action: 'change->submit-proposals#handleLocationChange'}, class: 'form-control', multiple: true %>
+            </div>
+            <div data-submit-proposals-target='locationSpecificQuestions'></div>
         </fieldset>
-        <div data-submit-proposals-target='form'></div>
         </div>
         <%end%>
       </div>
