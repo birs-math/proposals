@@ -45,14 +45,16 @@ RSpec.describe "/proposal_forms", type: :request do
   end
 
   describe "PATCH /update" do
+    let(:params) do { proposal_form: {status: 'active'}} end
     before do
       authenticate_for_controllers
-      patch proposal_form_url(proposal_form)
+      patch proposal_form_url(proposal_form, params: params)
     end
 
     it "updates the status to active" do
       expect(proposal_form.reload.status).to eq('active')
     end
+    it {expect(proposal_form.reload.updated_by).to eq(@user)}
   end
 
   describe "DELETE /destroy" do
@@ -61,5 +63,13 @@ RSpec.describe "/proposal_forms", type: :request do
     end
 
     it { expect(ProposalForm.all.count).to eq(0) }
+  end
+
+  describe "POST /clone" do
+    before do
+      post clone_proposal_form_path(proposal_form)
+    end
+
+    it { expect(response).to redirect_to(edit_proposal_form_path(ProposalForm.last)) }
   end
 end

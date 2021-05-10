@@ -1,5 +1,5 @@
 <%= render 'layouts/sidebar' %>
-<main class="content">
+<main class="content" data-controller="proposal-types">
   <div class="container-fluid">
     <div class="header">
       <h1 class="header-title">
@@ -33,9 +33,13 @@
                   <%= link_to '<i class="align-middle fas fa-fw fa-pen"></i>'.html_safe, edit_proposal_type_path(proposal_type) %>
                   <%= link_to '<i class="align-middle fas fa-fw fa-trash"></i>'.html_safe, proposal_type_path(proposal_type), method: :delete ,
                     data: {confirm: "Are you sure you want to delete #{proposal_type.name}?"} %>
-                  <%= link_to 'Proposal form',  proposal_forms_url(proposal_type: proposal_type.id ), class: 'btn btn-outline-primary', method: :post %>
+
+                    <i class="align-middle fas fa-fw fa-copy cursor-pointer" data-bs-toggle="modal" data-bs-target="#cloneProposalForm<%= proposal_type.id %>"></i>
+
+                  <%= link_to 'Proposal form',  proposal_forms_url(proposal_type: proposal_type.id ), class: 'btn btn-pill btn-primary text-white', method: :post %>
                 </td>
               </tr>
+              <%= render partial: 'clone_proposal_form', locals: { proposal_type: proposal_type } %>
               <% end %>
             </tbody>
           </table>

@@ -1,4 +1,5 @@
 class ProposalForm < ApplicationRecord
+  validates :title, presence: true
   belongs_to :proposal_type
   belongs_to :created_by, class_name: 'User'
   belongs_to :updated_by, class_name: 'User'

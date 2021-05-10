@@ -1,5 +1,5 @@
 class ProposalFormsController < ApplicationController
-  before_action :set_proposal_form, only: %i[edit update show destroy]
+  before_action :set_proposal_form, only: %i[edit update show destroy clone]
 
   def index
     @proposal_forms = ProposalForm.all
@@ -20,8 +20,12 @@ class ProposalFormsController < ApplicationController
   end
 
   def update
-    @proposal_form.update(status: 'active', updated_by: current_user)
-    redirect_to edit_proposal_form_path(@proposal_form)
+    if @proposal_form.update(proposal_form_params)
+      redirect_to @proposal_form, notice: 'Proposal form was successfully updated'
+    else
+      render :edit, status: :unprocessable_entity,
+                                     error: "Unable to update proposal form."
+    end
   end
 
   def create
@@ -44,9 +48,21 @@ class ProposalFormsController < ApplicationController
     end
   end
 
+  def clone
+    proposal_form = @proposal_form.dup
+    proposal_form.proposal_fields << @proposal_form.proposal_fields
+    proposal_form.status = 'draft'
+    proposal_form.save
+    redirect_to edit_proposal_form_path(proposal_form)
+  end
+
   private
 
   def set_proposal_form
     @proposal_form = ProposalForm.find_by(id: params[:id])
+  end
+
+  def proposal_form_params
+    params.require(:proposal_form).permit(:title, :status).merge(updated_by: current_user)
   end
 end

@@ -17,23 +17,34 @@
         <div class="card-body">
           <div id="panel" data-controller="proposal-form">
             <div class="container-fluid" data-proposal-form-target="proposalFormId">
-              <p> status: <%= @proposal_form.status %></p>
+              <%= form_for(@proposal_form) do |form| %>
+                <div class="form-group mb-2">
+                  <%= form.label :title, class:'mb-2' %>
+                  <%= form.text_field :title, class:'form-control', disabled: @proposal_form&.active? %>
+               </div>
+               <div class="form-group mb-2">
+                  <%= form.label :status, class:'mb-2' %>
+                  <%= form.select :status, options_for_select(proposal_form_statuses, @proposal_form.status), {}, class:'form-control', disabled: @proposal_form&.active? %>
+               </div>
+               <div class="form-group">
+                 <%= form.submit class:'btn btn-primary my-2', disabled: @proposal_form&.active? %>
+               </div>
+              <% end %>
               <% if @proposal_form.id && @proposal_form.draft? %>
-              <%= link_to 'Publish Form', proposal_form_path(@proposal_form), method: :put ,class: 'btn btn-primary' %>
-              <div class="col-12 d-flex align-self-center justify-content-end position-relative" >
-                <a href="javascript:void(0)" class="btn btn-primary" data-action="click->proposal-form#toggleProposalFieldsPanel">Add Form Field</a>
-                <section class="fields-panel hidden" data-proposal-form-target='proposalFieldsPanel' data-proposal-form-visible-value="false">
-                  <% ProposalField::FIELD_TYPES.each do |field_type| %>
-                  <a href="javascript:void(0);" class="btn btn-light " data-action="click->proposal-form#fetchField click->proposal-form#toggleProposalFieldsPanel" data-field="<%= field_type %>" data-id="<%= @proposal_form.id %>"><%= field_type %></a>
-                  <% end %>
-                </section>
-              </div>
+                <div class="col-12 d-flex align-self-center justify-content-end position-relative" >
+                  <a href="javascript:void(0)" class="btn btn-primary" data-action="click->proposal-form#toggleProposalFieldsPanel">Add Form Field</a>
+                  <section class="fields-panel hidden" data-proposal-form-target='proposalFieldsPanel' data-proposal-form-visible-value="false">
+                    <% ProposalField::FIELD_TYPES.each do |field_type| %>
+                    <a href="javascript:void(0);" class="btn btn-light " data-action="click->proposal-form#fetchField click->proposal-form#toggleProposalFieldsPanel" data-field="<%= field_type %>" data-id="<%= @proposal_form.id %>"><%= field_type %></a>
+                    <% end %>
+                  </section>
+                </div>
               <% end %>
               <div class="row">
                 <div class="col-7">
                   <div class="header"><h1>List of proposal fields</h1></div>
                     <% @proposal_form&.proposal_fields.each do |field| %>
-                      <div class="card">
+                      <div class="card cursor-pointer">
                         <div class="card-body">
                           <div class="row">
                             <div class="col mt-0">
