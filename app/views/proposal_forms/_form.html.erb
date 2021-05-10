@@ -2,13 +2,13 @@
   <div class="container-fluid">
     <div class="header">
       <h1 class="header-title">
-        Edit Proposal Form
+        Proposal Form
       </h1>
       <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
           <li class="breadcrumb-item"> <%= link_to "Dashboard", dashboards_path %></a></li>
           <li class="breadcrumb-item"> <%= link_to "Proposal Forms", proposal_forms_path %></li>
-          <li class="breadcrumb-item active" aria-current="page">Edit</li>
+          <li class="breadcrumb-item active" aria-current="page"><%= @proposal_form.new_record? ? 'New' : 'Edit' %></li>
         </ol>
       </nav>
     </div>
@@ -22,6 +22,12 @@
                   <%= form.label :title, class:'mb-2' %>
                   <%= form.text_field :title, class:'form-control', disabled: @proposal_form&.active? %>
                </div>
+               <% if @proposal_form.new_record? %>
+                  <div class="form-group mb-2">
+                    <%= form.label :proposal_type, class:'mb-2' %>
+                    <%= form.select :proposal_type_id, options_for_select(all_proposal_types, params[:proposal_type]), {}, class:'form-control' %>
+                  </div>
+               <% end %>
                <div class="form-group mb-2">
                   <%= form.label :status, class:'mb-2' %>
                   <%= form.select :status, options_for_select(proposal_form_statuses, @proposal_form.status), {}, class:'form-control', disabled: @proposal_form&.active? %>
@@ -40,29 +46,31 @@
                   </section>
                 </div>
               <% end %>
-              <div class="row">
-                <div class="col-7">
-                  <div class="header"><h1>List of proposal fields</h1></div>
-                    <% @proposal_form&.proposal_fields.each do |field| %>
-                      <div class="card cursor-pointer">
-                        <div class="card-body">
-                          <div class="row">
-                            <div class="col mt-0">
-                              <h5 class="card-title"><%= field.statement %></h5>
-                              Options: <%= options_for_field(field) %>
-                            </div>
-                            <div class="col-auto">
+              <% unless @proposal_form.new_record?  %>
+                <div class="row">
+                  <div class="col-7">
+                    <div class="header"><h1>List of proposal fields</h1></div>
+                      <% @proposal_form&.proposal_fields.each do |field| %>
+                        <div class="card cursor-pointer">
+                          <div class="card-body">
+                            <div class="row">
+                              <div class="col mt-0">
+                                <h5 class="card-title"><%= field.statement %></h5>
+                                Options: <%= options_for_field(field) %>
+                              </div>
+                              <div class="col-auto">
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                    <% end %>
-                  </div>
-                  <div class="col-5">
-                    <div data-proposal-form-target="proposalField"></div>
+                      <% end %>
+                    </div>
+                    <div class="col-5">
+                      <div data-proposal-form-target="proposalField"></div>
+                    </div>
                   </div>
                 </div>
-              </div>
+              <% end %>
             </div>
           </div>
         </div>

@@ -36,7 +36,7 @@
 
                     <i class="align-middle fas fa-fw fa-copy cursor-pointer" data-bs-toggle="modal" data-bs-target="#cloneProposalForm<%= proposal_type.id %>"></i>
 
-                  <%= link_to 'Proposal form',  proposal_forms_url(proposal_type: proposal_type.id ), class: 'btn btn-pill btn-primary text-white', method: :post %>
+                  <%= link_to 'Proposal form',  new_proposal_form_url(proposal_type: proposal_type.id ), class: 'btn btn-pill btn-primary text-white'%>
                 </td>
               </tr>
               <%= render partial: 'clone_proposal_form', locals: { proposal_type: proposal_type } %>

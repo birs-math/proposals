@@ -24,15 +24,13 @@ class ProposalFormsController < ApplicationController
       redirect_to @proposal_form, notice: 'Proposal form was successfully updated'
     else
       render :edit, status: :unprocessable_entity,
-                                     error: "Unable to update proposal form."
+                    error: "Unable to update proposal form."
     end
   end
 
   def create
-    @proposal_form = ProposalForm.new(status: 'draft', proposal_type_id: params[:proposal_type])
+    @proposal_form = ProposalForm.new(proposal_form_params)
     @proposal_form.created_by = current_user
-    @proposal_form.updated_by = current_user
-
     if @proposal_form.save
       redirect_to edit_proposal_form_path(@proposal_form)
     else
@@ -63,6 +61,6 @@ class ProposalFormsController < ApplicationController
   end
 
   def proposal_form_params
-    params.require(:proposal_form).permit(:title, :status).merge(updated_by: current_user)
+    params.require(:proposal_form).permit(:title, :status, :proposal_type_id).merge(updated_by: current_user)
   end
 end
