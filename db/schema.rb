@@ -46,10 +46,10 @@ ActiveRecord::Schema.define(version: 2021_07_05_101129) do
   create_table "feedbacks", force: :cascade do |t|
     t.string "content"
     t.bigint "user_id"
-    t.text "reply"
-    t.boolean "reviewed"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.text "reply"
+    t.boolean "reviewed"
     t.index ["user_id"], name: "index_feedbacks_on_user_id"
   end
 

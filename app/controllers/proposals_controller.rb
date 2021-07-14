@@ -45,11 +45,8 @@ class ProposalsController < ApplicationController
     proposal_id = latex_params[:proposal_id]
     session[:proposal_id] = proposal_id
 
-    temp_file = "propfile-#{current_user.id}-#{proposal_id}.tex"
-    session[:latex_file] = temp_file
     input = latex_params[:latex]
-
-    ProposalPdfService.new(proposal_id, temp_file, input).pdf
+    ProposalPdfService.new(proposal_id, latex_temp_file, input).pdf
 
     head :ok
   end
@@ -57,14 +54,12 @@ class ProposalsController < ApplicationController
   # GET /proposals/:id/rendered_proposal.pdf
   def latex_output
     proposal_id = params[:id]
-
-    temp_file = "propfile-#{current_user.id}-#{proposal_id}.tex"
-    ProposalPdfService.new(proposal_id, temp_file, 'all').pdf
+    ProposalPdfService.new(proposal_id, latex_temp_file, 'all').pdf
 
     @proposal = Proposal.find_by_id(proposal_id)
     @year = @proposal&.year || Date.current.year.to_i + 2
 
-    fh = File.open("#{Rails.root}/tmp/#{temp_file}")
+    fh = File.open("#{Rails.root}/tmp/#{latex_temp_file}")
     @latex_input = fh.read
 
     render_latex
@@ -77,9 +72,8 @@ class ProposalsController < ApplicationController
 
     @proposal = Proposal.find_by_id(prop_id)
     @year = @proposal&.year || Date.current.year.to_i + 2
-    temp_file = "propfile-#{current_user.id}-#{@proposal.id}.tex"
 
-    fh = File.open("#{Rails.root}/tmp/#{temp_file}")
+    fh = File.open("#{Rails.root}/tmp/#{latex_temp_file}")
     @latex_input = fh.read
 
     render_latex
@@ -126,6 +120,11 @@ class ProposalsController < ApplicationController
   def limit_of_one_per_type
     redirect_to new_proposal_path, alert: "There is a limit of one
       #{@proposal.proposal_type.name} proposal per lead organizer.".squish
+  end
+
+  def latex_temp_file
+    proposal_id = latex_params[:proposal_id] || params[:id]
+    "propfile-#{current_user.id}-#{proposal_id}.tex"
   end
 
   def render_latex
