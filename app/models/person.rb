@@ -1,7 +1,8 @@
 class Person < ApplicationRecord
   attr_accessor :is_lead_organizer, :province, :state
 
-  validates :firstname, :lastname, :email, presence: true
+  validates :firstname, :lastname, presence: true
+  validates :email, presence: true, uniqueness: true
   belongs_to :user, optional: true
   has_many :proposal_roles, dependent: :destroy
   has_many :proposals, through: :proposal_roles
