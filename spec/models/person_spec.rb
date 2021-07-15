@@ -129,7 +129,7 @@ RSpec.describe Person, type: :model do
     context 'When Province is blank' do
       let(:person) { create(:person, country: 'United States of America') }
       before do
-        person.update(state: nil, state: "xyz")   
+        person.update(state: "xyz", province: nil)   
       end
       it '' do
         expect(person.region).to eq(person.state)

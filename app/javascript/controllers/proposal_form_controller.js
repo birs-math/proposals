@@ -18,7 +18,7 @@ export default class extends Controller {
       let length = $('#' + role + '_' + element)[0].value.length
       role_values.push(length)
     })
-    if( role_values.every( e => e == 0 ) ) { disable_value = false }
+    if( role_values.every( e => e === 0 ) ) { disable_value = false }
 
     $.each(['firstname', 'lastname', 'email', 'deadline'],
       function(index, element) {

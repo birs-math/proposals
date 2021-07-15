@@ -85,69 +85,70 @@ module ProposalsHelper
 
   def graph_data(param, param2, proposal)
     citizenships = proposal.demographics_data.pluck(:result).pluck(param, param2).flatten.reject{ |s| s.blank? || s.eql?("Other")}
-    @data = Hash.new(0)
+    data = Hash.new(0)
 
     citizenships.each do |c|
-      @data[c] += 1
+      data[c] += 1
     end
+    data
   end
 
   def nationality_data(proposal)
     graph_data("citizenships", "citizenships_other", proposal)
-    @data
   end
 
   def ethnicity_data(proposal)
     graph_data("ethnicity", "ethnicity_other", proposal)
-    @data
   end
 
   def gender_labels(proposal)
-    graph_data("gender", "gender_other", proposal)
-    @data.keys
+    data = graph_data("gender", "gender_other", proposal)
+    data.keys
   end
 
   def gender_values(proposal)
-    graph_data("gender", "gender_other", proposal)
-    @data.values
+    data = graph_data("gender", "gender_other", proposal)
+    data.values
   end
 
   def career_data(param, param2, proposal)
     person = Person.where.not(id: proposal.lead_organizer.id)
     careerStage = person.where(id: proposal.person_ids).pluck(param, param2).flatten.reject{ |s| s.blank? || s.eql?("Other")}
-    @data = Hash.new(0)
+    data = Hash.new(0)
 
     careerStage.each do |s|
-      @data[s] += 1
+      data[s] += 1
     end
+    data
   end
 
   def career_labels(proposal)
-    career_data("academic_status", "other_academic_status", proposal)
-    @data.keys
+    data = career_data("academic_status", "other_academic_status", proposal)
+    data.keys
   end
 
   def career_values(proposal)
-    career_data("academic_status", "other_academic_status", proposal)
-    @data.values
+    data = career_data("academic_status", "other_academic_status", proposal)
+    data.values
   end
 
   def stem_graph_data(proposal)
     citizenships = proposal.demographics_data.pluck(:result).pluck("stem").flatten.reject{ |s| s.blank? || s.eql?("Other")}
-    @data = Hash.new(0)
+    data = Hash.new(0)
 
     citizenships.each do |c|
-      @data[c] += 1
+      data[c] += 1
     end
+    data
   end
 
   def stem_labels(proposal)
-    stem_graph_data(proposal)
-    @data.keys
+    data = stem_graph_data(proposal)
+    data.keys
   end
 
   def stem_values(proposal)
-    stem_graph_data(proposal)
-    @data.values
+    data = stem_graph_data(proposal)
+    data.values
   end
 end

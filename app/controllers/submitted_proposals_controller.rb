@@ -14,11 +14,13 @@ class SubmittedProposalsController < ApplicationController
 
   private
 
+  # rubocop:disable Metrics/AbcSize
   def query_params?
-    params[:firstname].present? || params[:lastname].present? || 
-    params[:subject_area].present? || params[:keywords].present? || 
-    params[:workshop_year].present? || params[:proposal_type].present?
+    params[:firstname].present? || params[:lastname].present? ||
+      params[:subject_area].present? || params[:keywords].present? ||
+      params[:workshop_year].present? || params[:proposal_type].present?
   end
+  # rubocop:enable Metrics/AbcSize
 
   def set_proposals
     if query_params?

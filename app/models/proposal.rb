@@ -12,7 +12,7 @@ class Proposal < ApplicationRecord
   belongs_to :proposal_type
   has_many :proposal_roles, dependent: :destroy
   has_many :people, through: :proposal_roles
-  has_many :answers, -> { order 'answers.proposal_field_id' }, dependent: :destroy
+  has_many(:answers, -> { order 'answers.proposal_field_id' }, inverse_of: :proposal, dependent: :destroy)
   has_many :invites, dependent: :destroy
   belongs_to :proposal_form
   has_many :proposal_ams_subjects, dependent: :destroy
@@ -60,8 +60,7 @@ class Proposal < ApplicationRecord
   end
 
   def list_of_co_organizers
-    invites.where('invites.invited_as = ?',
-      'Co Organizer').map(&:person).map(&:fullname).join(', ')
+    invites.where(invites: { invited_as: 'Co Organizer' }).map(&:person).map(&:fullname).join(', ')
   end
 
   def supporting_organizers
