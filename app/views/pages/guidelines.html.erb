@@ -1,88 +1,30 @@
 <main class="content" style="overflow-x: auto">
-<div class="container-fluid">
-<div class="header">
-  <h1 class="header-title">
-    Guidelines for Proposals
-  </h1>
-  <nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-      <li class="breadcrumb-item active" aria-current="page">Pages</li>
-      <li class="breadcrumb-item active" aria-current="page">Guidelines for Proposals</li>
-    </ol>
-  </nav>
-</div>
-<div class="col-12">
-  <div class="card">
-    <div class="card-header">
-      <h2 class="py-2 border-bottom mb-4">Guidelines for Proposals</h2>
+  <div class="container-fluid">
+    <div class="header">
+      <h1 class="header-title">
+        Guidelines for Proposals
+      </h1>
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item active" aria-current="page">Pages</li>
+          <li class="breadcrumb-item active" aria-current="page">Guidelines for Proposals</li>
+        </ol>
+      </nav>
     </div>
-    <div class="card-body">
-      <div>
-        <p>Please read the descriptions of our various <a href="/programs">programs</a> before preparing your proposal. Proposals should be submitted using the <a href="https://www.birs.ca/proposals/">online form</a>.</p>
-        <p>Please indicate the subject area of your proposal. If the codes are not adequate (particularly for emerging fields), use “Other” and specify in the “Additional Comments” field.</p>
-        <p>We follow the Tri-Agency’s Action Plan on EDI, available here:</p>
-        <p><a href="https://www.nserc-crsng.gc.ca/NSERC-CRSNG/EDI-EDI/Action-Plan_Plan-dAction_eng.asp">https://www.nserc-crsng.gc.ca/NSERC-CRSNG/EDI-EDI/Action-Plan_Plan-dAction_eng.asp  </a></p>
-        <p><a href="https://www.nserc-crsng.gc.ca/NSERC-CRSNG/EDI-EDI/Dimensions_Dimensions_eng.asp">https://www.nserc-crsng.gc.ca/NSERC-CRSNG/EDI-EDI/Dimensions_Dimensions_eng.asp</a></p>
-        <p></p>
-        <p>For ideas and resources on crafting an EDI positive program, please refer to:
-          <a href="https://www.birs.ca/about/governance/scientific-management/Equity-Diversity-Inclusion-Board/resources-for-EDI">Resources for Equity, Diversity and Inclusion</a>
-        </p>
-        <div data-controller="guidelines">
-          <h4 id="organizing_committee"> <a href="guidelines#organizing_committee" data-action="mouseup->guidelines#copy" value="organizing_committee"><i class="align-middle me-2 fas fa-fw fa-link" value="/guidelines#organizing_committee " ></i></a> 1. Organizing committee</h4>
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="py-2 border-bottom mb-4">Guidelines for Proposals</h2>
         </div>
-        <div class="ms-5">
-          <p>For a 5-day workshop, we require a minimum of two and a maximum of five organizers per proposal, and allow only one organizer per institution. Additional organizers may be listed in the "Comments" section, if needed. Please provide reasons for such additions. One of the organizing committee members should be designated as the main Contact Organizer. All organizers are expected to be on-site during the delivery of their program and participate actively in the execution of the event.</p>
-          <p>In accordance with BIRS’s mandate to promote equity, diversity and inclusion (EDI), we <b>strongly recommend</b> an organizing committee to include:</p>
-          <p>(A) at least one early-career researcher within ten years of their doctoral degree at the time of submission of the proposal, and</p>
-          <p>(B) at least one self-identified member(organizing committee of 2) or at least two self-identified members(organizing committee of 3 and more) from communities under-represented in STEM disciplines. This includes, but need not be limited to, women, Indigenous Peoples, persons with disabilities, members of visible minorities/racialized groups, and members of LGBTQ2+ communities.</p>
-          <p>Note: </p>
-          <ol type="i">
-            <li> An organizer can be counted towards both (A) and (B) if they satisfy both descriptions.</li>
-            <li>An organizing committee need not disclose any information that could be used to identify a specific member or an under-represented community. They may instead report the aggregate percentage in the organizing committee from under-represented groups without identifying any specific groups. </li>
-            <li>An organizing committee that does not report its demographic composition or whose composition does not meet the recommendations stated above is still eligible to submit an application. However we request such a proposal to explicitly address how the proposed program will include and support under-represented groups to meet BIRS's standards of EDI. We hope that applicants will take this as an invitation to look closely at their own research field and assess how it might be made more inclusive.</li>
-          </ol>
+        <div class="card-body">
+          <div>
+            <% if current_user&.staff_member? %>
+              <%= link_to "Edit guidelines", edit_site_setting_path(@guideline), class:'btn btn-primary mb-3' %>
+            <% end %>
+            <%= @guideline.guideline.html_safe %><br>
+          </div>
         </div>
-        <div data-controller="guidelines">
-          <h4 id="dates"> <a href="guidelines#dates" data-action="mouseup->guidelines#copy" value="dates"><i class="align-middle me-2 fas fa-fw fa-link" value="/guidelines#dates " ></i></a> 2. Dates</h4>
-        </div>
-        <div class="ms-5">
-          <p>With regard to your proposed dates, please give us options – particularly “low-season” alternatives! You may use the link <a href="https://www.calendarlabs.com/online-calendar/2020-calendar/canada-holidays/">https://www.calendarlabs.com/online-calendar/2020-calendar/canada-holidays/</a> for a list of holidays to make sure that the dates you indicate as being acceptable really are acceptable to you.</p>
-        </div>
-        <div data-controller="guidelines">
-          <h4 id="proposal_content"> <a href="guidelines#proposal_content" data-action="mouseup->guidelines#copy" value="proposal_content"><i class="align-middle me-2 fas fa-fw fa-link" value="/guidelines#proposal_content" ></i></a>3. Proposal content</h4>
-        </div>
-        <div class="ms-5">
-          <p>1. The workshop should be sufficiently innovative and timely that holding it has the potential to make a difference to the subject. Of special interest are proposals that take advantage of newly emerging links between areas, explore synergies between evolving fields or offer meeting opportunities for groups of participants who do not normally meet together.</p>
-          <p>2. Proposals must include contingency planning for situations similar to the COVID-19 pandemic. Priority will be given to proposals that demonstrate adaptability to virtual or online models under such circumstances.</p>
-          <p>3. At least some of the organizers should have recognized international stature as leaders in their fields.</p>
-          <p>4. The proposed participant list should be realistic and coherent with the goals of the event. It is more convincing to the selection panel if you can indicate that a number of your participants have confirmed their interest in the workshop.</p>
-          <p>5. The proposed and the final list of participants must ensure adequate representation of scientists from all career stages, and meet BIRS’s commitment to ensuring diversity in the broadest sense, across race, gender, ethnicity, visible and invisible disabilities, institution and geographic location. Please refer to the Canadian Tri-Agency statement and related links on equity, diversity and inclusion (EDI):</p>
-          <p><a href="https://www.nserc-crsng.gc.ca/NSERC-CRSNG/EDI-EDI/index_eng.asp">https://www.nserc-crsng.gc.ca/NSERC-CRSNG/EDI-EDI/index_eng.asp</a></p>
-          <p>and outline an action plan how the proposed participant list will fulfill this mandate. An EDI statement with specific participation targets and a strategy for meeting these targets will be helpful in this regard.</p>
-          <p>6. The proposal should avoid being too diffuse and should not attempt to cover too many areas at once. If applicable, indicate why it is distinct from other events in related areas being held elsewhere.</p>
-          <p>7. The proposal should indicate detailed planning for program delivery, and embed a variety of events in addition to the traditional meeting format. We intend to host events that facilitate new collaborations, demonstrate inclusive programming and support for under-represented groups, that aim to train young talent and have a mentorship component with the capability of long-range impact tracking.</p>
-        </div>
-        <div data-controller="guidelines">
-          <h4 id="proposal_format"> <a href="guidelines#proposal_format" data-action="mouseup->guidelines#copy" value="proposal_format"><i class="align-middle me-2 fas fa-fw fa-link" value="/guidelines#proposal_format" ></i></a>4. Proposal format</h4>
-        </div>
-        <div class="ms-5">
-          <p>The sections “A Short Overview” and “A Statement of Objectives” of the online form should total between 2 to 4 pages for workshops and FRGs. For other smaller or shorter programs we require less, preferably between 1 and 2 pages.</p>
-          <p>The text that you submit should be plain text, with UTF-8 encoding (for the Unicode character set). Proposals will be compiled into a book using LaTeX2e, for the proposal review process.</p>
-          <p>You may use LaTeX2e syntax for mathematical expressions or formatting. Formatting may include itemized lists, sections (\section*{section name}), subsections (\subsection*{subsection name}), citations, and bibliographies (add “\begin {thebibliography}{99} ...” to the end of the “Objectives” field). If you use custom macros, please send them to us, so that we can add them to our document’s preamble.</p>
-        </div>
-        <div data-controller="guidelines">
-          <h4 id="confirmation"> <a href="guidelines#confirmation" data-action="mouseup->guidelines#copy" value="confirmation"><i class="align-middle me-2 fas fa-fw fa-link" value="/guidelines#confirmation" ></i></a>5. Confirmation</h4>
-        </div>
-        <div class="ms-5">
-          <p>After you submit your proposal, you will receive an automatically-generated message containing the text of your proposal. The BIRS Program Coordinator will send you an e-mail message within one week to confirm that the proposal has been received and is complete. Please <a href="mailto:birs@birs.ca">contact us</a> if you do not receive confirmation or if the copy you receive back from us seems to be corrupted. If you have other questions about submissions of proposals, please feel free to contact us through the <a href="mailto:birs@birs.ca">BIRS Program Coordinator</a></p>
-        </div>
-      </div>
-      <div class="mt-5">
-        <%= render partial: 'edi_rubric' %>
-      </div>
-      <div class="mt-5">
-        <%= render partial: 'scientific_merit_rubric' %>
       </div>
     </div>
   </div>
-</div>
+</main>

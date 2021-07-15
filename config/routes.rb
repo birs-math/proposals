@@ -84,6 +84,7 @@ Rails.application.routes.draw do
       get :proposal_types
     end
   end
+  resources :site_settings
 
   get 'profile/' => 'profile#edit'
   patch 'update' => 'profile#update'

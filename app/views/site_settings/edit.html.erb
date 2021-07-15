@@ -1,0 +1,30 @@
+<main class="content">
+  <div class="container-fluid">
+    <div class="header">
+      <h1 class="header-title">
+        Site Settings
+      </h1>
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"> <%= link_to "Dashboard", dashboards_path %> </a></li>
+          <li class="breadcrumb-item active" aria-current="page">Site Settings</li>
+        </ol>
+      </nav>
+    </div>
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="py-2 border-bottom mb-4">Guidelines for Proposals</h2>
+        </div>
+        <div class="card-body">
+          <%= form_for @guideline do |f| %>
+            <div class="mb-3">
+              <%= f.text_area(:guideline, required: true, size: '3x10', class:'form-control')%>
+            </div>
+            <%= f.submit @guideline.new_record? ? "Create New Guideline" : "Update Guideline", class:  'btn btn-primary' %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
