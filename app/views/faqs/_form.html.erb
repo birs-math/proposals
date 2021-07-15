@@ -1,0 +1,33 @@
+<main class="content">
+  <div class="container-fluid">
+    <div class="header">
+      <h1 class="header-title">
+        FAQs
+      </h1>
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item active" aria-current="page"><%= link_to "FAQs", faqs_path %></li>
+          <li class="breadcrumb-item active" aria-current="page">New</li>
+        </ol>
+      </nav>
+    </div>
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="card-title"> </h5>
+        </div>
+        <div class="card-body">
+          <%= form_for @faq do |f| %>
+            <div class="mb-3">
+              <h2>FAQ</h2>
+              <p>Add a new frequently asked question here</p>
+              <%= f.text_area(:question, required: true, size: '2x1', class:'form-control mb-4', placeholder: "Write question here...")%>
+              <%= f.rich_text_area(:answer, required: true, size: '3x5', class:'form-control', placeholder: "Write answer here...")%>
+            </div>
+            <%= f.submit @faq.new_record? ? "Create" : "Update", class:  'btn btn-primary' %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>

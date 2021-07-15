@@ -83,6 +83,14 @@
           </li>
         </ul>
       </li>
+      <% if current_user&.staff_member? %>
+        <li class="sidebar-item <%= faq_menu %>">
+          <%= link_to faqs_path , class: "sidebar-link" do %>
+            <i class="far fa-file-alt ms-1"></i>
+            <span class="nav-link-text">FAQs</span>
+          <% end %>
+        </li>
+      <% end %>
       <% if !current_user&.staff_member? %>
         <li class="sidebar-item <%= feedback_menu %>">
           <%= link_to feedbacks_path , class: "sidebar-link" do %>

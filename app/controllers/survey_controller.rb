@@ -8,7 +8,9 @@ class SurveyController < ApplicationController
 
   def survey_questionnaire; end
 
-  def faq; end
+  def faq
+    @faqs = Faq.all
+  end
 
   def submit_survey
     demographic_data = DemographicData.new

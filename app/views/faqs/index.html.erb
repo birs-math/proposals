@@ -1,0 +1,42 @@
+<main class="content" style="overflow-x: auto">
+<div class="container-fluid">
+<div class="header">
+  <h1 class="header-title">
+    Frequently Asked Questions
+  </h1>
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item active" aria-current="page"><%= link_to "FAQs", faqs_path %></li>
+    </ol>
+  </nav>
+</div>
+<div class="col-12">
+  <div class="card">
+  	<div class="card-header">
+      <div class="mb-3 d-flex justify-content-between">
+	      <h3>FAQs</h3>
+	      <div class="float-end">
+	        <%= link_to "Add FAQ", new_faq_url, class: "btn btn-lg btn-primary" %>
+	      </div>
+	    </div>
+    </div>
+    <div data-controller="drag">
+      <% @faqs.order(position: :asc).each do |faq| %>
+        <div class="card-body cursor-pointer" data-id="<%= faq.id %>">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title mb-0">Question: <%= faq.question %></h3>
+            </div>
+            <div class="card-body">
+              <%= faq.answer %>
+            </div>
+            <div class="text-end m-2">
+              <%= link_to 'Edit', edit_faq_url(faq.id), class: "btn btn-primary" %>
+              <%= link_to 'Delete', faq_path(faq.id), method: :delete , data: {confirm: "Are you sure you want to delete this field?"}, class: "btn btn-primary" %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

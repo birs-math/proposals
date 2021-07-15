@@ -85,6 +85,12 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :faqs do
+    member do
+      patch :move
+    end
+  end
+
   get 'profile/' => 'profile#edit'
   patch 'update' => 'profile#update'
   post 'demographic_data' => 'profile#demographic_data'

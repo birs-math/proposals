@@ -26,3 +26,6 @@ toastr.options.extendedTimeOut = 60000;
 
 Rails.start();
 ActiveStorage.start();
+
+require("trix")
+require("@rails/actiontext")
