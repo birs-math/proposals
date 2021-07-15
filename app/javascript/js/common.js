@@ -16,4 +16,6 @@ $(document).ready(function() {
   $('[id^="chartjs"]').each(function(index, el) {
     this.style.height = '200px'
   })
+
+  $('#add-more-participant, #add-more-organizer').click();
 });

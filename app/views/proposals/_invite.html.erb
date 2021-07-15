@@ -1,30 +1,42 @@
-<div>
+<div class="nested-invites-wrapper" data-new-record="<%= f.object&.new_record? %>"  >
+  <label for="invites">Add Invites</label><br>
   <div class="mb-3">
     <label class="required" for="firstname">First Name</label>
-    <input type="text" name="invite[firstname]" class="form-control" id="<%= invited_as %>_firstname"
-           data-role="<%= invited_as %>"
-           data-action="change->proposal-form#disableOtherInvites">
+    <input type="text" name="invites_attributes[NEW_RECORD][firstname]"
+      class="form-control" 
+      id="<%=  invite_role(invited_as) %>_firstname"
+      data-role="<%= invite_role(invited_as) %>"
+      data-action="change->proposal-form#disableOtherInvites"
+    >
   </div>
   <div class="mb-3">
     <label for="lastname" class="required">Last Name</label>
-    <input type="text" name="invite[lastname]" class="form-control" id="<%= invited_as %>_lastname"
-           data-role="<%= invited_as %>"
-           data-action="change->proposal-form#disableOtherInvites">
+    <input type="text" name="invites_attributes[NEW_RECORD][lastname]" 
+      class="form-control" id="<%=  invite_role(invited_as) %>_lastname"
+      data-role="<%= invite_role(invited_as) %>"
+      data-action="change->proposal-form#disableOtherInvites"
+    >
   </div>
+
   <div class="mb-3">
     <label for="email" class="required">Email</label>
-    <input type="email" name="invite[email]" class="form-control" id="<%= invited_as %>_email"
-           data-role="<%= invited_as %>"
-           data-action="change->proposal-form#disableOtherInvites">
+    <input type="email" name="invites_attributes[NEW_RECORD][email]" 
+      class="form-control" id="<%=  invite_role(invited_as) %>_email"
+      data-role="<%= invite_role(invited_as) %>"
+      data-action="change->proposal-form#disableOtherInvites"
+    >
   </div>
   <div class="mb-3">
     <label for="deadline" class="required">Deadline for reply</label>
-    <input type="date" name="invite[deadline_date]" class="form-control" id="<%= invited_as %>_deadline" value="<%= date %>" data-action="click->proposal-form#presentDate" >
+    <input type="date" name="invites_attributes[NEW_RECORD][deadline_date]" 
+      class="form-control" id="<%= invite_role(invited_as) %>_deadline"
+      value="<%= date %>"
+      data-action="click->proposal-form#presentDate"
+    >
   </div>
-  <input type="hidden" name="invited_as" value="<%= invited_as %>" />
-  <div class="mb-3">
-    <span class='btn btn-primary' id="<%= invited_as %>"
-          data-propid="<%= @proposal.id %>"
-          data-action="click->submit-proposals#SendInvitation">Invite</span>
-  </div>
+  <input type="hidden" name="invites_attributes[NEW_RECORD][invited_as]" 
+    value="<%= invited_as %>" id="<%= invite_role(invited_as) %>_invited_as"
+    data-role="<%= invite_role(invited_as) %>"
+    data-action="change->proposal-form#disableOtherInvites"
+  >
 </div>

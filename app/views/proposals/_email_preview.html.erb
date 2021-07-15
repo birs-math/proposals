@@ -1,16 +1,17 @@
-<div class="modal-dialog" role="document">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h5 class="modal-title"><%= "BIRS Proposal: Invite for #{@invite.invited_as?}" %></h5>
-      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-    </div>
-    <div class="modal-body m-3">
-      <h1>Dear <%= @invite.person&.fullname %>:</h1>
-        <p>
-          <%= @invite.proposal.lead_organizer&.fullname %> <%= existing_co_organizers(@invite) %> <%= existing_co_organizers(@invite).blank? ? 'is' : 'are' %> putting together a proposal for a <%= @invite.proposal.proposal_type.name %> titled "<%= @invite.proposal.title %>" for submission to the Banff International Research Station. If successful, the program would take place at some time during the 2023 calendar year.
+<div class="modal fade" id="email-preview" tabindex="-1" aria-labelledby="email-previewLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><%= "BIRS Proposal: Invite for " %><span id="invited_as_title"></span></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body m-3">
+        <h1>Dear < Firstname Lastname></h1>
+          <p>
+          <%= @proposal.lead_organizer&.fullname %> is putting together a proposal for a <%= @proposal.proposal_type.name %> titled "<%= @proposal.title %>" for submission to the Banff International Research Station. If successful, the program would take place at some time during the 2023 calendar year.
         </p>
         <p>
-          This invitation is intended to gauge your interest in being a <%= @invite.invited_as?.downcase %> for this proposed workshop, provided that it is accepted and that the dates work with your schedule. Your response would help the organizing committee and the BIRS review committee determine the appeal of this proposed workshop to the wider mathematical community.
+          This invitation is intended to gauge your interest in being a <span id="invited_as_pre"></span> for this proposed workshop, provided that it is accepted and that the dates work with your schedule. Your response would help the organizing committee and the BIRS review committee determine the appeal of this proposed workshop to the wider mathematical community.
         </p>
         <p>
           Kindly indicate your response at the link below:
@@ -19,10 +20,12 @@
         <p>Thank you for considering this request!</p>
         <p>Banff International Research Station,<br>
             and the organizing committee.</p>
-    </div>
-    <div class="modal-footer">
-      <%= link_to 'Send Invitation', invite_email_proposal_invite_url(@invite.proposal, @invite, code: @invite.code), class: 'btn btn-secondary', method: :post %>
-      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+      <div class="modal-footer" data-controller="nested-invites">
+        <button data-action="click->nested-invites#sendInvite" data-id="<%= @proposal.id %>" class="btn btn-secondary" data-organizer="<%= no_of_participants(@proposal.id, 'Co Organizer').last&.id %>"
+        data-participant="<%= no_of_participants(@proposal.id, 'Participant').last&.id %>">Send Invitation</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
     </div>
   </div>
 </div>

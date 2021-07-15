@@ -5,7 +5,7 @@
   <body>
     <h1>Dear <%= @person&.fullname %>:</h1>
     <p>
-      <%= @proposal.lead_organizer&.fullname %><%= @existing_co_organizers %> <%= @existing_co_organizers.blank? ? 'is' : 'are'%> putting together a proposal for a <%= @proposal.proposal_type.name %> titled "<%= @proposal.title %>" for submission to the Banff International Research Station. If successful, the program would take place at some time during the 2023 calendar year.
+      <%= @proposal.lead_organizer&.fullname %> is putting together a proposal for a <%= @proposal.proposal_type.name %> titled "<%= @proposal.title %>" for submission to the Banff International Research Station. If successful, the program would take place at some time during the 2023 calendar year.
     </p>
     <p>
       This invitation is intended to gauge your interest in being a <%= @invite.invited_as?.downcase %> for this proposed workshop, provided that it is accepted and that the dates work with your schedule. Your response would help the organizing committee and the BIRS review committee determine the appeal of this proposed workshop to the wider mathematical community.

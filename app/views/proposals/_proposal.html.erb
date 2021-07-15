@@ -23,10 +23,12 @@
         <div class="col-12">
           <div class="card" style="background: #f4f7fc">
             <div class="card-body">
-              <div data-controller="submit-proposals proposal-form"
+              <div data-controller="submit-proposals proposal-form nested-invites"
                 data-submit-proposals-proposal-type-id-value="<%= @proposal.proposal_type.id %>"
-                data-submit-proposals-proposal-value="<%= @proposal.id %>" 
-              >
+                data-submit-proposals-proposal-value="<%= @proposal.id %>"data-nested-invites-wrapper-selector-value=".nested-invites-wrapper"
+                data-nested-invites-max-participant-value="<%= @proposal.proposal_type.participant %>"
+                data-nested-invites-max-organizer-value="<%= @proposal.proposal_type.co_organizer %>"
+                >
                 <div class="mb-3 d-flex flex-row-reverse">
                   <% if params[:action] == 'edit' %>
                     <% if lead_organizer?(@proposal.proposal_roles) %> 
@@ -116,7 +118,24 @@
                               <% end %>
                               <div>
                                 <% if max_invitations(@proposal, 'Co Organizer') %>
-                                  <%= render partial: 'invite', locals: {invited_as: 'organizer', date: @proposal.invites.where(invited_as: 'Co Organizer').first&.deadline_date&.to_date } %>
+                                  <% date = @proposal.invites.where(invited_as: 'Co Organizer').first&.deadline_date&.to_date %>
+                                    <% unless date.nil? %>
+                                      <% date = date  < DateTime.current.to_date ? DateTime.current.to_date : @proposal.invites.where(invited_as: 'Co Organizer').first&.deadline_date&.to_date %>
+                                    <% end %>
+                                  <div class="mb-3">
+                                    <template data-nested-invites-target="template">
+                                      <%= f.fields_for :invites, Invite.new, child_index: 'NEW_RECORD' do |invite| %>
+                                        <%= render partial: 'invite', locals: { f: invite, invited_as: 'Co Organizer', date: date } %>
+                                      <% end %>
+                                    </template>
+                                    <div data-nested-invites-target="target"></div>
+                                      <button type="button" class="btn btn-primary" data-action="nested-invites#addCoOrganizers" id="add-more-organizer">
+                                        Add More
+                                      </button>
+                                  </div>
+                                  <div class="mb-3">
+                                    <button data-action="click->nested-invites#invitePreview" data-id="<%= @proposal.id %>" class="btn btn-primary">Invite</button>
+                                  </div>
                                 <% end %>
                               </div>
                             </div>
@@ -132,7 +151,24 @@
                                 <% end %>
                                 <div>
                                   <% if max_invitations(@proposal, 'Participant') %>
-                                    <%= render partial: 'invite', locals: {invited_as: 'participant', date: @proposal.invites.where(invited_as: 'Participant').first&.deadline_date&.to_date } %>
+                                    <% date = @proposal.invites.where(invited_as: 'Participant').first&.deadline_date&.to_date %>
+                                    <% unless date.nil? %>
+                                      <% date = date < DateTime.current.to_date ? DateTime.current.to_date : @proposal.invites.where(invited_as: 'Participant').first&.deadline_date&.to_date %>
+                                    <% end %>
+                                    <div class="mb-3">
+                                      <template data-nested-invites-target="templateOne">
+                                        <%= f.fields_for :invites, Invite.new, child_index: 'NEW_RECORD' do |invite| %>
+                                          <%= render partial: 'invite', locals: { f: invite, invited_as: 'Participant', date: date } %>
+                                        <% end %>
+                                      </template>
+                                      <div data-nested-invites-target="targetOne"></div>
+                                        <button type="button" class="btn btn-primary" data-action="nested-invites#addParticipants" id="add-more-participant">
+                                          Add More
+                                        </button>
+                                    </div>
+                                    <div class="mb-3">
+                                      <button data-action="click->nested-invites#invitePreview" data-id="<%= @proposal.id %>" class="btn btn-primary">Invite</button>
+                                    </div>
                                   <% end %>
                                 </div>
                               </div>

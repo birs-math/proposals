@@ -33,7 +33,7 @@ class ProposalsController < ApplicationController
   def show; end
 
   def edit
-    @invite = @proposal.invites.new
+    @proposal.invites.build
   end
 
   def locations

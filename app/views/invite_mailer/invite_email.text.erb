@@ -1,12 +1,12 @@
 Dear <%= @person&.fullname %>:
 
-<%= @proposal.lead_organizer&.fullname %><%= @existing_co_organizers %> are putting together a proposal for a <%= @proposal.proposal_type.name %> titled "<%= @proposal.title %>" for submission to the Banff International Research Station. If successful, the program would take place at some time during the 2023 calendar year.
+<%= @proposal.lead_organizer&.fullname %> is putting together a proposal for a <%= @proposal.proposal_type.name %> titled "<%= @proposal.title %>" for submission to the Banff International Research Station. If successful, the program would take place at some time during the 2023 calendar year.
 
 This invitation is intended to gauge your interest in being a <%= @invite.invited_as?.downcase %> for this proposed workshop, provided that it is accepted and that the dates work with your schedule. Your response would help the organizing committee and the BIRS review committee determine the appeal of this proposed workshop to the wider mathematical community.
 
 Kindly indicate your response at the link below:
 
-<%= link_to 'Click here', proposal_invite_url(@proposal,@invite, code: @invite.code) %>
+<%= link_to 'Click here', proposal_invite_url(@proposal, @invite, code: @invite.code) %>
 
 Thank you for considering this request!
 
