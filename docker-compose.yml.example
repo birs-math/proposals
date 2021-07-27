@@ -54,6 +54,7 @@ services:
       - DEVISE_EMAIL=webmaster@example.com
       - APPLICATION_HOST=localhost
       - APPLICATION_PROTOCOL=http
+      - ROLLBAR_ENV=development
       - EMAIL_SERVER=mail.example.com
       - EMAIL_PORT=587
       - EMAIL_STARTTLS=true
