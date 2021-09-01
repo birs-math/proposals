@@ -7,9 +7,13 @@ AllCops:
   Include:
     - 'app/controllers/**/*'
     - 'app/models/**/*'
+    - 'app/views/**/*'
     - 'app/helpers/**/*'
     - 'app/jobs/**/*'
+    - 'app/services/**/*'
+    - 'app/queries/**/*'
     - 'app/channels/**/*'
+    - 'app/mailers/**/*'
     - 'spec/**/*.rb'
     - 'Gemfile'
   TargetRubyVersion: 2.7
