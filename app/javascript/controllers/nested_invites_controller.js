@@ -72,34 +72,40 @@ export default class extends Controller {
   }
 
   sendInvite () {
-    let id = event.currentTarget.dataset.id;
-    let invitedAs = ''
-    let inviteId = 0
-    let inviteParticipant = event.currentTarget.dataset.participant || 0
-    let inviteOrganizer = event.currentTarget.dataset.organizer || 0
-    $.post(`/submit_proposals?proposal=${id}&create_invite=true.js`,
-      $('form#submit_proposal').serialize(), function(data) {
-        invitedAs = $('#invited_as_pre').text()
-        if (invitedAs === 'participant') {
-          invitedAs = 'Participant'
-          inviteId = inviteParticipant
-        } else {
-          invitedAs = 'Organizer'
-          inviteId = inviteOrganizer
+    if($('#body').val() === "") {
+      toastr.error("Body is empty")
+    }
+    else {
+      let id = event.currentTarget.dataset.id;
+      let invitedAs = ''
+      let inviteId = 0
+      let inviteParticipant = event.currentTarget.dataset.participant || 0
+      let inviteOrganizer = event.currentTarget.dataset.organizer || 0
+      $.post(`/submit_proposals?proposal=${id}&create_invite=true.js`,
+        $('form#submit_proposal').serialize(), function(data) {
+          invitedAs = $('#invited_as_title').text()
+          if (invitedAs === 'Participant') {
+            inviteId = inviteParticipant
+          } else {
+            invitedAs = 'Organizer'
+            inviteId = inviteOrganizer
+          }
+          $.post(`/proposals/${id}/invites/${inviteId}/invite_email?invited_as=${invitedAs}`,
+            $('#email_preview').serialize(), function() {
+              toastr.success("Invitation has been sent!")
+              setTimeout(function() {
+                window.location.reload();
+              }, 2000)
+            }
+          )
         }
-        $.post(`/proposals/${id}/invites/${inviteId}/invite_email?invited_as=${invitedAs}`, function() {
-          toastr.success("Invitation has been sent!")
-          setTimeout(function() {
-            window.location.reload();
-          }, 2000)
+      ) 
+      .fail(function(response) {
+        let errors = response.responseJSON
+        $.each(errors, function(index, error) {
+          toastr.error(error)
         })
-      }
-    ) 
-    .fail(function(response) {
-      let errors = response.responseJSON
-      $.each(errors, function(index, error) {
-        toastr.error(error)
-      })
-    });
+      });
+    }
   }
 }

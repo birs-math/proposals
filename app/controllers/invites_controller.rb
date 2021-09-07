@@ -89,8 +89,11 @@ class InvitesController < ApplicationController
   end
 
   def send_invite_emails
+    @body = params[:body]
+    @cc_emails = params[:cc_email]
     @inviters.each do |invite|
-      InviteMailer.with(invite: invite, lead_organizer: @proposal.lead_organizer).invite_email.deliver_later
+      InviteMailer.with(invite: invite, lead_organizer: @proposal.lead_organizer, body: @body,
+                        cc_email: @cc_emails).invite_email.deliver_later
     end
   end
 

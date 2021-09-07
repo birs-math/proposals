@@ -5,29 +5,35 @@
         <h5 class="modal-title"><%= "BIRS Proposal: Invite for " %><span id="invited_as_title"></span></h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="modal-body">
-        <p>To: [invited person's email]</p>
-        <p>Cc: <%= @proposal.lead_organizer.email %></p>
-        <p>Dear [Firstname Lastname],</p>
-        <p>
-          <%= @proposal.lead_organizer&.fullname %> is putting together a proposal for a <%= @proposal.proposal_type.name %> titled "<%= @proposal.title %>" for submission to the Banff International Research Station. If successful, the program would take place at some time during the 2023 calendar year.
-        </p>
-        <p>
-          This invitation is intended to gauge your interest in being a <span id="invited_as_pre"></span> for this proposed workshop, provided that it is accepted and that the dates work with your schedule. Your response would help the organizing committee and the BIRS review committee determine the appeal of this proposed workshop to the wider mathematical community.
-        </p>
-        <p>
-          Please follow the link below to indicate your response:
-        </p>
-        <p><%= link_to invite_url(code: 'a1b2c3...'), '#' %></p>
-        <p>Thank you for considering this request!</p>
-        <p>Banff International Research Station,<br>
-            and the organizing committee.</p>
-      </div>
-      <div class="modal-footer" data-controller="nested-invites">
-        <button data-action="click->nested-invites#sendInvite" data-id="<%= @proposal.id %>" class="btn btn-secondary" data-organizer="<%= no_of_participants(@proposal.id, 'Organizer').last&.id %>"
-        data-participant="<%= no_of_participants(@proposal.id, 'Participant').last&.id %>">Send Invitation</button>
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-      </div>
+      <form id="email_preview">
+        <div class="modal-body text-justify" style="text-align: justify;">
+          <p>To: [invited person's email]</p>
+          <div class="mb-3">
+            <label>Cc:</label>
+            <input type="text" name="cc_email" class="form-control" value=<%= @proposal.lead_organizer.email %>>
+            <small>This text field supports a list of cc emails i.e. birs@example.com, noreply@example.com..</small>
+          </div>
+          <p>Dear [Firstname Lastname],</p>
+          <p> <span style="color:red;">Note:</span> Don't change these placeholders: invited_as, invite_deadline_date, code: 123
+          </p>
+          <textarea class="form-control text-justify" style="text-align: justify;" rows="10" name="body" id="body">
+            <div>
+              <p><%= @proposal.lead_organizer&.fullname %> is putting together a proposal for a <%= @proposal.proposal_type.name %> titled "<%= @proposal.title %>" for submission to the Banff International Research Station. If successful, the program would take place at some time during the 2023 calendar year.</p>
+              <p>This invitation is intended to gauge your interest in being a invited_as for this proposed workshop, provided that it is accepted and that the dates work with your schedule. Your response would help the organizing committee and the BIRS review committee determine the appeal of this proposed workshop to the wider mathematical community.</p>
+              <p>Kindly indicate your response by invite_deadline_date by following the link below:</p>
+              <p><%= link_to invite_url(code: 123), invite_url(code: 123) %></p>
+              <p>Thank you for considering this request!</p>
+              <p>Banff International Research Station,<br>
+                  and the organizing committee.</p>
+            </div>
+          </textarea>
+        </div>
+        <div class="modal-footer" data-controller="nested-invites">
+          <button data-action="click->nested-invites#sendInvite" data-id="<%= @proposal.id %>" class="btn btn-secondary" data-organizer="<%= no_of_participants(@proposal.id, 'Organizer').last&.id %>"
+          data-participant="<%= no_of_participants(@proposal.id, 'Participant').last&.id %>">Send Invitation</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        </div>
+      </form>
     </div>
   </div>
 </div>
