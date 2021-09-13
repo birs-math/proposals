@@ -14,16 +14,7 @@ class ProposalFormsController < ApplicationController
     @proposal_form = ProposalForm.new
   end
 
-  def edit
-    return unless @proposal_form.active?
-
-    @proposal_form.update(status: :inactive)
-    form = @proposal_form.deep_clone include: { proposal_fields:
-                                                %i[options validations] }
-    form.status = :draft
-    form.save
-    redirect_to edit_proposal_type_proposal_form_path(@proposal_type, form)
-  end
+  def edit; end
 
   def show
     redirect_to :index if @proposal_form.nil?
