@@ -35,6 +35,7 @@ class Proposal < ApplicationRecord
   validate :preferred_locations, if: :is_submission
   validate :not_before_opening, if: :is_submission
   validate :cover_letter_field, if: :is_submission
+  validate :proposal_type_check, if: :is_submission
 
   pg_search_scope :search_proposals, against: %i[title code],
                                      associated_against: {
@@ -357,6 +358,16 @@ class Proposal < ApplicationRecord
 
     errors.add('Preferred Locations:', "Please select at least one preferred
                  location".squish)
+  end
+
+  def proposal_type_check
+    prop = lead_organizer.proposals.where(proposal_type_id: proposal_type_id,
+                                          year: year).where.not(status: 'draft')
+
+    return if prop.blank?
+
+    errors.add('Preferred Locations:', "There is a limit of one
+    #{proposal_type.name} proposal per lead organizer in year #{year}.".squish)
   end
 
   def strip_whitespace

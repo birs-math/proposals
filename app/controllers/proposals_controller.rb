@@ -25,14 +25,14 @@ class ProposalsController < ApplicationController
 
   def create
     @proposal = start_new_proposal
-    current_proposal_year = @proposal.proposal_type.year
     @same_type_proposals = current_user.person.proposals.where(proposal_type_id: @proposal.proposal_type_id)
 
     @same_type_proposals.each do |proposal|
-      if (proposal.year == current_proposal_year || proposal.year.blank?) && !no_proposal?
+      if proposal.year == (Time.now.year + 2).to_s && !no_proposal?
         limit_of_one_per_type and return
       end
     end
+    
     if @proposal.save
       @proposal.create_organizer_role(current_user.person, organizer)
       redirect_to edit_proposal_path(@proposal), notice: "Started a new

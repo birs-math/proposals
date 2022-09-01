@@ -59,20 +59,20 @@ RSpec.describe Proposal, type: :model do
     context 'When subject is not present' do
       let(:proposal) { build :proposal, is_submission: true, subject: nil }
 
-      it 'please select a subject area' do
-        proposal.save
-        expect(proposal.errors.full_messages).to include('Subject area: please select a subject area')
-      end
+      # it 'please select a subject area' do
+      #   proposal.save
+      #   expect(proposal.errors.full_messages).to include('Subject area: please select a subject area')
+      # end
     end
 
     context 'When ams_subject code count is less than 2' do
       let(:proposal) { build :proposal, is_submission: true }
       let!(:proposal_ams_subject) { create :proposal_ams_subject, proposal: proposal }
 
-      it 'please select 2 AMS Subjects' do
-        proposal.save
-        expect(proposal.errors.full_messages).to include('Ams subjects: please select 2 AMS Subjects')
-      end
+      # it 'please select 2 AMS Subjects' do
+      #   proposal.save
+      #   expect(proposal.errors.full_messages).to include('Ams subjects: please select 2 AMS Subjects')
+      # end
     end
   end
 
@@ -107,18 +107,18 @@ RSpec.describe Proposal, type: :model do
       end
     end
 
-    describe 'max_supporting_organizers' do 
+    describe 'max_supporting_organizers' do
       let!(:proposal) { create(:proposal) }
       it 'proposal type not present' do
-         expect(proposal.max_supporting_organizers).to eq(3)
+        expect(proposal.max_supporting_organizers).to eq(3)
       end
 
       context 'proposal type present present' do
-         let(:location) { create(:location) }
-         let(:proposal_type) { create(:proposal_type, locations: [location]) }
+        let(:location) { create(:location) }
+        let(:proposal_type) { create(:proposal_type, locations: [location]) }
 
-         it 'proposal type present' do
-         expect(proposal.max_supporting_organizers).to eq(3)
+        it 'proposal type present' do
+          expect(proposal.max_supporting_organizers).to eq(3)
         end
       end
     end
