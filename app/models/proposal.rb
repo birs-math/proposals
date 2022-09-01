@@ -366,7 +366,7 @@ class Proposal < ApplicationRecord
 
     return if prop.blank?
 
-    errors.add('Preferred Locations:', "There is a limit of one
+    errors.add('Proposal limit exceeds:', "There is a limit of one
     #{proposal_type.name} proposal per lead organizer in year #{year}.".squish)
   end
 
