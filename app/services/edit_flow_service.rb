@@ -13,7 +13,7 @@ class EditFlowService
   end
 
   def find_country(organizer)
-    country = Country.find_country_by_name(organizer&.country)
+    country = Country.find_country_by_any_name(organizer&.country)
     if country.blank?
       raise "No match in Country database for Organizer #{organizer.fullname}
             country: #{organizer&.country}".squish
