@@ -57,7 +57,7 @@ RSpec.describe Person, type: :model do
     end
     it 'has a valid county' do
       expect(person.country).not_to be_blank
-      expect(Country.find_country_by_name(person.country)).not_to be_nil
+      expect(Country.find_country_by_any_name(person.country)).not_to be_nil
     end
   end
 
