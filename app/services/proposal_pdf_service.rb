@@ -305,7 +305,9 @@ class ProposalPdfService
 
     text = "\\begin{enumerate}\n\n"
     @participants.each do |participant|
-      text << participant_name_and_affil(participant)
+      if participant.academic_status == career
+        text << participant_name_and_affil(participant)
+      end
     end
     text << "\\end{enumerate}\n\n"
   end
