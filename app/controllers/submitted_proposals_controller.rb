@@ -45,7 +45,7 @@ class SubmittedProposalsController < ApplicationController
     @proposal = Proposal.find_by(id: params[:proposal_id].to_i)
     unless @proposal.may_requested? || @proposal.may_revision?
       redirect_to versions_proposal_url(@proposal),
-                  alert: "Proposal status should be initial_review or revision_submitted_spc."
+                  alert: "Proposal status should be initial_review or revision_submitted_before_review."
       return
     end
     check_proposal_editflow_id
