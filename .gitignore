@@ -41,7 +41,6 @@ yarn-debug.log*
 .yarn-integrity
 
 docker-compose.yml
-.env
 .DS_Store
 coverage
 public/coverage

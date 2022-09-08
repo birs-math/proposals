@@ -33,7 +33,6 @@ gem 'turbo-rails', '~> 0.8.2'
 gem 'webpacker', '~> 5.0'
 
 group :development, :test do
-  gem 'dotenv-rails'
   gem 'byebug'
   gem 'capybara', '>= 3.26'
   gem 'factory_bot_rails', require: false

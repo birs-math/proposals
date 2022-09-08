@@ -9,9 +9,6 @@ Bundler.require(*Rails.groups)
 
 module Proposals
   class Application < Rails::Application
-
-    # Load dotenv
-    Dotenv::Railtie.load
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 6.1
 
