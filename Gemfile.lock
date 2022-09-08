@@ -130,6 +130,10 @@ GEM
     docile (1.4.0)
     domain_name (0.5.20190701)
       unf (>= 0.0.5, < 1.0.0)
+    dotenv (2.8.1)
+    dotenv-rails (2.8.1)
+      dotenv (= 2.8.1)
+      railties (>= 3.2)
     ed25519 (1.2.4)
     email_verifier (0.1.0)
       dnsruby (>= 1.5)
@@ -396,6 +400,7 @@ DEPENDENCIES
   deep_cloneable (~> 3.1.0)
   devise
   devise-encryptable
+  dotenv-rails
   ed25519
   email_verifier
   factory_bot_rails
