@@ -330,6 +330,8 @@ class Proposal < ApplicationRecord
   end
 
   def proposal_type_check
+    return if self.revision_requested_before_review? || self.revision_submitted?
+    
     prop = lead_organizer.proposals.where(proposal_type_id: proposal_type_id,
                                           year: year).where.not(status: 'draft')
 
