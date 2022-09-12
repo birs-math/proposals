@@ -33,7 +33,7 @@ RSpec.describe 'EditFlowService' do
 
   it "assigns country code of lead organizer" do
     country = @proposal.lead_organizer.country
-    code = Country.find_country_by_name(country).alpha2
+    code = Country.find_country_by_any_name(country).alpha2
     expect(@efs.proposal_country.alpha2).to eq(code)
   end
 
@@ -52,7 +52,7 @@ RSpec.describe 'EditFlowService' do
   context '.proposal_country' do
     it 'returns a Country object for the Lead Organizer' do
       expect(@efs.proposal_country).to be_a(Country)
-      country = Country.find_country_by_name(@proposal.lead_organizer.country)
+      country = Country.find_country_by_any_name(@proposal.lead_organizer.country)
       expect(@efs.proposal_country).to eq(country)
     end
 
@@ -90,7 +90,7 @@ RSpec.describe 'EditFlowService' do
     expect(organizers.first.class).to eq(Array)
 
     first_org = @proposal.invites.first.person
-    country_code = Country.find_country_by_name(first_org.country).alpha2
+    country_code = Country.find_country_by_any_name(first_org.country).alpha2
     supporting_organizer1 = [first_org, country_code]
     expect(organizers.first).to eq(supporting_organizer1)
   end
