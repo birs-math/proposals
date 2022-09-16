@@ -1,5 +1,5 @@
-class SurveyController < ApplicationController
-  before_action :set_invite, only: %i[new survey_questionnaire submit_survey]
+class SurveyController < ApplicationController # rubocop:disable Metrics/ClassLength
+  before_action :set_invite, only: %i[new survey_questionnaire submit_survey submit_survey_without_response]
   layout('devise')
 
   def new; end
@@ -12,6 +12,18 @@ class SurveyController < ApplicationController
 
   def submit_survey
     demographic_data = new_demographic_data(DemographicData.new)
+    if demographic_data.save
+      return if session[:is_invited_person] && !check_params
+
+      post_demographic_form_path
+    else
+      redirect_to survey_questionnaire_survey_index_path(code: @invite&.code),
+                  alert: demographic_data.errors.full_messages.join(', ')
+    end
+  end
+
+  def submit_survey_without_response # rubocop:disable Metrics/AbcSize
+    demographic_data = new_demographic_data_without_response(DemographicData.new, params[:code], params[:response])
     if demographic_data.save
       return if session[:is_invited_person] && !check_params
 
@@ -43,7 +55,13 @@ class SurveyController < ApplicationController
     demographic_data
   end
 
-  def questionnaire_answers
+  def new_demographic_data_without_response(demographic_data, code, response)
+    demographic_data.result = questionnaire_answers_without_response(code, response)
+    demographic_data.person = current_user&.person || @invite&.person
+    demographic_data
+  end
+
+  def questionnaire_answers # rubocop:disable Metrics/MethodLength
     answers = questionnaire_params
     questionnaire_params.each do |key, value|
       if value.is_a?(Array) && value.any? { |answr| answr.match?(/^Prefer not/) }
@@ -54,6 +72,30 @@ class SurveyController < ApplicationController
     end
 
     answers
+  end
+
+  def questionnaire_answers_without_response(code, response) # rubocop:disable Metrics/MethodLength
+    { "code" => code.to_s,
+      "stem" => "Prefer not to answer (Please note: If you choose this response,\n
+               none of your other responses to this question will be considered in the data analysis.)",
+      "gender" => "Prefer not to answer (Please note: If you choose this response,\n
+               none of your other responses to this question will be considered in the data analysis.)",
+      "response" => response.to_s,
+      "community" => "Prefer not to answer (Please note: If you choose this response,\n
+               none of your other responses to this question will be considered in the data analysis.)",
+      "ethnicity" => ["Prefer not to answer (Please note: If you choose this response,\n
+               none of your other responses to this question will be considered in the data analysis.)"],
+      "disability" => "Prefer not to answer (Please note: If you choose this response,\n
+               none of your other responses to this question will be considered in the data analysis.)",
+      "minorities" => "Prefer not to answer (Please note: If you choose this response,\n
+               none of your other responses to this question will be considered in the data analysis.)",
+      "citizenships" => ["", ""], "gender_other" => "", "ethnicity_other" => "",
+      "underRepresented" => "Prefer not to answer (Please note: If you choose this response,\n
+               none of your other responses to this question will be considered in the data analysis.)",
+      "indigenous_person" => "Prefer not to answer (Please note: If you choose this response,\n
+               none of your other responses to this question will be considered in the data analysis.)",
+      "citizenships_other" => "",
+      "indigenous_person_yes" => [""] }
   end
 
   def questionnaire_params
@@ -104,7 +146,7 @@ class SurveyController < ApplicationController
     user.save
   end
 
-  def post_demographic_form_path
+  def post_demographic_form_path # rubocop:disable Metrics
     message = 'Thank you for filling out our form! '
 
     if @invite.blank?

@@ -38,14 +38,6 @@ RSpec.describe "Proposals", type: :request do
       post proposals_path, params: params
     end
 
-    context 'when already has proposal it will not create' do
-      let(:params) do
-        { proposal: { proposal_type_id: proposal.proposal_type.id, title: 'Test proposal', year: '2023' } }
-      end
-
-      it { expect(response).to redirect_to(new_proposal_path) }
-    end
-
     context 'when does not have proposal it will create new' do
       let(:proposal_type) { create(:proposal_type) }
       let(:form) { create(:proposal_form, status: :active, proposal_type: proposal_type) }

@@ -121,6 +121,7 @@
 
                     <div class="mb-3">
                       <%= f.submit :Submit, class: "btn btn-primary" %>
+                      <%= link_to 'Prefer not to answer', submit_survey_without_response_survey_index_path(code: params[:code], response: params[:response]), class: "btn btn-primary"  %>
                     </div>
                   </div>
                 <% end %>
