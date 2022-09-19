@@ -56,6 +56,22 @@ class SurveyController < ApplicationController
     answers
   end
 
+  def questionnaire_answers_without_response(code, response) # rubocop:disable Metrics/MethodLength
+    { "code" => code.to_s,
+      "stem" => "Prefer not to answer",
+      "gender" => "Prefer not to answer",
+      "response" => response.to_s,
+      "community" => "Prefer not to answer",
+      "ethnicity" => ["Prefer not to answer"],
+      "disability" => "Prefer not to answer",
+      "minorities" => "Prefer not to answer",
+      "citizenships" => ["", ""], "gender_other" => "", "ethnicity_other" => "",
+      "underRepresented" => "Prefer not to answer",
+      "indigenous_person" => "Prefer not to answer",
+      "citizenships_other" => "",
+      "indigenous_person_yes" => [""] }
+  end
+
   def questionnaire_params
     params.require(:survey)
   end
