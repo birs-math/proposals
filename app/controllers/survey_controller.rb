@@ -76,24 +76,16 @@ class SurveyController < ApplicationController # rubocop:disable Metrics/ClassLe
 
   def questionnaire_answers_without_response(code, response) # rubocop:disable Metrics/MethodLength
     { "code" => code.to_s,
-      "stem" => "Prefer not to answer (Please note: If you choose this response,\n
-               none of your other responses to this question will be considered in the data analysis.)",
-      "gender" => "Prefer not to answer (Please note: If you choose this response,\n
-               none of your other responses to this question will be considered in the data analysis.)",
+      "stem" => "Prefer not to answer",
+      "gender" => "Prefer not to answer",
       "response" => response.to_s,
-      "community" => "Prefer not to answer (Please note: If you choose this response,\n
-               none of your other responses to this question will be considered in the data analysis.)",
-      "ethnicity" => ["Prefer not to answer (Please note: If you choose this response,\n
-               none of your other responses to this question will be considered in the data analysis.)"],
-      "disability" => "Prefer not to answer (Please note: If you choose this response,\n
-               none of your other responses to this question will be considered in the data analysis.)",
-      "minorities" => "Prefer not to answer (Please note: If you choose this response,\n
-               none of your other responses to this question will be considered in the data analysis.)",
+      "community" => "Prefer not to answer",
+      "ethnicity" => ["Prefer not to answer"],
+      "disability" => "Prefer not to answer",
+      "minorities" => "Prefer not to answer",
       "citizenships" => ["", ""], "gender_other" => "", "ethnicity_other" => "",
-      "underRepresented" => "Prefer not to answer (Please note: If you choose this response,\n
-               none of your other responses to this question will be considered in the data analysis.)",
-      "indigenous_person" => "Prefer not to answer (Please note: If you choose this response,\n
-               none of your other responses to this question will be considered in the data analysis.)",
+      "underRepresented" => "Prefer not to answer",
+      "indigenous_person" => "Prefer not to answer",
       "citizenships_other" => "",
       "indigenous_person_yes" => [""] }
   end
