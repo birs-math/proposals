@@ -1,10 +1,29 @@
 class SurveyController < ApplicationController # rubocop:disable Metrics/ClassLength
-  before_action :set_invite, only: %i[new survey_questionnaire submit_survey submit_survey_without_response]
+  before_action :set_invite,
+                only: %i[new survey_questionnaire submit_survey submit_survey_without_response
+                         pre_load_survey_questionnaire]
   layout('devise')
 
   def new; end
 
-  def survey_questionnaire; end
+  def survey_questionnaire
+    @demographic_data = @invite.person.demographic_data
+    @result = @demographic_data&.result
+  end
+
+  def pre_load_survey_questionnaire # rubocop:disable Metrics/AbcSize
+    @demographic_data = DemographicData.find_by(params[:id])
+    @demographic_data.result = params["pre_load_survey_questionnaire_survey_index"]
+
+    if @demographic_data.save
+      return if session[:is_invited_person] && !check_params
+
+      post_demographic_form_path
+    else
+      redirect_to survey_questionnaire_survey_index_path(code: @invite&.code),
+                  alert: demographic_data.errors.full_messages.join(', ')
+    end
+  end
 
   def faqs
     @faqs = Faq.all
