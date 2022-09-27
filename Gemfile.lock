@@ -108,8 +108,7 @@ GEM
       caxlsx (>= 3.0)
     childprocess (4.1.0)
     concurrent-ruby (1.1.9)
-    countries (4.1.0)
-      i18n_data (~> 0.13.1)
+    countries (5.1.2)
       sixarm_ruby_unaccent (~> 1.1)
     crack (0.4.5)
       rexml
@@ -156,7 +155,6 @@ GEM
       domain_name (~> 0.5)
     i18n (1.8.11)
       concurrent-ruby (~> 1.0)
-    i18n_data (0.13.1)
     jbuilder (2.11.3)
       activesupport (>= 5.0.0)
     launchy (2.5.0)
@@ -393,7 +391,7 @@ DEPENDENCIES
   capybara (>= 3.26)
   caxlsx
   caxlsx_rails
-  countries
+  countries (~> 5.1, >= 5.1.2)
   deep_cloneable (~> 3.1.0)
   devise
   devise-encryptable
