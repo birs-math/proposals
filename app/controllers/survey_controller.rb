@@ -7,8 +7,10 @@ class SurveyController < ApplicationController # rubocop:disable Metrics/ClassLe
   def new; end
 
   def survey_questionnaire
-    @demographic_data = @invite.person.demographic_data
-    @result = @demographic_data&.result
+    if params[:code].present?
+      @demographic_data = @invite.person.demographic_data
+      @result = @demographic_data&.result
+    end
   end
 
   def pre_load_survey_questionnaire # rubocop:disable Metrics/AbcSize
