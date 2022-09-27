@@ -10,7 +10,7 @@ gem 'bootsnap', '>= 1.4.4', require: false
 gem 'cancancan'
 gem 'caxlsx'
 gem 'caxlsx_rails'
-gem 'countries', require: 'countries/global'
+gem 'countries', '~> 5.1', '>= 5.1.2', require: 'countries/global'
 gem 'deep_cloneable', '~> 3.1.0'
 gem 'devise'
 gem 'devise-encryptable'
