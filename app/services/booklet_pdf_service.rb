@@ -1,5 +1,6 @@
 class BookletPdfService
-  attr_reader :proposal, :temp_file, :table, :user
+  attr_reader :temp_file, :table, :user
+  attr_accessor :proposal
 
   def initialize(proposal_id, file, input, user)
     @proposal = Proposal.find(proposal_id)
@@ -131,11 +132,11 @@ class BookletPdfService
   def proposals_with_content
     proposals = Proposal.where(id: @proposals_ids.split(','))
     subjects_with_proposals = selected_proposals_subjects(proposals)
-    subjects_with_proposals.each do |subject|
+    subjects_with_proposals.each_with_index do |subject, iteration|
       @subject = Subject.find_by(id: subject.first)
       check_subject
       @proposals_objects = subject.last
-      subject_proposals
+      subject_proposals(iteration, proposals.count)
     end
     @latex_text
   end
@@ -153,13 +154,13 @@ class BookletPdfService
     @text << "\\addcontentsline{toc}{chapter}{\ \\large{#{@number}. #{@subject&.title}}}"
   end
 
-  def subject_proposals
+  def subject_proposals(index, count)
     @proposals_objects&.sort_by { |p| p.code }&.each do |proposal|
-      @current_proposal = proposal
+      @proposal = proposal
       code = proposal.code.blank? ? '' : "#{proposal.code}: "
       @text << "\\addcontentsline{toc}{section}{ #{code} #{LatexToPdf.escape_latex(proposal&.title)}}"
       proposals_without_content
-      check_no_latex
+      check_no_latex(index, count)
     end
   end
 
@@ -176,13 +177,13 @@ class BookletPdfService
 
   def proposals_heading
     @proposals = @proposals_ids.split(",").first.to_i
-    @proposals_ids.split(',').each do |id|
+    @proposals_ids.split(',').each_with_index do |id, index|
       proposal = Proposal.find_by(id: id)
-      @current_proposal = proposal
-      code = proposal.code.blank? ? '' : "#{@current_proposal&.code}: "
+      @proposal = proposal
+      code = proposal.code.blank? ? '' : "#{proposal&.code}: "
       @text << "\\section*{\\centering #{code} #{proposal_title(proposal)}}\n "
       single_proposal_heading
-      check_no_latex
+      check_no_latex(index, @proposals_ids.split(',').count)
     end
   end
 
@@ -190,8 +191,8 @@ class BookletPdfService
     @text << "\n\\subsection*{#{proposal.proposal_type&.name} }\n\n"
     @text << participant_confirmed_count
     @text << lead_organizer_info
-    @current_proposal = proposal
-    all_text = ProposalPdfService.new(@current_proposal.id, @temp_file, 'all', @user).booklet_content
+    @proposal = proposal
+    all_text = ProposalPdfService.new(@proposal.id, @temp_file, 'all', @user).booklet_content
     @text << all_text if all_text.present?
   end
 
@@ -233,11 +234,11 @@ class BookletPdfService
     @first_proposal_id = subjects_with_proposals.first[1].min_by(&:code).id
   end
 
-  def check_no_latex
-    if @current_proposal.id == @first_proposal_id
-      File.open("#{Rails.root}/tmp/#{temp_file}", "w:UTF-8") do |io|
-        io.write(@text)
-      end
+  def check_no_latex(index = 0, count = 1)
+    if index.zero? && (count == 1)
+      write_to_file
+    elsif count.positive? && index.zero?
+      write_to_file
     else
       File.open("#{Rails.root}/tmp/#{temp_file}", "a:UTF-8") do |io|
         io.write(@text)
@@ -251,5 +252,12 @@ class BookletPdfService
     @latex_infile = LatexToPdf.escape_latex(@latex_infile) if @proposal.no_latex
     @latex_text = @text
     @text = ''
+  end
+
+  private
+  def write_to_file
+    File.open("#{Rails.root}/tmp/#{temp_file}", "w:UTF-8") do |io|
+      io.write(@text)
+    end
   end
 end
