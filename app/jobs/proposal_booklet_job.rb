@@ -59,7 +59,7 @@ class ProposalBookletJob < ApplicationJob
   end
 
   def create_booklet(proposal_ids, temp_file, table, current_user)
-    BookletPdfService.new(proposal_ids.split(',').first, temp_file, 'all', current_user)
+    BookletPdfService.new(proposal_ids.split(','), temp_file, 'all', current_user)
                      .multiple_booklet(table, proposal_ids)
   rescue StandardError => e
     Rails.logger.info { "\n\nLaTeX error:\n #{e.message}\n\n" }
@@ -68,7 +68,6 @@ class ProposalBookletJob < ApplicationJob
 
   def check_file_existence(proposal_ids, temp_file, table, current_user)
     create_booklet(proposal_ids, temp_file, table, current_user) unless File.exist?("#{Rails.root}/tmp/#{temp_file}")
-
     fh = File.open("#{Rails.root}/tmp/#{temp_file}")
     fh.read
   end
