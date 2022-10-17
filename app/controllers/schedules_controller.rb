@@ -24,12 +24,16 @@ class SchedulesController < ApplicationController
 
   def new_schedule_run; end
 
-  def run_hmc_program
+  def run_hmc_program    
     schedule_run = ScheduleRun.new(run_params.merge(start_time: DateTime.now))
     if schedule_run.save
       if check_valid_number_of_proposals(schedule_run) == true
+<<<<<<< HEAD
         render json: { errors: 'The number of proposals to be scheduled for this location is less than or equal to the
                                                                                     Number of weeks in program year' }
+=======
+        render json: { errors: 'The number of proposals to be scheduled for this location is less than or equal to the Number of weeks in program year'}
+>>>>>>> 8c092981 (validation added on schedule form)
       else
         hmc_program(schedule_run)
       end
