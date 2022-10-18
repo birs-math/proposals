@@ -20,7 +20,11 @@ class ImportJob < ApplicationJob
     if @reviews_not_imported.present?
       error_messages
     elsif @errors.blank?
-      @message = "Reviews imported successfully."
+      if @no_review == "No_review_found"
+        @message = "This proposal has no reviews yet."
+      else
+        @message = "Reviews imported successfully."
+      end
     end
   end
 
@@ -50,7 +54,7 @@ class ImportJob < ApplicationJob
 
   def importing_proposal_reviews
     import_reviews = ImportReviewsService.new(@proposal)
-    import_reviews.proposal_reviews
+    @no_review = import_reviews.proposal_reviews
     @errors << import_reviews.errors if import_reviews.errors.present?
   end
 

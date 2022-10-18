@@ -46,16 +46,20 @@ class ImportReviewsService
   end
 
   def store_proposal_reviews(review_version)
-    @reviews.each do |review|
-      reviewer_name = review["reviewer"]["nameFull"]
-      is_quick = review["isQuick"]
-      @score = review["score"]
+    if @reviews.present?
+      @reviews.each do |review|
+        reviewer_name = review["reviewer"]["nameFull"]
+        is_quick = review["isQuick"]
+        @score = review["score"]
 
-      @review = Review.new(reviewer_name: reviewer_name, is_quick: is_quick, score: @score,
-                           proposal_id: @proposal.id, person_id: @proposal.lead_organizer&.id,
-                           version: review_version)
-      @review.save
-      review_file(review)
+        @review = Review.new(reviewer_name: reviewer_name, is_quick: is_quick, score: @score,
+                             proposal_id: @proposal.id, person_id: @proposal.lead_organizer&.id,
+                             version: review_version)
+        @review.save
+        review_file(review)
+      end
+    else
+      "No_review_found"
     end
   end
 
