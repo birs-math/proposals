@@ -65,7 +65,7 @@
                   <% if current_user.staff_member? %>
                     <td>
                       <%= link_to "Send to EditFlow", revise_proposal_editflow_submitted_proposals_path(proposal_id: @proposal.id, version: version), method: :post, class: "btn btn-primary" %>
-                      <%= link_to "Import Reviews", import_reviews_submitted_proposals_path(proposals: @proposal.id), method: :post, class: "btn btn-primary" %>
+                      <%= link_to "Import Reviews", import_reviews_submitted_proposals_path(proposals: @proposal.id), method: :post, class: "btn btn-primary", remote: true %>
                     </td>
                   <% end %>
                 </tr>
