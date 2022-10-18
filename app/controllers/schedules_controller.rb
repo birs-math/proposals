@@ -27,7 +27,12 @@ class SchedulesController < ApplicationController
   def run_hmc_program
     schedule_run = ScheduleRun.new(run_params.merge(start_time: DateTime.now))
     if schedule_run.save
-      hmc_program(schedule_run)
+      if check_valid_number_of_proposals(schedule_run) == true
+        render json: { errors: 'The number of proposals to be scheduled for this location is less than or equal to the
+                                                                                    Number of weeks in program year' }
+      else
+        hmc_program(schedule_run)
+      end
     else
       render json: { errors: schedule_run.errors.full_messages },
              status: :unprocessable_entity
@@ -92,10 +97,10 @@ class SchedulesController < ApplicationController
       prop1, prop2 = schedule.proposal.split(' and ')
       update_proposal_applied_date(prop1, date)
       update_proposal_applied_date(prop2, date)
-      return [prop1, prop2]
+      [prop1, prop2]
     else
       update_proposal_applied_date(schedule.proposal, date)
-      return [schedule.proposal]
+      [schedule.proposal]
     end
   end
 
@@ -154,5 +159,21 @@ class SchedulesController < ApplicationController
 
   def authorize_user
     authorize! params[:action], SchedulesController
+  end
+
+  def check_valid_number_of_proposals(schedule_run)
+    @location = schedule_run.location
+    proposals = Proposal.where(assigned_location: @location)
+                        .where(outcome: 'Approved')
+                        .where(year: schedule_run.year)
+
+    half_proposals = proposals.where(assigned_size: "Half")
+    full_proposals = proposals.where(assigned_size: "Full")
+    total_proposals = full_proposals.count + (half_proposals.count.to_f / 2).ceil
+    if @location&.num_weeks&.< total_proposals
+      true
+    else
+      false
+    end
   end
 end
