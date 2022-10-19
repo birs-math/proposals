@@ -9,7 +9,15 @@ module SchedulesHelper
       "[#{link_to proposal.code, submitted_proposal_path(proposal),
                   target: :blank}] #{proposal.title}"
     else
-      ''
+      proposal_code.gsub!(" and ", " ")
+      first_half_proposal_code = proposal_code.split.first
+      last_half_proposal_code = proposal_code.split.last
+      first_half_proposal = Proposal.find(first_half_proposal_code)
+      last_half_proposal =  Proposal.find(last_half_proposal_code)
+
+      "[#{link_to first_half_proposal.code, submitted_proposal_path(first_half_proposal),
+                  target: :blank}] #{first_half_proposal.title} and [#{link_to last_half_proposal.code, submitted_proposal_path(last_half_proposal),
+                  target: :blank}] #{last_half_proposal.title}"
     end
   end
 
