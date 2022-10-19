@@ -4,7 +4,7 @@ FactoryBot.define do
     week { 23 }
     case_num { 34 }
     hmc_score { 43 }
-    proposal { 'Faker::Lorem.paragraph' }
+    proposal { Faker::Lorem.paragraph }
 
     association :schedule_run, factory: :schedule_run, strategy: :create
   end
