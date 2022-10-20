@@ -2,6 +2,7 @@ require 'rails_helper'
 
 RSpec.describe "/schedules", type: :request do
   let(:location) { create(:location) }
+  let(:proposal) { create_list(:proposal, 2) }
   let(:role) { create(:role, name: 'Staff') }
   let(:schedule_run) { create(:schedule_run) }
   let(:schedules) { create_list(:schedule, 2, schedule_run_id: schedule_run.id) }
@@ -102,7 +103,7 @@ RSpec.describe "/schedules", type: :request do
         }
       end
       it "render a successful response" do
-        schedules.first.update(case_num: 1)
+        schedules.first.update(case_num: 6, proposal: "#{proposal.first.code} and #{proposal.last.code}")
         get optimized_schedule_schedules_url, params: params
         expect(response).to have_http_status(:ok)
       end
@@ -116,7 +117,7 @@ RSpec.describe "/schedules", type: :request do
         }
       end
       it "render a successful response" do
-        schedules.first.update(case_num: 2)
+        schedules.first.update(case_num: 6, proposal: "#{proposal.first.code} and #{proposal.last.code}")
         get optimized_schedule_schedules_url, params: params
         expect(response).to have_http_status(:ok)
       end
@@ -130,7 +131,7 @@ RSpec.describe "/schedules", type: :request do
         }
       end
       it "render a successful response" do
-        schedules.first.update(case_num: 1)
+        schedules.first.update(case_num: 6, proposal: "#{proposal.first.code} and #{proposal.last.code}")
         get optimized_schedule_schedules_url, params: params
         expect(response).to have_http_status(:ok)
       end
@@ -144,7 +145,7 @@ RSpec.describe "/schedules", type: :request do
         }
       end
       it "render a successful response" do
-        schedules.first.update(case_num: 6)
+        schedules.first.update(case_num: 6, proposal: "#{proposal.first.code}")
         get optimized_schedule_schedules_url, params: params
         expect(response).to have_http_status(:ok)
       end
@@ -172,7 +173,7 @@ RSpec.describe "/schedules", type: :request do
         }
       end
       it "render a successful response" do
-        schedules.first.update(case_num: 6)
+        schedules.first.update(case_num: 6, proposal: "#{proposal.first.code} and #{proposal.last.code}")
         schedule_run.location.update(start_date: nil)
         get optimized_schedule_schedules_url, params: params
         expect(response).to have_http_status(:ok)
