@@ -302,9 +302,7 @@ module ProposalsHelper
 
   def proposal_version(version, proposal)
     @proposal_version = ProposalVersion.find_by(version: version, proposal_id: proposal.id)
-    if @proposal_version.status != proposal.status
-      @proposal_version.update(status: proposal.status)
-    end
+    @proposal_version.update(status: proposal.status) if @proposal_version.status != proposal.status
     return @proposal_version
   end
 
