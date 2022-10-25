@@ -117,7 +117,7 @@ RSpec.describe "Proposals", type: :request do
         file << fixture_file_upload(Rails.root.join('spec/fixtures/files/proposal_booklet.pdf'),
                                     'application/pdf')
         expect do
-          post "/proposals/#{proposal.id}/upload_file", params: { files: file }
+          post "/proposals/#{proposal.id}/upload_file", files: file
         end.to change(ActiveStorage::Attachment, :count).by(1)
       end
     end
@@ -127,7 +127,7 @@ RSpec.describe "Proposals", type: :request do
         file = []
         file << fixture_file_upload(Rails.root.join('spec/fixtures/files/review_sample.xlsx'))
         expect do
-          post "/proposals/#{proposal.id}/upload_file", params: { files: file }
+          post "/proposals/#{proposal.id}/upload_file", files: file
         end.to change(ActiveStorage::Attachment, :count).by(0)
       end
     end

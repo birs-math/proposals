@@ -68,7 +68,7 @@ module SchedulesHelper
 
   def program_years
     years = []
-    (7).each do |i|
+    (0..7).each do |i|
       years.append([Date.current.year + i, Date.current.year + i])
     end
     return years
