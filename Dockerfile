@@ -39,7 +39,7 @@ ENV LANGUAGE en_CA:en
 ENV LC_ALL en_CA.utf8
 
 # Match deployment userid
-RUN /usr/sbin/usermod -u 1051 app
+RUN /usr/sbin/usermod -u 40130 app
 
 #COPY rails-env.conf /etc/nginx/main.d/rails-env.conf
 #RUN chmod 644 /etc/nginx/main.d/rails-env.conf

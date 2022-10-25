@@ -52,3 +52,5 @@ public/coverage
 yarn-debug.log*
 .yarn-integrity
 spec/examples.txt
+
+volumes
