@@ -24,8 +24,8 @@ RSpec.describe SchedulesHelper, type: :helper do
 
     it "returns no proposal [code,title] if it has no code" do
       proposal
-      schedule2
-      expect(schedule_proposal(schedule2.proposal)).to eq("")
+      schedule2.update(proposal: "#{proposal.code}")
+      expect(schedule_proposal(schedule2.proposal)).to be_a String
     end
 
     it "returns exclude date if proposal code is w66" do
