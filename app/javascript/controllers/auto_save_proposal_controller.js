@@ -2,6 +2,10 @@ import { Controller } from "stimulus"
 
 export default class extends Controller {
 
+  connect() {
+    this.onClickEdit();
+  }
+
   autoSaveProposal () {
     let url = window.location.href.split('/').slice(-3)
     var interval;
@@ -30,7 +34,13 @@ export default class extends Controller {
     this.autoSaveProposal();
   }
 
-  disabledSelectWeekAs (){
+
+  onClickEdit() {
+      let assigned_size_value = $('#assigned_size').val()
+      if(assigned_size_value == "Full")
+        document.getElementById("same_week_as").disabled = true;
+      else
+        document.getElementById("same_week_as").disabled = false;
   }
 
   onBlur () {
