@@ -30,8 +30,16 @@ export default class extends Controller {
     this.autoSaveProposal();
   }
 
+  disabledSelectWeekAs (){
+  }
+
   onBlur () {
     let id = $('#proposal_id').val()
+    let assigned_size_value = $('#assigned_size').val()
+    if(assigned_size_value == "Full")
+      document.getElementById("same_week_as").disabled = true;
+    else
+      document.getElementById("same_week_as").disabled = false;
     this.submitProposal(id)
   }
 

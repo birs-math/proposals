@@ -23,7 +23,7 @@ module ProposalsHelper
   end
 
   def approved_proposals(proposal)
-    [""] + Proposal.where(outcome: 'Approved').pluck(:code) - [proposal.code]
+    [""] + Proposal.where(outcome: 'Approved', assigned_size: 'Half').pluck(:code) - [proposal.code]
   end
 
   def assigned_dates(location)
