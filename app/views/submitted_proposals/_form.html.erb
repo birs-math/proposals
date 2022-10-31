@@ -103,7 +103,7 @@
                             <%= label_tag :assigned_size %>
                           </div>
                           <div class="mb-3">
-                            <%= select_tag :assigned_size, options_for_select(['', 'Full', 'Half'], @proposal.assigned_size), class: "form-select w-25", data: {'action': 'change->auto-save-proposal#onBlur'} %>
+                            <%= select_tag :assigned_size, options_for_select(['', 'Full', 'Half'], @proposal.assigned_size), class: "form-select w-25", disabled: action, data: {'action': 'change->auto-save-proposal#onBlur'} %>
                           </div>
                           <div class="mb-3">  
                             <%= label_tag :applied_date %>
