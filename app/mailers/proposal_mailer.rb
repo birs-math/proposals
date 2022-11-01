@@ -103,6 +103,16 @@ class ProposalMailer < ApplicationMailer
   def placing_holders
     placeholders = { "[WORKSHOP CODE]" => @email.proposal&.code,
                      "[WORKSHOP TITLE]" => @email.proposal&.title,
+                     "[WORKSHOP ASSIGNED_LOCATION]" => @email.proposal&.assigned_location&.name,
+                     "[WORKSHOP LEAD_ORGANIZER_NAME]" => "#{@email.proposal.lead_organizer.firstname}
+                      #{@email.proposal.lead_organizer.lastname}",
+                     "[WORKSHOP LEAD_ORGANIZER_EMAIL]" => @email.proposal.lead_organizer.email,
+                     "[WORKSHOP SUPPORTING_ORGANIZER_NAME]" => @email.proposal.invites.where(invited_as: "Organizer")
+                                                                     .map do |p|
+                                                                 "#{p.firstname} #{p.lastname}"
+                                                               end.join(', '),
+                     "[WORKSHOP SUPPORTING_ORGANIZER_EMAIL]" => "#{JSON.parse(@email.cc_email).map(&:values).flatten
+                     .join(', ')}, #{@email.bcc_email}",
                      "[INSERT ASSIGNED DATES]" => workshop_date_range(@email.proposal&.assigned_date),
                      "[INSERT APPLIED DATES]" => workshop_date_range(@email.proposal&.applied_date) }
     placeholders.each { |k, v| @template_body.gsub!(k, v) }
