@@ -25,7 +25,7 @@ module Users
     # end
 
     # The path used after confirmation.
-    def after_confirmation_path_for(resource_name, resource)
+    def after_confirmation_path_for(resource)
       new_user_session_path
     end
   end

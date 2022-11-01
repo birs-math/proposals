@@ -12,7 +12,7 @@ class SurveyController < ApplicationController # rubocop:disable Metrics/ClassLe
   end
 
   def pre_load_survey_questionnaire # rubocop:disable Metrics/AbcSize
-    @demographic_data = DemographicData.find_by(params[:id])
+    @demographic_data = DemographicData.find(params[:id])
     @demographic_data.result = params["pre_load_survey_questionnaire_survey_index"]
 
     if @demographic_data.save

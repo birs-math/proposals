@@ -3,8 +3,10 @@ require 'rails_helper'
 RSpec.describe "/submitted_proposals", type: :request do
   let(:proposal_type) { create(:proposal_type) }
   # let(:proposal) { create(:proposal, :with_organizers, proposal_type: proposal_type, status: :decision_pending) }
-  let(:subject) {create(:subject)}
-  let(:proposal) { create(:proposal, :with_organizers, proposal_type: proposal_type, status: :decision_pending, subject_id: subject.id) }
+  let(:subject) { create(:subject) }
+  let(:proposal) do
+    create(:proposal, :with_organizers, proposal_type: proposal_type, status: :decision_pending, subject_id: subject.id)
+  end
   let(:person) { create(:person) }
   let(:location) { create(:location) }
   let(:role) { create(:role, name: 'Staff') }
@@ -49,6 +51,10 @@ RSpec.describe "/submitted_proposals", type: :request do
       expect(response.header['Content-Type']).to eq("text/csv")
       expect(response).to have_http_status(:ok)
     end
+    it 'download_csv_organizers_and_participants' do
+      get download_csv_organizers_and_participants_submitted_proposals_path(id: proposal.id)
+      expect(response).to have_http_status(:ok)
+    end
 
     it 'no proposal is selected' do
       proposal_ids = []
@@ -84,20 +90,6 @@ RSpec.describe "/submitted_proposals", type: :request do
     it { expect(response).to have_http_status(:ok) }
   end
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   describe "POST /edit_flow when ids are in params" do
     let(:subject) { create(:subject) }
     let!(:ams_subject) { create(:ams_subject, subject: subject) }
@@ -109,34 +101,20 @@ RSpec.describe "/submitted_proposals", type: :request do
       expect(response).to have_http_status(:unprocessable_entity)
     end
 
-    context 'Ams project present' do
-      it 'when proposal code is present' do
-        proposal.update(code: nil, status: :initial_review)
-        post edit_flow_submitted_proposals_url, params: params
-        expect(response).to have_http_status(:unprocessable_entity)
-      end
-    end
+    # context 'Ams project present' do
+    #   it 'when proposal code is present' do
+    #     proposal.update(code: nil, status: :initial_review)
+    #     post edit_flow_submitted_proposals_url, params: params
+    #     expect(response).to have_http_status(:unprocessable_entity)
+    #   end
+    # end
 
-    it 'with proposal status may_progress' do
-      proposal.update(status: :initial_review)
-      post edit_flow_submitted_proposals_url, params: params
-      expect(response).to have_http_status(:unprocessable_entity)
-    end
+    # it 'with proposal status may_progress' do
+    #   proposal.update(status: :initial_review)
+    #   post edit_flow_submitted_proposals_url, params: params
+    #   expect(response).to have_http_status(:unprocessable_entity)
+    # end
   end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
   describe "POST /edit_flow when ids are not in params" do
     it 'when status is unprocessable_entity' do
