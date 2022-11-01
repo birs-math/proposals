@@ -54,8 +54,8 @@
       <td><%= proposal&.edit_flow %></td>
       <td class="table-action">
         <%= link_to '<i class="align-middle fas fa-fw fa-print"></i>PDF'.html_safe, rendered_proposal_proposal_path(proposal.id, :format => :pdf), target: '_blank' %>
-        <%= link_to '<i class="align-middle fas fa-fw fa-pen"></i>Edit'.html_safe, edit_submitted_proposal_url(proposal) %>
-        <%= link_to '<i class="align-middle fas fa-fw fa-eye"></i>Show'.html_safe, submitted_proposal_url(proposal) %>
+        <%= link_to '<i class="align-middle fas fa-fw fa-pen"></i>Edit'.html_safe, edit_submitted_proposal_url(proposal)%>
+        <%= link_to  '<i class="align-middle fas fa-fw fa-eye"></i>Show'.html_safe, submitted_proposal_url(proposal) %>
         <%= link_to '<i class="align-middle mr-2 fas fa-fw fa-clone"></i>Versions'.html_safe, versions_proposal_url(proposal) %>
         <%= link_to '<i class="align-middle fas fa-fw fa-trash" data-toggle="tooltip" title="Delete" ></i>Delete'.html_safe,submitted_proposal_url(proposal), method: :delete , data: {confirm: "Are you sure you want to delete this proposal?"} %>
         <%= link_to '<i class="align-middle mr-2 fas fa-fw fa-file"></i>Reviews'.html_safe, reviews_submitted_proposal_path(proposal) %>

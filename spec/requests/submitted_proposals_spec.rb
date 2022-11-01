@@ -183,16 +183,22 @@ RSpec.describe "/submitted_proposals", type: :request do
     end
 
     it "send emails to lead_organizer" do
+      debugger
       post send_emails_submitted_proposal_path(proposal, params: params)
       expect(response).to redirect_to(edit_submitted_proposal_path(proposal))
     end
   end
 
   describe "POST /send_emails with params Reject" do
-    let(:email_template) { create(:email_template, email_type: :revision_type) }
+    let!(:email_template) { create(:email_template, email_type: :revision_type) }
+    let!(:email) { Email.create(subject: "test email", body: "test email text body", proposal_id: proposal.id, cc_email: "test1@gmail.com", bcc_email: "test2@gmail.com")}
+    before do
+      debugger
+    end
     let(:params) do
-      { cc_email: '',
-        bcc_email: '',
+      debugger
+      { cc_email: email.cc_email,
+        bcc_email: email.bcc_email,
         subject: email_template.subject,
         body: email_template.body,
         templates: "Reject: Reject Proposal" }

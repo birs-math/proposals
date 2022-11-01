@@ -111,268 +111,40 @@ RSpec.describe ProposalsHelper, type: :helper do
     end
   end
 
-  describe "#approved_proposals" do
-    let(:proposal) { create(:proposal) }
-    let(:proposals) { create_list(:proposal, 3, outcome: 'Approved') }
-    it "return the code for approved proposals" do
-      codes = [""] + proposals.pluck(:code)
-      expect(approved_proposals(proposal)).to match_array(codes)
-    end
-  end
-
-  describe "#proposal_version" do
-    let(:proposal) { create(:proposal) }
-    let(:version) { create(:proposal_version, proposal_id: proposal.id) }
-    it "returns the version of proposal" do
-      version
-      expect(proposal_version(1, proposal)).to eq(version)
-    end
-  end
-
-  describe "#proposal_version_title" do
-    let(:proposal) { create(:proposal, title: 'Test') }
-    let(:proposal_version) { create(:proposal_version, proposal_id: proposal.id) }
-    it "returns the title of proposal version" do
-      proposal_version
-      expect(proposal_version_title(1, proposal)).to eq(proposal_version.title)
-    end
-  end
-
-  describe "#invite_last_name" do
-    let(:person) { create(:person) }
-    let(:invite) { create(:invite, person_id: person.id) }
-    it "returns the last name of invite" do
-      expect(invite_last_name(invite)).to eq(invite.lastname)
-    end
-  end
-
-  describe "#invite_first_name" do
-    let(:person) { create(:person) }
-    let(:invite) { create(:invite, person_id: person.id) }
-    it "returns the first name of invite" do
-      expect(invite_first_name(invite)).to eq(invite.firstname)
-    end
-  end
-
   describe "#no_of_participants" do
-    let(:proposal) { create(:proposal) }
-    let(:invites) { create_list(:invite, 2, proposal_id: proposal.id, invited_as: "Organizer") }
-    it "returns total  participants" do
-      expect(no_of_participants(proposal.id, "Organizer")).to eq(invites)
+    context "returns total number of participants" do
+      let(:proposal) { create :proposal }
+      let(:invites) { create(:invite, proposal_id: proposal.id, invited_as: "Organizer") }
+      it 'returns total number of participants' do
+        expect(no_of_participants(proposal.id, invites.invited_as))
+      end
     end
   end
 
   describe "#confirmed_participants" do
-    let(:proposal) { create(:proposal) }
-    let(:invites) { create_list(:invite, 2, proposal_id: proposal.id, invited_as: "Organizer", status: "confirmed") }
-    it "returns confirmed participants" do
-      expect(confirmed_participants(proposal.id, "Organizer")).to eq(invites)
-    end
-  end
-
-  describe "#invite_deadline_date_color" do
-    let(:invite) { create(:invite, status: 'pending') }
-    it "it changes the color of text" do
-      invite_deadline_date_color(invite)
-      expect(response).to have_http_status(:ok)
-    end
-  end
-
-  describe "#invite_response_color" do
-    context "when status is yes or may be" do
-      let(:invite) { create(:invite, response: 'yes') }
-      it "changes the color of response" do
-        invite_response_color(invite.response)
-        expect(response).to have_http_status(:ok)
-      end
-    end
-    context "when status is no" do
-      let(:invite) { create(:invite, response: 'no') }
-      it "changes the color of response" do
-        invite_response_color(invite.response)
-        expect(response).to have_http_status(:ok)
-      end
-    end
-    context "when status is nil" do
-      let(:invite) { create(:invite, response: nil) }
-      it "changes the color of response" do
-        invite_response_color(invite.response)
-        expect(response).to have_http_status(:ok)
+    context "returns confirmed participants" do
+      let(:proposal) { create :proposal }
+      let(:invites) { create(:invite, proposal_id: proposal.id, invited_as: "Organizer", status: 'confirmed') }
+      it 'returns confirmed participants' do
+        expect(confirmed_participants(proposal.id, invites.invited_as))
       end
     end
   end
 
-  describe "#career_labels" do
-    let(:person) { create(:person, :with_proposals) }
-    before do
-      invites = person.proposals.first.invites.each { |invite| invite.update(invited_as: "Participant") }
-      invites.map(&:person).each do |p|
-        p.update(academic_status: "IT", other_academic_status: "Physics", country: 'USA', first_phd_year: '1998',
-                 department: 'IT', affiliation: 'affiliation')
-      end
-    end
-    it "returns the lables" do
-      expect(career_labels(person.proposals.first)).to match_array(%w[IT Physics])
-    end
-
-    it 'returns the values' do
-      expect(career_values(person.proposals.first)).to match_array([3, 3])
-    end
-  end
-
-  describe "#proposal_status" do
-    context "when status is revision_submitted it capitalize" do
-      let(:proposal) { create(:proposal, status: :revision_submitted) }
-      it { expect(proposal_status(proposal.status)).to eq("Revision Submitted") }
-    end
-
-    context "when status is draft" do
-      let(:proposal) { create(:proposal, status: :draft) }
-      it { expect(proposal_status(proposal.status)).to eq("Draft") }
-    end
-  end
-
-  describe "#proposal_status_class" do
-    let(:proposal) { create(:proposal, status: :revision_submitted) }
-    it "return the status of the proposal" do
-      expect(proposal_status_class(proposal.status)).to eq('text-revision-submitted')
-    end
-  end
-
-  describe "#invite_status" do
-    context "when status is cancelled" do
-      let(:invite) { create(:invite) }
-      it "return if status is cancelled" do
-        expect(invite_status(invite.response, 'cancelled')).to eq("Invite has been cancelled")
-      end
-    end
-    context "when response is yes or may be" do
-      let(:invite) { create(:invite, response: 'yes') }
-      it "accepts the invitation" do
-        invite_status(invite.response, invite)
-        expect(invite_status(invite.response, invite)).to eq("Invitation accepted")
-      end
-    end
-    context "when response is no" do
-      let(:invite) { create(:invite, response: 'no') }
-      it "declines th einvitation" do
-        expect(invite_status(invite.response, invite)).to eq("Invitation declined")
-      end
-    end
-    context "when response is nil" do
-      let(:invite) { create(:invite, response: nil) }
-      it "did not respond to invitation yet" do
-        expect(invite_status(invite.response, invite)).to eq("Not yet responded to invitation")
+  describe "#specific proposal statuses" do
+    context "returns array of statuses" do
+      it 'returns array of specific proposal statuses' do
+        expect(specific_proposal_statuses).to be_a Array
       end
     end
   end
 
-  describe "#specific_proposal_statuses" do
-    let(:statuses) do
-      [["Draft", 0], ["Submitted", 1], ["Initial review", 2],
-       ["Revision requested before review", 3], ["Revision submitted", 4],
-       ["In progress", 5], ["Decision pending", 6], ["Decision email sent", 7], ["Revision requested after review", 10],
-       ["Revision submitted spc", 11], ["In progress spc", 12], ["Shortlisted", 13]]
-    end
-    it "retunrs the specific statuses" do
-      expect(specific_proposal_statuses).to match_array(statuses)
-    end
-  end
-
-  describe '#nationality_data' do
-    let(:proposal) { create(:proposal) }
-
-    it 'returning hash' do
-      expect(nationality_data(proposal)).to be_a Hash
-    end
-  end
-
-  describe '#ethnicity_data' do
-    let(:proposal) { create(:proposal) }
-
-    it 'returning hash' do
-      expect(ethnicity_data(proposal)).to be_a Hash
-    end
-  end
-
-  describe '#gender_labels' do
-    let(:proposal) { create(:proposal) }
-
-    it 'returning hash' do
-      expect(gender_labels(proposal)).to be_a Array
-    end
-  end
-
-  describe '#gender_values' do
-    let(:proposal) { create(:proposal) }
-
-    it 'returning hash' do
-      expect(gender_values(proposal)).to be_a Array
-    end
-  end
-
-  describe '#proposal_outcome' do
-    let(:proposal) { create(:proposal) }
-
-    it { expect(proposal_outcome).to be_present }
-    it { expect(proposal_outcome).to eq %w[Approved Rejected Declined] }
-    it { expect(proposal_outcome).to be_a Array }
-  end
-
-  describe '#single_gender_delete' do
-    let(:data) { { "test_val01" => "Male", "test_val02" => "Female" } }
-    it 'return records after deleting single gender' do
-      option = "test_val02"
-      val = "test_val03"
-
-      expect(single_gender_delete(data, option, val)).to be_present
-      expect(single_gender_delete(data, option, val)).to be_a Hash
-    end
-  end
-
-  describe '#single_data_delete' do
-    let(:data) { { "test_val01" => "Male", "test_val02" => "Female" } }
-    it 'when no case will call' do
-      expect(single_data_delete(data)).to be_present
-    end
-  end
-
-  describe '#single_data_delete' do
-    let(:data) { { "Prefer not to answer" => "Male", "test_val02" => "Female" } }
-    it 'when first case will call' do
-      response = single_data_delete(data)
-      expect(response).to be_present
-      expect(response.count).to eq 2
-      expect(response.last).not_to be_a Hash
-    end
-  end
-
-  describe '#single_data_delete' do
-    let(:data) { { "Gender fluid and/or non-binary person" => "Male", "test_val02" => "Female" } }
-    it 'when second case will call' do
-      response = single_data_delete(data)
-      expect(response).to be_present
-      expect(response.count).to eq 2
-      expect(response.last).not_to be_a Hash
-    end
-  end
-
-  describe '#gender_delete' do
-    let(:data) { { "Prefer not to answer" => "test_val01", "Gender fluid and/or non-binary person" => "test_val02" } }
-    it 'return records after deleting' do
-      values = "Male"
-      expect(gender_delete(data, values)).to be_present
-      expect(gender_delete(data, values)).to be_a Hash
-    end
-  end
-
-  describe '#stem_graph_data' do
-    let(:person) { create(:person) }
-    let(:proposal) { create(:proposal) }
-    let(:demographic_data) { create(:demographic_data, person: person) }
-
-    it 'with no demographic_data' do
-      expect(stem_graph_data(proposal)).not_to be_present
+  describe "#proposal roles" do
+    context "returns proposal roles" do
+      let(:proposal_roles) { create(:proposal_role, proposal: proposal) }
+      it 'return proposal roles' do
+        expect(proposal_roles(proposal_roles))
+      end
     end
   end
 end
