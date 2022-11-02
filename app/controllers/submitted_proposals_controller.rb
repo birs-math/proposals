@@ -67,6 +67,7 @@ class SubmittedProposalsController < ApplicationController
 
   def send_emails
     raise CanCan::AccessDenied unless @ability.can?(:manage, Email)
+
     @email = Email.new(email_params.merge(proposal_id: @proposal.id))
     change_status
     unless @check_status
