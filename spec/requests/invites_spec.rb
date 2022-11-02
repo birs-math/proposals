@@ -112,6 +112,38 @@ RSpec.describe "/proposals/:proposal_id/invites", type: :request do
       patch proposal_invite_url(proposal.id, invite.id), params: params
       expect(response).to have_http_status(302)
     end
+<<<<<<< Updated upstream
+=======
+
+    context 'with wrong params' do
+      let(:new_user) { create(:user, person: invite.person) }
+
+      let(:params) do
+        {
+          invite: {
+            firstname: nil,
+            lastname: nil,
+            affiliation: "Test Affiliation"
+          }
+        }
+      end
+
+      before do
+        sign_in new_user
+      end
+
+      it "if lead organizer" do
+        invite.proposal.proposal_roles.first.update(person_id: invite.person.id)
+        patch proposal_invite_url(proposal.id, invite.id), params: params
+        expect(response).to have_http_status(302)
+      end
+
+      it "don't update invite" do
+        patch proposal_invite_url(proposal.id, invite.id), params: params
+        expect(response).to have_http_status(302)
+      end
+    end
+>>>>>>> Stashed changes
   end
 
   describe "POST /cancel" do
