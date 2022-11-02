@@ -103,7 +103,7 @@ class ProposalMailer < ApplicationMailer
   def placing_holders
     placeholders = { "[WORKSHOP CODE]" => @email.proposal&.code,
                      "[WORKSHOP TITLE]" => @email.proposal&.title,
-                     "[WORKSHOP ASSIGNED_LOCATION]" => @email.proposal&.assigned_location&.name,
+                     "[WORKSHOP ASSIGNED_LOCATION]" => @email.proposal&.assigned_location&.name.to_s,
                      "[WORKSHOP LEAD_ORGANIZER_NAME]" => "#{@email.proposal.lead_organizer.firstname}
                       #{@email.proposal.lead_organizer.lastname}",
                      "[WORKSHOP LEAD_ORGANIZER_EMAIL]" => @email.proposal.lead_organizer.email,
