@@ -3,10 +3,10 @@ default: &default
   encoding: unicode
   min_messages: WARNING
   pool: 5
-  host: localhost
+  host: db
   port: 5432
-  username: root
-  password: 1234
+  username: <%= ENV['DB_USER'] %>
+  password: <%= ENV['DB_PASS'] %>
 
 production:
   <<: *default
@@ -15,8 +15,12 @@ production:
 development:
   <<: *default
   database: proposals_development
+  username: <%= ENV['DB_USER'] %>
+  password: <%= ENV['DB_PASS'] %>
 
 test:
   <<: *default
   database: proposals_test
+  username: <%= ENV['DB_USER'] %>
+  password: <%= ENV['DB_PASS'] %>
   
