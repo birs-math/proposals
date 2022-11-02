@@ -111,7 +111,7 @@ RSpec.describe ProposalsHelper, type: :helper do
     end
   end
 
-describe "#approved_proposals" do
+  describe "#approved_proposals" do
     let(:proposal) { create(:proposal) }
     let(:proposals) { create_list(:proposal, 3, outcome: 'Approved') }
     it "return the code for approved proposals" do
