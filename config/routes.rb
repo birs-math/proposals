@@ -97,6 +97,7 @@ Rails.application.routes.draw do
       get :faqs
       post :submit_survey
       get :submit_survey_without_response
+      post :pre_load_survey_questionnaire
     end
   end
 

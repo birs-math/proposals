@@ -20,11 +20,8 @@ class ImportJob < ApplicationJob
     if @reviews_not_imported.present?
       error_messages
     elsif @errors.blank?
-      if @no_review == "No_review_found"
-        @message = "This proposal has no reviews yet."
-      else
-        @message = "Reviews imported successfully."
-      end
+      (return @message = "This proposal has no reviews yet." if @no_review == "No_review_found")
+      @message = "Reviews imported successfully."
     end
   end
 

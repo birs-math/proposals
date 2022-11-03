@@ -112,7 +112,9 @@ module SurveyHelper
                  ['West Asian (e.g., Iranian, Afghan)', 'West Asian (e.g., Iranian, Afghan)'],
                  %w[White White], %w[Other Other],
                  ['Prefer not to answer (Please note: If you choose this response, none of your other
-                  responses to this question will be considered in the data analysis.)'.squish, 'Prefer not to answer (Please note: If you choose this response, none of your other responses to this question will be considered in the data analysis.)']]
+                  responses to this question will be considered in the data analysis.)'.squish,
+                  'Prefer not to answer (Please note: If you choose this response, none of your other
+                  responses to this question will be considered in the data analysis.)']]
     ethnicity.map { |disp, _value| disp }
   end
 
@@ -138,26 +140,26 @@ module SurveyHelper
   end
 
   def indigenous_radio_option(results, option)
-    results["indigenous_person"] === option ? true : false # rubocop:disable Style/CaseEquality
+    results["indigenous_person"].eql? option
   end
 
   def community_radio_option(results, option)
-    results["community"] === option ? true : false # rubocop:disable Style/CaseEquality
+    results["community"] === option # rubocop:disable Style/CaseEquality
   end
 
   def minorities_radio_option(results, option)
-    results["minorities"] === option ? true : false # rubocop:disable Style/CaseEquality
+    results["minorities"] === option # rubocop:disable Style/CaseEquality
   end
 
   def stem_radio_option(results, option)
-    results["stem"] === option ? true : false # rubocop:disable Style/CaseEquality
+    results["stem"] === option # rubocop:disable Style/CaseEquality
   end
 
   def under_represented_radio_option(results, option)
-    results["underRepresented"] === option ? true : false # rubocop:disable Style/CaseEquality
+    results["underRepresented"] === option # rubocop:disable Style/CaseEquality
   end
 
   def disability_radio_option(results, option)
-    results["disability"] === option ? true : false # rubocop:disable Style/CaseEquality
+    results["disability"] === option # rubocop:disable Style/CaseEquality
   end
 end

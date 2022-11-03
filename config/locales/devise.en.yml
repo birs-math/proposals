@@ -178,7 +178,7 @@ en:
     staff_discussion:
       success: "Your comment was added!"
     revise_proposal_editflow:
-      alert: "Proposal status should be initial_review or revision_requested_before_review."
+      alert: "Proposal status should be initial_review or revision_submitted."
     revision_proposal:
       success: "Proposal is successfully sent to EditFlow!"
     check_proposal_editflow_id:
