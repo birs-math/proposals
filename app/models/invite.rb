@@ -14,7 +14,8 @@ class Invite < ApplicationRecord
 
   validates :firstname, :lastname, :email, :invited_as,
             :deadline_date, presence: true
-  validates :email, format: /\A(|(([A-Za-z0-9]+_+)|([A-Za-z0-9]+\-+)|([A-Za-z0-9]+\.+)|([A-Za-z0-9]+\++))*[A-Za-z0-9]+@((\w+\-+)|(\w+\.))*\w{1,63}\.[a-zA-Z]{2,6})\z/i
+  validates :email,
+            format: /\A(|(([A-Za-z0-9]+_+)|([A-Za-z0-9]+-+)|([A-Za-z0-9]+\.+)|([A-Za-z0-9]+\++))*[A-Za-z0-9]+@((\w+-+)|(\w+\.))*\w{1,63}\.[a-zA-Z]{2,6})\z/i
   validate :deadline_not_in_past, :proposal_title
   validate :one_invite_per_person, on: :create
   after_commit :log_activity

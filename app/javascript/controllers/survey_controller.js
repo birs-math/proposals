@@ -67,7 +67,7 @@ export default class extends Controller {
       }
   }
 
-  hideIndigenousOptions(targetValue) {
+  hideIndigenousOptions() {
       this.indigenousYesTarget.classList.add("hidden")
       $("#indigenous_person_yes").prop('required', false);
   }

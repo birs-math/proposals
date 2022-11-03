@@ -20,7 +20,7 @@ class ProposalPdfService
     @input << "\\subsection*{Reviews:}\n\n\n"
     return unless proposal.reviews.first.files.attached?
 
-    latex, file_errors = add_review_attachments(proposal.reviews.first, @input, proposal, file_errors)
+    latex, _file_errors = add_review_attachments(proposal.reviews.first, @input, proposal, file_errors)
     @input = latex if latex.present?
   end
 
@@ -305,9 +305,7 @@ class ProposalPdfService
 
     text = "\\begin{enumerate}\n\n"
     @participants.each do |participant|
-      if participant.academic_status == career
-        text << participant_name_and_affil(participant)
-      end
+      text << participant_name_and_affil(participant) if participant.academic_status == career
     end
     text << "\\end{enumerate}\n\n"
   end

@@ -19,7 +19,7 @@ module ProposalsHelper
   def proposal_type_year(proposal_type)
     return [Date.current.year + 2] if proposal_type.year.blank?
 
-    proposal_type.year&.split(",")&.map { |year| year.strip }
+    proposal_type.year&.split(",")&.map(&:strip)
   end
 
   def approved_proposals(proposal)
@@ -56,7 +56,7 @@ module ProposalsHelper
 
   def specific_proposal_statuses
     specific_status = %w[approved declined]
-    statuses = Proposal.statuses.reject { |k, _v| specific_status.include?(k) }
+    statuses = Proposal.statuses.except(*specific_status)
     statuses.map { |k, v| [k.humanize.capitalize, v] }
   end
 
@@ -301,11 +301,9 @@ module ProposalsHelper
   end
 
   def proposal_version(version, proposal)
-    @proposal_version = ProposalVersion.find_by(version: version, proposal_id: proposal.id)
-    if @proposal_version.status != proposal.status
-      @proposal_version.update(status: proposal.status)
-    end
-    return @proposal_version
+    proposal_version = ProposalVersion.find_by(version: version, proposal_id: proposal.id)
+    proposal_version.update(status: proposal.status) if proposal_version.status != proposal.status
+    proposal_version
   end
 
   def proposal_outcome

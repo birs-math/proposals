@@ -19,8 +19,16 @@ class ProposalsController < ApplicationController
     head :ok
   end
 
+  def show
+    log_activity(@proposal)
+  end
+
   def new
     @proposal = Proposal.new
+  end
+
+  def edit
+    @proposal.invites.build
   end
 
   def create
@@ -28,11 +36,10 @@ class ProposalsController < ApplicationController
     @same_type_proposals = current_user.person.proposals.where(proposal_type_id: @proposal.proposal_type_id)
 
     @same_type_proposals.each do |proposal|
-      if proposal.year == (Time.now.year + 2).to_s && !no_proposal? && proposal.status != 'draft'
+      if proposal.year == (Time.zone.now.year + 2).to_s && !no_proposal? && proposal.status != 'draft'
         limit_of_one_per_type and return
       end
     end
-    
     if @proposal.save
       @proposal.create_organizer_role(current_user.person, organizer)
       redirect_to edit_proposal_path(@proposal), notice: "Started a new
@@ -40,14 +47,6 @@ class ProposalsController < ApplicationController
     else
       redirect_to new_proposal_path, alert: @proposal.errors
     end
-  end
-
-  def show
-    log_activity(@proposal)
-  end
-
-  def edit
-    @proposal.invites.build
   end
 
   def locations
