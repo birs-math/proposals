@@ -12,13 +12,14 @@ namespace :birs do
             }
 END_STRING
 
-    next if ENV['APPLICATION_HOST'] == 'localhost'
+    next if ENV['APPLICATION_HOST'] == 'localhost' or ENV['APPLICATION_HOST'] == 'pstaging.birs.ca'
 
     if ENV['EDITFLOW_API_URL'].blank?
       puts "No EDITFLOW_API_URL is set, aborting."
       next
     end
     
+    puts "Contacting EDITFLOW_API_URL."
     response = RestClient.post ENV['EDITFLOW_API_URL'],
                                { query: query },
                                { x_editflow_api_token: ENV['EDITFLOW_API_TOKEN'] }
