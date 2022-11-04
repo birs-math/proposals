@@ -84,7 +84,9 @@ RSpec.describe Proposal, type: :model do
       let!(:schedule) { create(:schedule, schedule_run_id: schedule_run.id) }
       let!(:answers) do
         create(:answer, proposal: proposal, proposal_field: proposal_field,
-                        answer: "[\"01/15/23 to 01/20/2023\",\"01/15/23 to 01/20/2023\",\"01/15/23 to 01/20/2023\",\"01/15/23 to 01/20/2023\",\"01/15/23 to 01/20/2023\",\"01/15/23 to 01/20/2023\"]")
+                        answer: "[\"01/15/23 to 01/20/2023\",\"01/15/23 to 01/20/2023
+                        \",\"01/15/23 to 01/20/2023\",\"01/15/23 to 01/20/2023\",\"01/15/23 to 01/20/2023
+                        \",\"01/15/23 to 01/20/2023\"]")
       end
 
       it 'returns empty string when proposal preferred_dates are empty' do
@@ -99,7 +101,9 @@ RSpec.describe Proposal, type: :model do
       let!(:schedule) { create(:schedule, schedule_run_id: schedule_run.id) }
       let!(:answers) do
         create(:answer, proposal: proposal, proposal_field: proposal_field,
-                        answer: "[\"01/15/23 to 01/20/2023\",\"01/15/23 to 01/20/2023\",\"01/15/23 to 01/20/2023\",\"01/15/23 to 01/20/2023\",\"01/15/23 to 01/20/2023\",\"01/15/23 to 01/20/2023\"]")
+                        answer: "[\"01/15/23 to 01/20/2023\",\"01/15/23 to 01/20/2023
+                        \",\"01/15/23 to 01/20/2023\",\"01/15/23 to 01/20/2023\",
+                        \"01/15/23 to 01/20/2023\",\"01/15/23 to 01/20/2023\"]")
       end
 
       it 'returns empty string when proposal preferred_dates are empty' do

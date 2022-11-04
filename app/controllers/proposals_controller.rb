@@ -19,8 +19,16 @@ class ProposalsController < ApplicationController
     head :ok
   end
 
+  def show
+    log_activity(@proposal)
+  end
+
   def new
     @proposal = Proposal.new
+  end
+
+  def edit
+    @proposal.invites.build
   end
 
   def create
@@ -39,14 +47,6 @@ class ProposalsController < ApplicationController
     else
       redirect_to new_proposal_path, alert: @proposal.errors
     end
-  end
-
-  def show
-    log_activity(@proposal)
-  end
-
-  def edit
-    @proposal.invites.build
   end
 
   def locations

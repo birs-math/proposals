@@ -20,7 +20,7 @@ class ProposalPdfService
     @input << "\\subsection*{Reviews:}\n\n\n"
     return unless proposal.reviews.first.files.attached?
 
-    latex, file_errors = add_review_attachments(proposal.reviews.first, @input, proposal, file_errors)
+    latex, _file_errors = add_review_attachments(proposal.reviews.first, @input, proposal, file_errors)
     @input = latex if latex.present?
   end
 

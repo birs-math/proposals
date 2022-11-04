@@ -150,11 +150,11 @@ class BookletPdfService
     return if @subject.blank?
 
     @number += 1
-    @text << "\\addcontentsline{toc}{chapter}{\ \\large{#{@number}. #{@subject&.title}}}"
+    @text << "\\addcontentsline{toc}{chapter}{\\\large{#{@number}. #{@subject&.title}}}"
   end
 
   def subject_proposals
-    @proposals_objects&.sort_by { |p| p.code }&.each do |proposal|
+    @proposals_objects&.sort_by(&:code)&.each do |proposal|
       @current_proposal = proposal
       code = proposal.code.blank? ? '' : "#{proposal.code}: "
       @text << "\\addcontentsline{toc}{section}{ #{code} #{LatexToPdf.escape_latex(proposal&.title)}}"

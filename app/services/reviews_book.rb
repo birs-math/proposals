@@ -54,11 +54,11 @@ class ReviewsBook # rubocop:disable Metrics/ClassLength
     return if @subject.blank?
 
     @number += 1
-    @text << "\\addcontentsline{toc}{chapter}{\ \\large{#{@number}. #{@subject&.title}}}\n\n"
+    @text << "\\addcontentsline{toc}{chapter}{\\\large{#{@number}. #{@subject&.title}}}\n\n"
   end
 
   def subject_proposals
-    @proposals_objects&.sort_by { |p| p.code }&.each do |proposal|
+    @proposals_objects&.sort_by(&:code)&.each do |proposal|
       @proposal = proposal
       @code = proposal.code.blank? ? '' : "#{proposal.code}: "
       @text << "\\addcontentsline{toc}{section}{ #{@code} #{delatex(proposal&.title)}}\n\n"

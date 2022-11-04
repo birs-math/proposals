@@ -33,7 +33,7 @@ class ProposalFieldValidationsService
       when 'equal (integer matcher)'
         @errors << val.error_message unless @answer.to_i == val.value.to_i
       when 'equal (float matcher)'
-        @errors << val.error_message unless @answer.to_f == val.value.to_f
+        @errors << val.error_message unless @answer.to_d == val.value.to_d
       when 'words limit'
         texcount = `echo "#{@answer}" | texcount -total -`
         word_count = texcount.match(/Words in text: (\d+)/)[1]
@@ -59,20 +59,16 @@ class ProposalFieldValidationsService
     uniq_dates = JSON.parse(@answer).reject { |date| date == '' }
     @errors << "You can't select the same date twice" unless uniq_dates.uniq.count == uniq_dates.count
     if preferred_dates.count > proposal.proposal_type.max_no_of_preferred_dates
-      @errors << "You can choose maximum #{proposal.proposal_type.max_no_of_preferred_dates}
-      preferred dates"
+      @errors << "You can choose maximum #{proposal.proposal_type.max_no_of_preferred_dates} preferred dates"
     end
     if preferred_dates.count < proposal.proposal_type.min_no_of_preferred_dates
-      @errors << "You have to choose atleast #{proposal.proposal_type.min_no_of_preferred_dates}
-      preferred dates"
+      @errors << "You have to choose atleast #{proposal.proposal_type.min_no_of_preferred_dates} preferred dates"
     end
     if impossible_dates.count > proposal.proposal_type.max_no_of_impossible_dates
-      @errors << "You can choose maximum #{proposal.proposal_type.max_no_of_impossible_dates}
-      impossible dates"
+      @errors << "You can choose maximum #{proposal.proposal_type.max_no_of_impossible_dates} impossible dates"
     end
     if impossible_dates.count < proposal.proposal_type.min_no_of_impossible_dates
-      @errors << "You have to choose atleast #{proposal.proposal_type.min_no_of_impossible_dates}
-      impossible dates"
+      @errors << "You have to choose atleast #{proposal.proposal_type.min_no_of_impossible_dates} impossible dates"
     end
   end
 
