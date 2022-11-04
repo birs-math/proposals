@@ -33,7 +33,7 @@ class ProposalFieldValidationsService
       when 'equal (integer matcher)'
         @errors << val.error_message unless @answer.to_i == val.value.to_i
       when 'equal (float matcher)'
-        @errors << val.error_message unless @answer.to_f == val.value.to_f
+        @errors << val.error_message unless @answer.to_d == val.value.to_d
       when 'words limit'
         texcount = `echo "#{@answer}" | texcount -total -`
         word_count = texcount.match(/Words in text: (\d+)/)[1]
@@ -70,7 +70,7 @@ class ProposalFieldValidationsService
       @errors << "You can choose maximum #{proposal.proposal_type.max_no_of_impossible_dates}
       impossible dates"
     end
-    if impossible_dates.count < proposal.proposal_type.min_no_of_impossible_dates
+    return unless impossible_dates.count < proposal.proposal_type.min_no_of_impossible_dates
       @errors << "You have to choose atleast #{proposal.proposal_type.min_no_of_impossible_dates}
       impossible dates"
     end

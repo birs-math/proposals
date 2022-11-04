@@ -97,7 +97,6 @@ export default class extends Controller {
 
   latex () {
     let data = event.target.dataset
-    let _this = this
     let textField
     for (var i = 0; i < this.textFieldTargets.length; i++) {
       textField = this.textFieldTargets [`${i}`]
