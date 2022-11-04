@@ -2,6 +2,10 @@ import { Controller } from "stimulus"
 
 export default class extends Controller {
 
+  connect() {
+    this.onClickEdit();
+  }
+
   autoSaveProposal () {
     let url = window.location.href.split('/').slice(-3)
     var interval;
@@ -30,8 +34,22 @@ export default class extends Controller {
     this.autoSaveProposal();
   }
 
+
+  onClickEdit() {
+      let assigned_size_value = $('#assigned_size').val()
+      if(assigned_size_value == "Full")
+        document.getElementById("same_week_as").disabled = true;
+      else
+        document.getElementById("same_week_as").disabled = false;
+  }
+
   onBlur () {
     let id = $('#proposal_id').val()
+    let assigned_size_value = $('#assigned_size').val()
+    if(assigned_size_value == "Full")
+      document.getElementById("same_week_as").disabled = true;
+    else
+      document.getElementById("same_week_as").disabled = false;
     this.submitProposal(id)
   }
 
