@@ -151,11 +151,11 @@ class BookletPdfService
     return if @subject.blank?
 
     @number += 1
-    @text << "\\addcontentsline{toc}{chapter}{\ \\large{#{@number}. #{@subject&.title}}}"
+    @text << "\\addcontentsline{toc}{chapter}{ \\large{#{@number}. #{@subject&.title}}}"
   end
 
   def subject_proposals(index, count)
-    @proposals_objects&.sort_by { |p| p.code }&.each do |proposal|
+    @proposals_objects&.sort_by(&:code)&.each do |proposal|
       @proposal = proposal
       code = proposal.code.blank? ? '' : "#{proposal.code}: "
       @text << "\\addcontentsline{toc}{section}{ #{code} #{LatexToPdf.escape_latex(proposal&.title)}}"
@@ -254,7 +254,6 @@ class BookletPdfService
     @text = ''
   end
 
-  private
   def write_to_file
     File.open("#{Rails.root}/tmp/#{temp_file}", "w:UTF-8") do |io|
       io.write(@text)

@@ -12,7 +12,7 @@ RSpec.describe "Reviews", type: :request do
       it 'saves the uploaded file' do
         file = fixture_file_upload(Rails.root.join('spec/fixtures/files/review.text'), 'text/plain')
         expect do
-          post add_file_review_url(review), file: file
+          post add_file_review_url(review), params: { file: file }
         end.to change(ActiveStorage::Attachment, :count).by(1)
       end
     end
@@ -21,7 +21,7 @@ RSpec.describe "Reviews", type: :request do
       it 'does not save the uploaded file' do
         file = fixture_file_upload(Rails.root.join('spec/fixtures/files/review_sample.xlsx'))
         expect do
-          post add_file_review_url(review), file: file
+          post add_file_review_url(review), params: { file: file }
         end.to change(ActiveStorage::Attachment, :count).by(0)
       end
     end
