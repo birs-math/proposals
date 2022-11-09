@@ -190,9 +190,9 @@ RSpec.describe "/submitted_proposals", type: :request do
 
   describe "POST /send_emails with params Reject" do
     let!(:email_template) { create(:email_template, email_type: :revision_type) }
-  
+
     let(:params) do
-      { cc_email: [{"value":"john@gmail.com"},{"value":"hgvs@gmail.com"}].to_json,
+      { cc_email: [{ value: "john@gmail.com" }, { value: "hgvs@gmail.com" }].to_json,
         bcc_email: Faker::Internet.email(domain: 'gmail.com'),
         subject: email_template.subject,
         body: email_template.body,
@@ -208,7 +208,7 @@ RSpec.describe "/submitted_proposals", type: :request do
   describe "POST /send_emails with params Decision" do
     let(:email_template) { create(:email_template, email_type: :revision_type) }
     let(:params) do
-      { cc_email: [{"value":"john@gmail.com"},{"value":"hgvs@gmail.com"}].to_json,
+      { cc_email: [{ value: "john@gmail.com" }, { value: "hgvs@gmail.com" }].to_json,
         bcc_email: Faker::Internet.email(domain: 'gmail.com'),
         subject: email_template.subject,
         body: email_template.body,
@@ -224,7 +224,7 @@ RSpec.describe "/submitted_proposals", type: :request do
   describe 'POST /submitted_proposals/approve_decline_proposals' do
     let(:email_template) { create(:email_template, email_type: :approval_type) }
     let(:params) do
-      { cc_email: [{"value":"john@gmail.com"},{"value":"hgvs@gmail.com"}].to_json,
+      { cc_email: [{ value: "john@gmail.com" }, { value: "hgvs@gmail.com" }].to_json,
         bcc_email: Faker::Internet.email(domain: 'gmail.com'),
         subject: email_template.subject,
         templates: "Approval: Approve proposal",
