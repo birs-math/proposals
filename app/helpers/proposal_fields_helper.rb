@@ -101,6 +101,10 @@ module ProposalFieldsHelper
       (params[:action] == 'location_based_fields' && request.referer.exclude?('edit'))
   end
 
+  def disable_proposal_meeting_type
+    params[:action] == 'show' || params[:action] == 'edit' 
+  end
+
   def mandatory_field?(field)
     return print_validation if field.validations.where(validation_type: 'mandatory').present?
 
