@@ -18,6 +18,7 @@ Rails.application.routes.draw do
   resources :submitted_proposals do
     collection do
       get :download_csv
+      post :sendToWorkshop
       post :proposals_booklet
       get :download_booklet
       post :edit_flow
