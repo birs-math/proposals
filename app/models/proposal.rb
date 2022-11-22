@@ -194,6 +194,18 @@ class Proposal < ApplicationRecord
     proposal&.supporting_organizers&.map { |org| "#{org.firstname} #{org.lastname}" }&.join(', ')
   end
 
+  def self.participants_fullnames(proposal)
+    proposal&.participants&.map { |org| "#{org.firstname} #{org.lastname}" }&.join(', ')
+  end
+
+  def self.participants_emails(proposal)
+    proposal&.participants&.map { |org| "#{org.email}" }&.join(', ')
+  end
+
+  def self.supporting_organizer_emails(proposal)
+    proposal&.supporting_organizers&.map { |org| "#{org.email}" }&.join(', ')
+  end
+
   def self.to_csv(proposals)
     CSV.generate(headers: true) do |csv|
       csv << HEADERS
@@ -203,14 +215,22 @@ class Proposal < ApplicationRecord
     end
   end
 
-  HEADERS = ["Code", "Proposal Title", "Proposal Type", "Preffered Locations", "Status",
-             "Updated", "Subject Area", "Lead Organizer", "Supporting Organizers"].freeze
+  HEADERS = ["Code", "Proposal Title", "Proposal Type", "Preferred Locations", "Assigned Location",
+             "Status", "Outcome", "Updated", "Submitted to EditFlow", "Subject Area", "Lead Organizer", 
+             "Lead Organizer Email", "Supporting Organizers", " Supporting Organizers Email",
+             "Participants Name", "Participants Emails",
+             "Max No of Preferred Dates", "Min No of Preferred Dates", "Preferred Dates",
+             "Max No of Impossible Dates","Min No of Impossible Dates", "Impossible Dates"].freeze
 
   def self.each_row(proposal)
     [proposal&.code, proposal&.title, proposal&.proposal_type&.name,
-     proposal&.the_locations, proposal&.status, proposal&.updated_at&.to_date,
-     proposal.subject&.title, proposal&.lead_organizer&.fullname,
-     supporting_organizer_fullnames(proposal)]
+     proposal&.the_locations, proposal&.assigned_location.name, proposal&.status, proposal&.outcome,
+     proposal&.updated_at&.to_date, proposal&.edit_flow.to_date ,proposal.subject&.title, proposal&.lead_organizer&.fullname, 
+     proposal&.lead_organizer&.email, supporting_organizer_fullnames(proposal), 
+     supporting_organizer_emails(proposal), participants_fullnames(proposal), participants_emails(proposal),
+     proposal&.proposal_type&.max_no_of_preferred_dates, proposal&.proposal_type.min_no_of_preferred_dates,
+     proposal&.preferred_dates.join(' ,'), proposal&.proposal_type&.max_no_of_impossible_dates, 
+     proposal&.proposal_type&.min_no_of_impossible_dates, proposal&.impossible_dates.join(' ,')]
   end
 
   def pdf_file_type(file)
