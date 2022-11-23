@@ -216,21 +216,22 @@ class Proposal < ApplicationRecord
   end
 
   HEADERS = ["Code", "Proposal Title", "Proposal Type", "Preferred Locations", "Assigned Location",
-             "Status", "Outcome", "Updated", "Submitted to EditFlow", "Subject Area", "Lead Organizer", 
+             "Status", "Outcome", "Updated", "Submitted to EditFlow", "Subject Area", "Lead Organizer",
              "Lead Organizer Email", "Supporting Organizers", " Supporting Organizers Email",
              "Participants Name", "Participants Emails",
              "Max No of Preferred Dates", "Min No of Preferred Dates", "Preferred Dates",
-             "Max No of Impossible Dates","Min No of Impossible Dates", "Impossible Dates"].freeze
+             "Max No of Impossible Dates", "Min No of Impossible Dates", "Impossible Dates"].freeze
 
   def self.each_row(proposal)
     [proposal&.code, proposal&.title, proposal&.proposal_type&.name,
-     proposal&.the_locations, proposal&.assigned_location.name, proposal&.status, proposal&.outcome,
-     proposal&.updated_at&.to_date, proposal&.edit_flow.to_date ,proposal.subject&.title, proposal&.lead_organizer&.fullname, 
-     proposal&.lead_organizer&.email, supporting_organizer_fullnames(proposal), 
+     proposal&.the_locations, proposal&.assigned_location&.name, proposal&.status, proposal&.outcome,
+     proposal&.updated_at&.to_date, proposal&.edit_flow&.to_date,
+     proposal&.subject&.title, proposal&.lead_organizer&.fullname,
+     proposal&.lead_organizer&.email, supporting_organizer_fullnames(proposal),
      supporting_organizer_emails(proposal), participants_fullnames(proposal), participants_emails(proposal),
-     proposal&.proposal_type&.max_no_of_preferred_dates, proposal&.proposal_type.min_no_of_preferred_dates,
-     proposal&.preferred_dates.join(' ,'), proposal&.proposal_type&.max_no_of_impossible_dates, 
-     proposal&.proposal_type&.min_no_of_impossible_dates, proposal&.impossible_dates.join(' ,')]
+     proposal&.proposal_type&.max_no_of_preferred_dates, proposal&.proposal_type&.min_no_of_preferred_dates,
+     proposal&.preferred_dates, proposal&.proposal_type&.max_no_of_impossible_dates,
+     proposal&.proposal_type&.min_no_of_impossible_dates, proposal&.impossible_dates]
   end
 
   def pdf_file_type(file)
@@ -292,7 +293,7 @@ class Proposal < ApplicationRecord
     proposal_fields = answers.joins(:proposal_field).where("proposal_fields.fieldable_type =?",
                                                            "ProposalFields::PreferredImpossibleDate")
 
-    return '' if proposal_fields.blank?
+    return [] if proposal_fields.blank? || proposal_fields.first.answer.nil?
 
     JSON.parse(proposal_fields.first.answer)
   end
