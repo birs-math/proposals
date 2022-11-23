@@ -267,7 +267,6 @@ class SubmittedProposalsController < ApplicationController
 
 
   def post_to_workshop(proposals)
-    debugger
     proposals = proposals.map do |proposal| 
         {
           proposal_type: proposal.proposal_type.name,
