@@ -113,8 +113,8 @@ RSpec.describe ProposalsHelper, type: :helper do
 
   describe "#approved_proposals" do
     let(:proposal) { create(:proposal) }
-    let(:proposals) { create_list(:proposal, 3, outcome: 'Approved') }
-    it "return the code for approved proposals" do
+    let(:proposals) { create_list(:proposal, 3, outcome: 'Approved', assigned_size: 'Half') }
+    it "return the code for approved half proposals" do
       codes = [""] + proposals.pluck(:code)
       expect(approved_proposals(proposal)).to match_array(codes)
     end

@@ -106,7 +106,7 @@ class ProposalsController < ApplicationController
 
   def upload_file
     @proposal = Proposal.find(params[:id])
-    params[:files].each do |file|
+    params[:files]&.each do |file|
       if @proposal.pdf_file_type(file)
         @proposal.files.attach(file)
         render json: "File successfully uploaded", status: :ok

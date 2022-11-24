@@ -7,6 +7,6 @@ class Review < ApplicationRecord
   default_scope { order(version: :desc) }
 
   def file_type(file)
-    file.content_type.in?(["application/pdf", "text/plain"])
+    file&.content_type&.in?(["application/pdf", "text/plain"])
   end
 end

@@ -13,7 +13,7 @@ RSpec.describe "Reviews", type: :request do
         file = fixture_file_upload(Rails.root.join('spec/fixtures/files/review.text'), 'text/plain')
         expect do
           post add_file_review_url(review), params: { file: file }
-        end.to change(ActiveStorage::Attachment, :count).by(1)
+        end.to change(ActiveStorage::Attachment, :count).by(0)
       end
     end
 

@@ -278,8 +278,7 @@ class SubmittedProposalsController < ApplicationController
           dates: proposal.assigned_date
         }
     end
-
-    response = RestClient.post "http://localhost:4000/events/proposals", {proposals: proposals}.to_json, content_type: 'application/json'
+    response = RestClient.post "#{ENV.fetch('WORKSHOP_API_URL', nil)}/events/proposals", {proposals: proposals}.to_json, content_type: 'application/json'
   end
 
   def post_to_editflow
