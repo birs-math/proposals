@@ -86,6 +86,62 @@ RSpec.describe Proposal, type: :model do
         expect(proposal.the_locations).to eq("")
       end
     end
+  end 
+
+  describe '#supporting organizer fullnames' do
+    context "supporting organizer fullnames" do
+      let!(:proposal) { create(:proposal) }
+
+      before do
+        Proposal.supporting_organizer_fullnames(proposal)
+      end
+
+      it 'returns supporting organizers fullnames' do
+        expect(Proposal.supporting_organizer_fullnames(proposal)).to eq("#{proposal&.supporting_organizers&.first&.firstname}#{proposal&.supporting_organizers&.first&.lastname}" )
+      end
+    end
+  end 
+
+  describe '#supporting organizer emails' do
+    context "supporting organizer email" do
+      let!(:proposal) { create(:proposal) }
+
+      before do
+        Proposal.supporting_organizer_emails(proposal)
+      end
+
+      it 'returns supporting organizers emails' do
+        expect(Proposal.supporting_organizer_emails(proposal)).to eq("#{proposal&.supporting_organizers&.first&.email}" )
+      end
+    end
+  end  
+
+  describe '#participants fullnames' do
+    context "participants fullnames" do
+      let!(:proposal) { create(:proposal) }
+
+      before do
+        Proposal.participants_fullnames(proposal)
+      end
+
+      it 'returns participants fullnames' do
+        expect(Proposal.participants_fullnames(proposal)).to eq("#{proposal&.participants&.first&.firstname}#{proposal&.participants&.first&.lastname}" )
+      end
+    end
+  end 
+
+  describe '#participants emails' do
+    context "participants emails" do
+      let!(:proposal) { create(:proposal) }
+
+      before do
+        Proposal.participants_emails(proposal)
+      end
+
+      it 'returns participants emails' do
+        expect(Proposal.participants_emails(proposal)).to eq("#{proposal&.participants&.first&.email}" )
+      end
+    end
   end  
 
   describe '#list of organizers' do
@@ -163,7 +219,111 @@ RSpec.describe Proposal, type: :model do
         expect(proposal.invites_demographic_data).to eq([])
       end
     end
-  end  
+  end
+
+  describe '#birs email' do
+    context "birs email" do
+      emails = ['birs-director@birs.ca','birs@birs.ca']
+      let!(:proposal) { create(:proposal) }
+
+      before do
+        proposal.birs_emails
+      end
+      
+      it 'birs email' do
+        expect(proposal.birs_emails).to eq(emails)
+      end
+    end
+  end
+
+  describe '#max supporting organizers' do
+    context "max supporting organizers" do
+      let (:proposal_type) { create(:proposal_type, co_organizer: 3) }
+      let!(:proposal) { create(:proposal) }
+
+      before do
+        proposal.max_supporting_organizers
+      end
+      
+      it 'max supporting organizers' do
+        expect(proposal.max_supporting_organizers).to eq(3)
+      end
+    end
+  end
+
+  describe '#max participants' do
+    context "max participants" do
+      let (:proposal_type) { create(:proposal_type, participant: 2) }
+      let!(:proposal) { create(:proposal) }
+
+      before do
+        proposal.max_participants
+      end
+      
+      it 'max participants' do
+        expect(proposal.max_participants).to eq(proposal_type.participant)
+      end
+    end
+  end
+
+  describe '#max virtual participants' do
+    context "max virtual participants" do
+      let!(:proposal) { create(:proposal) }
+
+      before do
+        proposal.max_virtual_participants
+      end
+      
+      it 'max virtual participants' do
+        expect(proposal.max_virtual_participants).to eq(300)
+      end
+    end
+  end
+
+  describe '#max total participants' do
+    context "max total participants" do
+      let!(:proposal) { create(:proposal) }
+
+      before do
+        proposal.max_total_participants
+      end
+      
+      it 'max virtual total participants' do
+        expect(proposal.max_total_participants).to eq(302)
+      end
+    end
+  end
+
+  describe '#macros' do
+    context "macros" do
+      let!(:proposal) { create(:proposal) }
+
+      before do
+        proposal.macros
+      end
+      
+      it 'macros' do
+        expect(proposal.macros).to eq('')
+      end
+    end
+  end
+
+  describe '#pdf_file_type' do
+    include Rack::Test::Methods
+    include ActionDispatch::TestProcess::FixtureFile
+    context "pdf_file_type" do
+      let!(:proposal) { create(:proposal) }
+      let(:file) { fixture_file_upload(Rails.root.join('spec/fixtures/files/proposal_booklet.pdf')) }
+
+      before do
+        proposal.pdf_file_type(file)
+      end
+      
+      it 'pdf_file_type' do
+        expect(proposal.pdf_file_type(file)).to be_falsey
+      end
+    end
+  end
 
   describe '#subjects' do
     context 'When subject is not present' do

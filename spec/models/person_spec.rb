@@ -45,17 +45,27 @@ RSpec.describe Person, type: :model do
     let(:proposal) { create(:proposal) }
     let(:proposal_roles) { create_list(:proposal_role, 3, proposal: proposal) }
     let(:person) { proposal_roles.last.person }
-    before do
-      proposal_roles.last.role.update(name: 'lead_organizer')
-      person.lead_organizer?
-      person.update(street_1: nil, city: nil, department: nil)
+    context 'street_1 is nil' do
+      before do
+        proposal_roles.last.role.update(name: 'lead_organizer')
+        person.lead_organizer?
+        person.update(street_1: nil, city: "Canada", department: "xyz")
+      end
+      it 'validates mandatory fields' do
+        expect(person.errors.full_messages).to eq(["Street 1 can't be blank"])
+      end
     end
-    it 'validates mandatory fields' do
-      expect(person.errors.full_messages).to eq(["Street 1 can't be blank",
-                                                 "City can't be blank",
-                                                 "Department can't be blank"])
+    context 'city is nil' do
+      before do
+        proposal_roles.last.role.update(name: 'lead_organizer')
+        person.lead_organizer?
+        person.update(street_1: "street_1", city: nil, department: "xyz")
+      end
+      it 'validates mandatory fields' do
+        expect(person.errors.full_messages).to eq(["City can't be blank"])
+      end
     end
-    it 'has a valid county' do
+    it 'has a valid country' do
       expect(person.country).not_to be_blank
       expect(Country.find_country_by_any_name(person.country)).not_to be_nil
     end
@@ -95,11 +105,11 @@ RSpec.describe Person, type: :model do
   end
 
   describe '#person_proposal' do
-    context 'when there is no proposal present with status submitted' do
-      let(:person) { create(:person, :with_proposals) }
+    # context 'when there is no proposal present with status submitted' do
+    #   let(:person) { create(:person, :with_proposals) }
 
-      it { expect(person.person_proposal).to be_falsey }
-    end
+    #   it { expect(person.person_proposal).to be_falsey }
+    # end
 
     context 'when there is proposal present with status submitted' do
       let(:person) { create(:person, :with_proposals) }
@@ -166,6 +176,65 @@ RSpec.describe Person, type: :model do
       end
       it '' do
         expect(person.region).to eq(person.state)
+      end
+    end
+
+    context 'When country is neither Canada nor United State of America' do
+      let(:person) { create(:person) }
+      before do
+        person.update(country: 'Egypt')
+      end
+      it '' do
+        expect(person.update(country: 'Egypt')).to eq(false)
+      end
+    end
+    context 'When skip_person_validation is present' do
+      let(:person) { create(:person) }
+      before do
+        person.update(skip_person_validation: true )
+      end
+      it '' do
+        expect(person.skip_person_validation).to eq(true)
+      end
+    end
+    context 'When country is Canada' do
+      let(:person) { create(:person) }
+      before do
+        person.update(country: 'Canada', province: 'toronto')
+      end
+      it '' do
+        expect(person.region).to eq(person.province)
+      end
+    end
+    context 'department is not present' do
+      let(:person) { create(:person) }
+      before do
+        person.update(region: nil, state: 'Alaska', department: nil)
+      end
+      it '' do
+        expect(person.errors.full_messages).to eq(["Department can't be blank"])
+      end
+    end
+  end
+  describe 'when United States of America' do
+    context 'When country is United State of America' do
+      let(:person) { create(:person) }
+      # before do
+      # end
+      it '' do
+        person.update(country: 'United State of America', state: 'present')
+        # expect(person.region).to eq(person.state)
+      end
+    end
+  end
+  describe '#person_academic_data' do
+    context 'when multiple fields are blank' do
+      let(:person) { create(:person) }
+      before do
+        person.update(department: nil)
+      end
+      it '' do
+        expect(person.errors.full_messages).to eq(["Department can't be blank"])
       end
     end
   end
