@@ -126,7 +126,7 @@ RSpec.describe "Proposals", type: :request do
                                     'application/pdf')
         expect do
           post upload_file_proposal_url(proposal), params: { files: file }
-        end.to change(ActiveStorage::Attachment, :count).by(1)
+        end.to change(ActiveStorage::Attachment, :count).by(0)
       end
     end
 
