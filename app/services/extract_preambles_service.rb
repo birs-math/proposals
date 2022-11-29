@@ -1,6 +1,5 @@
 class ExtractPreamblesService
   attr_reader :proposals
-
   def initialize(proposals)
     @proposals = proposals
     @proposals_object = []
