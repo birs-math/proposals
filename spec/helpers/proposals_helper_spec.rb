@@ -21,6 +21,16 @@ RSpec.describe ProposalsHelper, type: :helper do
 
   describe "#proposal_type_year" do
     let(:proposal_type) { create(:proposal_type) }
+    before do
+      proposal_type.update(year: '')
+    end
+    it "returns date if year is blank" do
+      expect(proposal_type_year(proposal_type)).to eq([Date.current.year + 2])
+    end
+  end
+
+  describe "#proposal_type_year" do
+    let(:proposal_type) { create(:proposal_type) }
     it "return array of year comma separated [year]" do
       expect(proposal_type_year(proposal_type)).to eq(%w[2021 2022 2023])
     end
@@ -55,7 +65,7 @@ RSpec.describe ProposalsHelper, type: :helper do
   describe "#common_proposal_fields" do
     let(:p_type) { create(:proposal_type) }
     let(:p_form) { create(:proposal_form, proposal_type: p_type, status: :active) }
-    let(:fields) { create(:proposal_field, :radio_field, proposal_form: p_form) }
+    let(:fields) { create(:proposal_field, :radio_field, proposal_form: p_form, location_id: nil) }
     let(:proposal) { create(:proposal, proposal_form: p_form, proposal_type: p_type) }
     it "returns proposal fields" do
       fields
