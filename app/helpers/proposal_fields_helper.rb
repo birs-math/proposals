@@ -98,7 +98,7 @@ module ProposalFieldsHelper
 
   def action
     params[:action] == 'show' || params[:action] == 'proposal_version' ||
-      (params[:action] == 'location_based_fields' && request.referer.exclude?('edit'))
+      (params[:action] == 'location_based_fields' && request&.referer&.exclude?('edit'))
   end
 
   def disable_proposal_meeting_type

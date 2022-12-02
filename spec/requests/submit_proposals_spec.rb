@@ -41,7 +41,7 @@ RSpec.describe "/submit_proposals", type: :request do
     end
 
     let(:params) do
-      { proposal: proposal.id, title: 'Test proposal', year: '2023',
+      { proposal: proposal.id, title: 'Test proposal', year: '2023', assigned_date: Date.today.to_date, applied_date: Date.today.to_date,
         subject_id: subject.id,
         ams_subjects: { code1: ams_subjects.first.id,
                         code2: ams_subjects.last.id },

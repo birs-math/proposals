@@ -55,6 +55,23 @@ RSpec.describe "/submitted_proposals", type: :request do
     end
   end
 
+  describe "POST /send_to_workshop" do
+    let!(:proposals) { create_list(:proposal, 3) }
+    before do 
+      proposals
+    end
+    it 'when proposal is selected' do
+      proposal_ids = [proposal.id]
+      post sendToWorkshop_submitted_proposals_path(ids: [proposal_ids])
+      expect(response).to have_http_status(:ok)
+    end
+    it 'no proposal is selected' do
+      proposal_ids = []
+      post sendToWorkshop_submitted_proposals_path(ids: [proposal_ids])
+      expect(response).to have_http_status(:ok)
+    end
+  end
+
   describe "GET /show" do
     let(:proposal_roles) { create_list(:proposal_role, 3, proposal: proposal) }
     before do
@@ -88,9 +105,27 @@ RSpec.describe "/submitted_proposals", type: :request do
     let(:params) do
       { ids: proposal.id }
     end
+
     it 'when status is unprocessable_entity' do
       post edit_flow_submitted_proposals_url, params: params
       expect(response).to have_http_status(:unprocessable_entity)
+    end
+  end
+
+  describe "POST /edit_flow when ids are in params" do
+    let(:proposal) { create(:proposal, status: 'initial_review') }
+    let(:subject) { create(:subject) }
+    let!(:ams_subject) { create(:ams_subject, subject: subject) }
+    let(:params) do
+      { ids: proposal.id }
+    end
+
+    before do
+      proposal.edit_flow
+    end
+    it 'when status is unprocessable_entity' do
+      post edit_flow_submitted_proposals_url, params: params
+      expect(response).to have_http_status(:initial_review)
     end
   end
 
@@ -124,6 +159,7 @@ RSpec.describe "/submitted_proposals", type: :request do
     end
   end
 
+
   describe "POST /send_emails with wrong params" do
     let(:email_template) { create(:email_template, email_type: :revision_type) }
     let(:params) do
@@ -131,9 +167,9 @@ RSpec.describe "/submitted_proposals", type: :request do
         bcc_email: '',
         subject: email_template.subject,
         body: email_template.body,
-        templates: "Test: Test Proposal" }
+        templates: "Test: Test Proposal"}
     end
-
+    
     it "send emails to lead_organizer" do
       post send_emails_submitted_proposal_path(proposal, params: params)
       expect(response).to redirect_to(edit_submitted_proposal_path(proposal))
@@ -141,16 +177,22 @@ RSpec.describe "/submitted_proposals", type: :request do
   end
 
   describe "POST /send_emails with params Revision" do
+    let!(:proposal) { create(:proposal, status: 'draft') }
     let(:email_template) { create(:email_template, email_type: :revision_type) }
     let(:params) do
       { cc_email: '',
         bcc_email: '',
         subject: email_template.subject,
         body: email_template.body,
-        templates: "Revision: Revision Proposal" }
+        templates: "Revision: Revision Proposal",
+        action: 'show' }
+    end
+
+    before do
     end
 
     it "send emails to lead_organizer" do
+      @check_status = proposal.editable?
       post send_emails_submitted_proposal_path(proposal, params: params)
       expect(response).to redirect_to(edit_submitted_proposal_path(proposal))
     end
@@ -196,7 +238,8 @@ RSpec.describe "/submitted_proposals", type: :request do
         bcc_email: Faker::Internet.email(domain: 'gmail.com'),
         subject: email_template.subject,
         body: email_template.body,
-        templates: "Reject: Reject Proposal" }
+        templates: "Reject: Reject Proposal",
+        action: 'show' }
     end
 
     it "send emails to lead_organizer" do
@@ -231,8 +274,10 @@ RSpec.describe "/submitted_proposals", type: :request do
         body: email_template.body,
         proposal_ids: proposal.id }
     end
+    
     context 'when proposal can be approved/rejected' do
       before do
+
         post approve_decline_proposals_submitted_proposals_path(params: params)
       end
 
@@ -374,6 +419,7 @@ RSpec.describe "/submitted_proposals", type: :request do
 
   describe ' POST /submitted_proposals/revise_proposal_editflow' do
     it 'revise proposal editflow when not progress spc' do
+      proposal.update(editflow_id: 122)
       post revise_proposal_editflow_submitted_proposals_url(proposal_id: proposal.id)
       expect(response).to have_http_status(302)
     end
@@ -392,9 +438,9 @@ RSpec.describe "/submitted_proposals", type: :request do
   end
 
   describe 'GET/ reviews_excel_booklet_submitted_proposals' do
+    let!(:proposal) { create(:proposal) }
     let(:subject) { create(:subject) }
     let!(:review) { create(:review, person_id: person.id) }
-
     it 'when file is not present' do
       params = { proposals: proposal.id,
                  format: :xlsx }
@@ -422,4 +468,56 @@ RSpec.describe "/submitted_proposals", type: :request do
     #   expect(response).to have_http_status(200)
     # end
   end
+
+  describe 'GET/ reviews_excel_booklet_submitted_proposals' do
+    let(:subject) { create(:subject) }
+    let!(:review) { create(:review, person_id: person.id) }
+
+    before do
+    end
+
+    it 'when proposal ids not present for reviews' do
+      params = { proposals: nil,
+                 format: :xlsx }
+      proposal.update(subject_id: subject.id)
+      review.update(proposal_id: proposal.id)
+      get reviews_excel_booklet_submitted_proposals_path, params: params
+      expect(response).to have_http_status(200)
+    end
+  end
+
+  describe 'GET/ reviews_excel_booklet_submitted_proposals' do
+    let!(:proposal) { create(:proposal) }
+    let(:subject) { create(:subject) }
+    let!(:review) { create(:review, person_id: person.id) }
+
+    before do
+    end
+
+    it 'when proposal ids present for reviews' do
+      params = { proposals: proposal.id,
+                 format: :xlsx }
+      proposal.update(subject_id: subject.id)
+      review.update(proposal_id: proposal.id)
+      get reviews_excel_booklet_submitted_proposals_path, params: params
+      expect(response).to have_http_status(200)
+    end
+  end
+
+  describe 'GET/ reviews_excel_booklet_submitted_proposals' do
+    let!(:proposal) { create(:proposal, editflow_id: 1222) }
+    let(:subject) { create(:subject) }
+
+    before do
+    end
+
+    it 'when proposal ids present for reviews' do
+      params = { proposals: proposal.id,
+                 format: :xlsx }
+      proposal.update(subject_id: subject.id)
+      get reviews_excel_booklet_submitted_proposals_path, params: params
+      expect(response).to have_http_status(200)
+    end
+  end
+
 end

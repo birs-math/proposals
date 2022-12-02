@@ -189,7 +189,7 @@ class SubmittedProposalsController < ApplicationController
 
   def reviews_excel_booklet
     check_selected_proposals
-    @proposals = Proposal.where(id: params[:proposals].split(','))
+    @proposals = Proposal.where(id: params[:proposals]&.split(','))
     log_activities(@proposals)
     respond_to do |format|
       format.xlsx
@@ -530,8 +530,8 @@ class SubmittedProposalsController < ApplicationController
   def check_proposals_reviews
     return if @proposal_ids.blank?
 
-    pids = @proposal_ids.is_a?(String) ? @proposal_ids.split(',') : @proposal_ids
-    pids.each do |id|
+    pids = @proposal_ids&.is_a?(String) ? @proposal_ids&.split(',') : @proposal_ids
+    pids&.each do |id|
       @proposal = Proposal.find_by(id: id)
       reviews_conditions
     end
