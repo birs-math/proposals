@@ -39,7 +39,7 @@ RSpec.describe ProposalType, type: :model do
       it 'expecting' do
         proposal_type.update(open_date: Date.today + 10.days)
         response = proposal_type.not_closed_date_greater
-        expect(proposal_type.errors.full_messages).to eq(["Open date  2022-12-09 - cannot be greater than Closed Date 2022-12-06", "Open date  2022-12-09 - cannot be greater than Closed Date 2022-12-06"])
+        expect(proposal_type.errors.full_messages).to eq(["Open date  2022-12-15 - cannot be greater than Closed Date 2022-12-11", "Open date  2022-12-15 - cannot be greater than Closed Date 2022-12-11"])
       end
     end
 
@@ -47,7 +47,7 @@ RSpec.describe ProposalType, type: :model do
       it 'expecting' do
         proposal_type.update(open_date: Date.today, closed_date: Date.today)
         response = proposal_type.not_closed_date_greater
-        expect(proposal_type.errors.full_messages).to eq(["Open date  2022-11-29 - cannot be same as Closed Date 2022-11-29", "Open date  2022-11-29 - cannot be same as Closed Date 2022-11-29"])
+        expect(proposal_type.errors.full_messages).to eq(["Open date  2022-12-05 - cannot be same as Closed Date 2022-12-05", "Open date  2022-12-05 - cannot be same as Closed Date 2022-12-05"])
       end
     end
   end

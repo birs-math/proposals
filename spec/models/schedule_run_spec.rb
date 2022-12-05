@@ -52,18 +52,24 @@ RSpec.describe ScheduleRun, type: :model do
     end
   end
 
-  # describe '#to_csv' do
-  #   context 'Generate CSV file' do
-  #     let(:schedule_run) {create :schedule_run}
-  #     let(:schedule_run_id) {schedule_run.id}
-  #     let(:schedule) {create :schedule}
-  #     let(:case_num) {schedule.case_num}
-  #     let(:csv) {Schedule.new}
+  describe '#to_csv' do
+    context 'Generate CSV file' do
+      let(:proposal) { create :proposal }
+      let(:schedule_run) {create :schedule_run}
+      let(:schedule) { create(:schedule, schedule_run_id: schedule_run.id, proposal: proposal) }
+      let(:case_num) {schedule.case_num}
+      let(:csv) {Schedule.new}
 
-  #     it 'creates CSV file with proper value' do
-  #       expect(schedule_run.to_csv(1).to match_array(CSV.generate_line([
-  #       schedule,proposal]))
-  #     end
-  #   end
-  # end
+      before do
+        proposal
+        schedule
+        schedule_run.each_schedule_row(schedule,proposal)
+        schedule_run.to_csv(case_num)
+      end
+
+      it 'creates CSV file with proper value' do
+        expect(schedule_run.to_csv(1)).to eq("Week,Proposal Code,Preferred Dates,Impossible Dates\n")
+      end
+    end
+  end
 end
