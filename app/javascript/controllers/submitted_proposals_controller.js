@@ -289,6 +289,21 @@ export default class extends Controller {
     }
   }
 
+  workshop() {
+    var proposalIds = [];
+    $("input:checked").each(function() {
+      proposalIds.push(this.dataset.value);
+    });
+    if(typeof proposalIds[0] === "undefined")
+    {
+      toastr.error("Please select any checkbox!")
+    }
+    else {
+      let selectedProposals = proposalIds.filter((x) => typeof x !== "undefined")
+      $.post(`/submitted_proposals/sendToWorkshop?ids=${selectedProposals}`)
+    }
+  }
+
   importReviews() {
     var proposalIds = [];
     $("input:checked").each(function() {

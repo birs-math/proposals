@@ -65,17 +65,16 @@ class ProposalFieldValidationsService
     if preferred_dates.count < proposal.proposal_type.min_no_of_preferred_dates
       @errors << "You have to choose atleast #{proposal.proposal_type.min_no_of_preferred_dates}
       preferred dates"
-    end
+   	end
     if impossible_dates.count > proposal.proposal_type.max_no_of_impossible_dates
-      @errors << "You can choose maximum #{proposal.proposal_type.max_no_of_impossible_dates}
+    	@errors << "You can choose maximum #{proposal.proposal_type.max_no_of_impossible_dates}
       impossible dates"
-    end
+   	end
     if impossible_dates.count < proposal.proposal_type.min_no_of_impossible_dates
       @errors << "You have to choose atleast #{proposal.proposal_type.min_no_of_impossible_dates}
       impossible dates"
     end
   end
-
   def attached_file
     !Answer.find_by(proposal_field_id: field.id, proposal_id: proposal.id)&.file&.attached?
   end

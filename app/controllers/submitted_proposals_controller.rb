@@ -20,6 +20,11 @@ class SubmittedProposalsController < ApplicationController
     @proposal.invites.build
   end
 
+  def sendToWorkshop
+    proposals = Proposal.where(id: params[:ids].split(','))
+    post_to_workshop(proposals)
+  end
+
   def download_csv
     @proposals = Proposal.where(id: params[:ids].split(','))
     log_activities(@proposals)
@@ -184,7 +189,7 @@ class SubmittedProposalsController < ApplicationController
 
   def reviews_excel_booklet
     check_selected_proposals
-    @proposals = Proposal.where(id: params[:proposals].split(','))
+    @proposals = Proposal.where(id: params[:proposals]&.split(','))
     log_activities(@proposals)
     respond_to do |format|
       format.xlsx
@@ -258,6 +263,22 @@ class SubmittedProposalsController < ApplicationController
     Rails.logger.info { "\n\nError creating #{@proposal&.code} PDF: #{e.message}\n\n" }
     flash[:alert] = "Error creating #{@proposal&.code} PDF: #{e.message}"
     false
+  end
+
+
+  def post_to_workshop(proposals)
+    proposals = proposals.map do |proposal| 
+        {
+          proposal_type: proposal.proposal_type.name,
+          proposal_year: proposal.year,
+          proposal_id: proposal.id,
+          code: proposal.code,
+          workshop_name: proposal.title,
+          participants: proposal.invites.where(status: "confirmed", invited_as: "Participant"),
+          dates: proposal.assigned_date
+        }
+    end
+    response = RestClient.post "#{ENV.fetch('WORKSHOPS_API_URL', nil)}/events/proposals", {proposals: proposals}.to_json, content_type: 'application/json'
   end
 
   def post_to_editflow
@@ -509,8 +530,8 @@ class SubmittedProposalsController < ApplicationController
   def check_proposals_reviews
     return if @proposal_ids.blank?
 
-    pids = @proposal_ids.is_a?(String) ? @proposal_ids.split(',') : @proposal_ids
-    pids.each do |id|
+    pids = @proposal_ids&.is_a?(String) ? @proposal_ids&.split(',') : @proposal_ids
+    pids&.each do |id|
       @proposal = Proposal.find_by(id: id)
       reviews_conditions
     end

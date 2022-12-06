@@ -28,6 +28,26 @@ RSpec.describe ProposalFieldsHelper, type: :helper do
     end
   end
 
+  describe "#proposal_field_partial" do
+    let(:field) { create(:proposal_field) }
+
+    it "returns proposal field partial" do
+      expect(proposal_field_partial(field)).to eq("proposal_fields/#{field.fieldable_type.split('::').last.underscore}")
+    end
+  end
+
+  describe "#preferred impossible dates" do
+    let(:field) { create(:proposal_field) }
+
+    before do
+      field.fieldable.update(statement: "test statement")
+    end
+
+    it "returns preferred impossible dates" do
+      expect(preferred_impossible_dates(field, "statement")).to eq([["test statement", "test statement"]])
+    end
+  end
+
   describe "#options_for_field" do
     let(:single_choice_field) { create(:proposal_field, :single_choice_field) }
     let(:date_field) { create(:proposal_field, :date_field) }
@@ -215,6 +235,22 @@ RSpec.describe ProposalFieldsHelper, type: :helper do
     end
   end
 
+  describe '#active tab' do
+    let!(:proposal) { create(:proposal) }
+
+    it 'when it returns active' do
+      param_tab = 'tab-2'
+      tab = 'two'
+      expect(active_tab(proposal,tab,param_tab)).to eq 'active'
+    end
+
+    it 'when it returns ''' do
+      param_tab = 'tab-2'
+      tab = 'tab'
+      expect(active_tab(proposal,tab,param_tab)).to eq ''
+    end
+  end
+
   describe '#tab_errors' do
     let(:locations) { create_list(:location, 4) }
     let!(:proposal_type) { create(:proposal_type, locations: locations) }
@@ -260,6 +296,98 @@ RSpec.describe ProposalFieldsHelper, type: :helper do
         response = tab_errors(proposal, param_tab)
         invite.update(status: "confirmed")
         expect(response)
+      end
+    end
+  end
+
+  describe '#tab_errors' do
+    let(:locations) { create_list(:location, 4) }
+    let!(:proposal_type) { create(:proposal_type, locations: locations) }
+    let(:subject) { create(:subject) }
+    let!(:proposal) { create(:proposal, proposal_type: proposal_type, subject_id: subject.id) }
+
+    before do
+      param_tab = 'test'
+      tab_errors(proposal,param_tab)
+    end
+    
+    it 'when it returns one' do
+      expect(tab_one(proposal)).to eq true
+    end
+  end
+
+  describe '#tab_errors' do
+    let(:locations) { create_list(:location, 4) }
+    let!(:proposal_type) { create(:proposal_type, locations: locations) }
+    let(:subject) { create(:subject) }
+    let!(:proposal) { create(:proposal, proposal_type: proposal_type, subject_id: subject.id) }
+
+    before do
+      param_tab = 'test'
+      tab_errors(proposal,param_tab)
+    end
+    
+    it 'when it returns two' do
+      expect(tab_two(proposal)).to eq false
+    end
+  end
+
+  describe '#tab_errors' do
+    let(:locations) { create_list(:location, 4) }
+    let!(:proposal_type) { create(:proposal_type, locations: locations) }
+    let(:subject) { create(:subject) }
+    let!(:proposal) { create(:proposal, proposal_type: proposal_type, subject_id: subject.id) }
+
+    before do
+      param_tab = 'test'
+      tab_errors(proposal,param_tab)
+    end
+
+    it 'when it returns three' do
+      expect(tab_three(proposal)).to eq true
+    end
+  end
+
+  describe '#action' do
+    context "when action is show" do
+      let(:params) do
+        { action: 'show' }
+      end
+
+      it 'when it returns true' do
+        expect(action).to be_truthy
+      end
+    end
+
+    context "when action is location_based_fields and request exclude edit" do
+      let(:params) do
+        { action: 'location_based_fields' }
+      end
+
+      it 'when it returns true' do
+        expect(action).to eq(nil)
+      end
+    end
+  end
+
+  describe '#disable proposal meeting type' do
+    context "when action is show or edit" do
+      let(:params) do
+        { action: 'show' }
+      end
+
+      it 'when it returns true' do
+        expect(disable_proposal_meeting_type).to be_truthy
+      end
+    end
+
+    context "when action is location_based_fields and request exclude edit" do
+      let(:params) do
+        { action: 'location_based_fields' }
+      end
+
+      it 'when it returns true' do
+        expect(action).to eq nil
       end
     end
   end
@@ -438,6 +566,29 @@ RSpec.describe ProposalFieldsHelper, type: :helper do
       it 'with no current user' do
         expect(can_edit(proposal_form))
       end
+    end
+  end
+
+  describe '#can_edit' do
+    let(:person) { create(:person) }
+    let(:role) { create(:role, name: 'Staff') }
+    let(:current_user) { create(:user, person: person) }
+    let(:role_privilege) do
+      create(:role_privilege,
+             permission_type: "Manage", privilege_name: "ProposalForm", role_id: role.id)
+    end
+    let!(:proposal_form) { create(:proposal_form, status: "draft") }
+    let(:params) do
+      { action: 'edit' }
+    end
+
+    before do
+      role_privilege
+      current_user.roles << role
+    end
+
+    it 'if will return true if status present and action is edit' do
+      expect(can_edit(proposal_form)).to be_truthy
     end
   end
 end

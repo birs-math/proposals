@@ -31,8 +31,17 @@ RSpec.describe "/submit_proposals", type: :request do
                  deadline_date: DateTime.now, invited_as: 'Organizer' }
       }
     end
+
+    let(:person) { create(:person) }
+    let(:role) { create(:role, name: 'Staff') }
+    let(:user) { create(:user, person: person) }
+    let(:role_privilege) do
+      create(:role_privilege,
+             permission_type: "Manage", privilege_name: "SubmitProposalsController", role_id: role.id)
+    end
+
     let(:params) do
-      { proposal: proposal.id, title: 'Test proposal', year: '2023',
+      { proposal: proposal.id, title: 'Test proposal', year: '2023', assigned_date: Date.today.to_date, applied_date: Date.today.to_date,
         subject_id: subject.id,
         ams_subjects: { code1: ams_subjects.first.id,
                         code2: ams_subjects.last.id },
@@ -41,6 +50,9 @@ RSpec.describe "/submit_proposals", type: :request do
     end
 
     before do
+      role_privilege
+      user.roles << role
+      sign_in user
       post submit_proposals_url, params: params, xhr: true
     end
 
@@ -75,10 +87,13 @@ RSpec.describe "/submit_proposals", type: :request do
     end
 
     context 'with valid invite params, as lead organizer' do
+      let!(:proposal) { build :proposal, proposal_type: proposal_type, is_submission: true}
       before do
         @prop = @person.proposals.first
         expect(@person.user.lead_organizer?(@prop)).to be_truthy
         @invites_count = @prop.invites.count
+        @submission = SubmitProposalService.new(proposal,params)
+        @submission.params[:commit] = true
         post submit_proposals_url, params: params.merge(proposal: @prop.id), xhr: true
       end
 
@@ -128,7 +143,7 @@ RSpec.describe "/submit_proposals", type: :request do
       it "does not update the proposal invites count" do
         expect(proposal.invites.count).to eq(0)
       end
-    end
+    end 
 
     context 'with invalid invite params, as lead organizer' do
       before do
