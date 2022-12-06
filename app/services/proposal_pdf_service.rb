@@ -27,7 +27,7 @@ class ProposalPdfService
   def generate_latex_file
     @input = @input.presence || 'Please enter some text.'
     @input = all_proposal_fields if @input == 'all'
-    generate_pdf_with_reviews if proposal.reviews.count.positive?
+    # generate_pdf_with_reviews if proposal.reviews.count.positive?
     LatexToPdf.config[:arguments].delete('-halt-on-error') if @proposal.is_submission
 
     File.open("#{Rails.root}/tmp/#{temp_file}", "w:UTF-8") do |io|
