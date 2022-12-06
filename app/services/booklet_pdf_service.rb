@@ -142,7 +142,7 @@ class BookletPdfService
   end
 
   def selected_proposals_subjects(proposals)
-    subjects_with_proposals = proposals.sort_by { |p| p.subject.title }.group_by(&:subject_id)
+    subjects_with_proposals = proposals.sort_by { |p| p&.subject&.title }.group_by(&:subject_id)
     first_subject_proposal(subjects_with_proposals)
     subjects_with_proposals
   end
@@ -176,7 +176,7 @@ class BookletPdfService
   end
 
   def proposals_heading
-    @proposals = @proposals_ids.split(",").first.to_i
+    @proposals = @proposals_ids&.split(",")&.first&.to_a
     @proposals_ids.split(',').each_with_index do |id, index|
       proposal = Proposal.find_by(id: id)
       @proposal = proposal
