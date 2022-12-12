@@ -93,4 +93,52 @@ RSpec.describe "/person", type: :request do
       end
     end
   end
+
+  describe "GET /show_person_modal" do
+    let!(:proposal) { create(:proposal) }
+    let!(:proposal_roles) { create_list(:proposal_role, 3, proposal: proposal) }
+    let!(:person) { proposal_roles.last.person }
+
+    before do
+      role_privilege
+      user.roles << role
+      sign_in user
+      proposal_roles.last.role.update(name: 'lead_organizer')
+    end
+    it "renders a partial" do
+      proposal
+      person
+      get show_person_modal_url(proposal.id)
+      expect(response).to have_http_status(:ok)
+    end
+  end
+
+  describe "PATCH /update_lead_organizer" do
+    let!(:proposal) { create(:proposal) }
+    let!(:proposal_roles) { create_list(:proposal_role, 3, proposal: proposal) }
+    let!(:person) { proposal_roles.last.person }
+    let(:params) do
+      {
+        person_id: proposal_roles.last.person_id,
+        person: {
+          firstname: "Test FirstName",
+          lastname: "Test LastName",
+          email: "test email",
+          affiliation: "Test Affiliation"
+        }
+      }
+    end
+    before do
+      role_privilege
+      user.roles << role
+      sign_in user
+    end
+    it "redirect edit_submitted_proposal" do
+      proposal
+      person
+      patch update_lead_organizer_url(proposal.id), params: params
+      expect(response).to redirect_to(edit_submitted_proposal_url(proposal.id))
+    end
+  end
+
 end

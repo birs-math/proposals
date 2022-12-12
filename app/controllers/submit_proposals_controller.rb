@@ -197,7 +197,7 @@ class SubmitProposalsController < ApplicationController
     placeholders = { "Proposal_lead_organizer_name" => @proposal&.lead_organizer&.fullname,
                      "proposal_type" => @proposal.proposal_type&.name,
                      "proposal_title" => @proposal&.title }
-    placeholders.each { |k, v| @template_body.gsub!(k, v) }
+    placeholders.each { |k, v| @template_body&.gsub!(k, v) }
   end
 
   def staff_redirect

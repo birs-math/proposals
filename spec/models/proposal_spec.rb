@@ -345,4 +345,68 @@ RSpec.describe Proposal, type: :model do
       end
     end
   end
+
+  describe '#preferred_dates' do
+    context 'When answer is not present' do
+      let!(:proposal) { create(:proposal) }
+      let(:answer) { create(:answer) }
+
+      before do
+        answer = nil
+      end
+      it 'return '' when answer is blank' do
+        expect(proposal.preferred_dates).to include('')
+      end
+    end
+  end
+
+  describe '#preferred_dates' do
+    context 'When answer is present' do
+      let(:proposal) { create(:proposal, assigned_date: "2023-01-15 - 2023-01-20") }
+      let!(:proposal_field) { create(:proposal_field) }
+      let(:schedule_run) { create(:schedule_run) }
+      let(:schedule) { create(:schedule, schedule_run_id: schedule_run.id) }
+      let!(:answers) { create(:answer, proposal: proposal, proposal_field: proposal_field) }
+
+      before do
+        proposal_field.update_columns(fieldable_type: "ProposalFields::PreferredImpossibleDate")
+        proposal_field.answer.update_columns(answer: "[\" 01/19/24 to 01/23/24\", \"04/11/24 to 04/15/24\", \"07/11/24 to 7/15/24\", \"08/11/24 to 08/15/24\", \"\", \"12/11/24 to 12/15/24\", \" 02/19/24 to 02/23/24\"]")
+      end
+      it 'return preferred_dates' do
+        expect(proposal.preferred_dates).to be_a Array
+      end
+    end
+  end
+
+  describe '#impossible_dates' do
+    context 'When answer is not present' do
+      let!(:proposal) { create(:proposal) }
+      let(:answer) { create(:answer) }
+
+      before do
+        answer = nil
+      end
+      it 'return '' when answer is blank' do
+        expect(proposal.impossible_dates).to eq []
+      end
+    end
+  end
+
+  describe '#impossible_dates' do
+    context 'When answer is present' do
+      let(:proposal) { create(:proposal, assigned_date: "2023-01-15 - 2023-01-20") }
+      let!(:proposal_field) { create(:proposal_field) }
+      let(:schedule_run) { create(:schedule_run) }
+      let(:schedule) { create(:schedule, schedule_run_id: schedule_run.id) }
+      let!(:answers) { create(:answer, proposal: proposal, proposal_field: proposal_field) }
+
+      before do
+        proposal_field.update_columns(fieldable_type: "ProposalFields::PreferredImpossibleDate")
+        proposal_field.answer.update_columns(answer: "[\" 01/19/24 to 01/23/24\", \"04/11/24 to 04/15/24\", \"07/11/24 to 7/15/24\", \"08/11/24 to 08/15/24\", \"\", \"12/11/24 to 12/15/24\", \" 02/19/24 to 02/23/24\"]")
+      end
+      it 'return impossible dates' do
+        expect(proposal.impossible_dates).to be_a Array
+      end
+    end
+  end
 end
