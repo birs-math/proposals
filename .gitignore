@@ -44,6 +44,7 @@ docker-compose.yml
 .DS_Store
 coverage
 public/coverage
+.idea/
 
 /public/packs
 /public/packs-test
@@ -54,3 +55,4 @@ yarn-debug.log*
 spec/examples.txt
 
 volumes
+.env.rb
