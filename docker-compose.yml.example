@@ -5,6 +5,8 @@
 # Create data volumes like this:
 # docker volume create --name=proposals_data --label proposals_database
 #
+# docker volume create --name=redis_data --label redis_data
+#
 # docker volume create --name=proposals_cache --label proposals_cache
 #
 # Be sure to update all of the usernames, passwords, and keys with secure ones!
@@ -19,9 +21,9 @@ services:
     container_name: proposals_db
     volumes:
       - ./db/pg-init:/docker-entrypoint-initdb.d
-      - poposals_data:/var/lib/postgresql/data
+      - proposals_data:/var/lib/postgresql/data
     environment:
-      - POSTGRES_USER=postges
+      - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=
       - PSQL_TRUST_LOCALNET=true
       - DB_PORT=5433
