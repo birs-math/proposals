@@ -40,7 +40,7 @@ RSpec.describe "/person", type: :request do
 
     it 'redirect to root_path when person is not present' do
       get new_person_url(code: 'test', response: 'yes')
-      # expect(response).to have_http_status(302)
+
       expect(response).to redirect_to(root_path)
     end
   end

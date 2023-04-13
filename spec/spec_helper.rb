@@ -1,9 +1,16 @@
 ENV['RAILS_ENV'] = 'test'
+# TODO: this should be moved to CircleCI
+ENV['WORKSHOPS_API_URL'] = 'workshops.example.com'
+ENV['EDITFLOW_API_URL'] = 'editflow.example.com'
+
 require_relative '../config/environment'
 require 'rails/test_help'
 require 'simplecov'
 require 'simplecov-lcov'
 require 'factory_bot_rails'
+require 'webmock/rspec'
+
+WebMock.disable_net_connect!(allow_localhost: true)
 
 SimpleCov::Formatter::LcovFormatter.config.report_with_single_file = true
 COVERAGE_FORMATTER = SimpleCov::Formatter::MultiFormatter.new([

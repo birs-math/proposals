@@ -20,13 +20,14 @@ class SubmittedProposalsController < ApplicationController
     @proposal.invites.build
   end
 
-  def sendToWorkshop
+  def send_to_workshop
     proposals = Proposal.where(id: params[:ids].split(','))
     post_to_workshop(proposals)
   end
 
   def download_csv
-    @proposals = Proposal.where(id: params[:ids].split(','))
+    @proposals = Proposal.where(id: params[:ids]&.split(','))
+
     log_activities(@proposals)
     send_data Proposal.to_csv(@proposals), filename: "submitted_proposals.csv"
   end
@@ -36,7 +37,7 @@ class SubmittedProposalsController < ApplicationController
       @proposal = Proposal.find_by(id: id.to_i)
       check_proposal_status and return unless @proposal.may_progress?
 
-      break unless post_to_editflow
+      next unless post_to_editflow
     end
 
     respond_to do |format|
@@ -49,9 +50,8 @@ class SubmittedProposalsController < ApplicationController
   def revise_proposal_editflow
     @proposal = Proposal.find_by(id: params[:proposal_id].to_i)
     unless @proposal.may_requested? || @proposal.may_revision?
-      redirect_to versions_proposal_url(@proposal),
+      return redirect_to versions_proposal_url(@proposal),
                   alert: "Proposal status should be initial_review or revision_submitted_before_review."
-      return
     end
     check_proposal_editflow_id
     nil
@@ -267,7 +267,7 @@ class SubmittedProposalsController < ApplicationController
 
 
   def post_to_workshop(proposals)
-    proposals = proposals.map do |proposal| 
+    proposals = proposals.map do |proposal|
         {
           proposal_type: proposal.proposal_type.name,
           proposal_year: proposal.year,
@@ -278,7 +278,8 @@ class SubmittedProposalsController < ApplicationController
           dates: proposal.assigned_date
         }
     end
-    response = RestClient.post "#{ENV.fetch('WORKSHOPS_API_URL', nil)}/events/proposals", {proposals: proposals}.to_json, content_type: 'application/json'
+
+    RestClient.post "#{ENV['WORKSHOPS_API_URL']}/events/proposals", {proposals: proposals}.to_json, content_type: 'application/json'
   end
 
   def post_to_editflow
@@ -293,7 +294,7 @@ class SubmittedProposalsController < ApplicationController
     end
     return if flash[:alert].present?
 
-    response = RestClient.post ENV.fetch('EDITFLOW_API_URL', nil),
+    response = RestClient.post ENV['EDITFLOW_API_URL'],
                                { query: edit_flow_query, fileMain: File.open(@pdf_path) },
                                { x_editflow_api_token: ENV.fetch('EDITFLOW_API_TOKEN', nil) }
 
@@ -328,6 +329,9 @@ class SubmittedProposalsController < ApplicationController
   def store_response_id(response)
     response_body = JSON.parse(response.body)
     article = response_body["data"]["article"]
+
+    return unless article
+
     @id = article["id"]
     @proposal.update(editflow_id: @id, edit_flow: DateTime.current)
     @proposal_version = @proposal.proposal_versions.find_by(version: 1)
@@ -340,7 +344,6 @@ class SubmittedProposalsController < ApplicationController
     else
       revision_proposal
     end
-    nil
   end
 
   def revision_proposal
@@ -362,7 +365,7 @@ class SubmittedProposalsController < ApplicationController
 
     return unless cover_letter_file
 
-    response = RestClient.post ENV.fetch('EDITFLOW_API_URL', nil),
+    response = RestClient.post ENV['EDITFLOW_API_URL'],
                                { query: revise_query, fileMain: File.open(@pdf_path),
                                  fileRevisionLetter: File.open(@letter_path) },
                                { x_editflow_api_token: ENV.fetch('EDITFLOW_API_TOKEN', nil) }
@@ -405,8 +408,7 @@ class SubmittedProposalsController < ApplicationController
       return
     else
       Rails.logger.info { "\n\nEditFlow response: #{response.inspect}\n\n" }
-      store_revised_response_id(response, version)
-      @proposal.progress_spc!
+      @proposal.progress_spc! if store_revised_response_id(response, version)
     end
     Rails.logger.info { "\n\n*****************************************\n\n" }
   end
@@ -435,7 +437,11 @@ class SubmittedProposalsController < ApplicationController
   def store_revised_response_id(response, version)
     response_body = JSON.parse(response.body)
     article = response_body["data"]["articleReviewVersion"]
+
+    return unless article
+
     id = article["id"]
+
     proposal_version = @proposal.proposal_versions.find_by(version: version)
     proposal_version&.update(editflow_id: id, send_to_editflow: DateTime.current)
   end
