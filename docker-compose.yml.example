@@ -51,7 +51,7 @@ services:
     environment:
       - DB_USER=propuser
       - DB_PASS=
-      - PG_HOST=db
+      - DB_HOST=db
       - RAILS_ENV=development
       - YARN_ENV=development
       - RAILS_SERVE_STATIC_FILES=true
