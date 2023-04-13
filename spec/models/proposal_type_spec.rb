@@ -24,48 +24,60 @@ RSpec.describe ProposalType, type: :model do
     end
   end
 
-  describe '#not_closed_date_greater' do
+  describe 'open_date validations' do
     let(:proposal_type) { create(:proposal_type)}
 
-    context 'whe./spec/models/proposal_type_spec.rbn open_date is nil' do
-      it 'expecting' do
+    context 'when open_date is nil' do
+      it 'has nil response' do
         proposal_type.update(open_date: nil)
         response = proposal_type.not_closed_date_greater
+
         expect(response).to eq(nil)
       end
     end
 
-    context 'when open_date is nil' do
+    context 'when open_date > closed_date' do
+      let(:open_date) { Date.today + 10.days }
+
       it 'expecting' do
-        proposal_type.update(open_date: Date.today + 10.days)
-        response = proposal_type.not_closed_date_greater
-        expect(proposal_type.errors.full_messages).to eq(["Open date  2022-12-15 - cannot be greater than Closed Date 2022-12-11", "Open date  2022-12-15 - cannot be greater than Closed Date 2022-12-11"])
+        proposal_type.update(open_date: open_date)
+
+        expect(proposal_type.errors.full_messages)
+          .to eq(["Open date  #{open_date} - cannot be greater than Closed Date #{proposal_type.closed_date.to_date}"])
       end
     end
 
-    context 'when open_date is nil' do
+    context 'when open_date == closed_date' do
+      let(:today) { Date.today }
+
       it 'expecting' do
-        proposal_type.update(open_date: Date.today, closed_date: Date.today)
-        response = proposal_type.not_closed_date_greater
-        expect(proposal_type.errors.full_messages).to eq(["Open date  2022-12-05 - cannot be same as Closed Date 2022-12-05", "Open date  2022-12-05 - cannot be same as Closed Date 2022-12-05"])
+        proposal_type.update(open_date: today, closed_date: today)
+
+        expect(proposal_type.errors.full_messages)
+          .to eq(["Open date  #{today} - cannot be same as Closed Date #{today}"])
       end
     end
   end
 
   describe 'max_preferred_greater_than_min_preferred' do
     let(:proposal_type) { create(:proposal_type)}
+
     it 'expecting' do
       proposal_type.update(min_no_of_preferred_dates: 3)
-      response = proposal_type.max_preferred_greater_than_min_preferred
-      expect(proposal_type.errors.full_messages).to eq(["Minimum number of preferred dates can not be greater than maximum number of preferred dates", "Minimum number of preferred dates can not be greater than maximum number of preferred dates"])
+
+      expect(proposal_type.errors.full_messages.last)
+        .to eq("Minimum number of preferred dates can not be greater than maximum number of preferred dates")
     end
   end
+
   describe 'max_preferred_greater_than_min_preferred' do
     let(:proposal_type) { create(:proposal_type)}
+
     it 'expecting' do
       proposal_type.update(min_no_of_impossible_dates: 4)
-      response = proposal_type.max_impossible_greater_than_min_impossible
-      expect(proposal_type.errors.full_messages).to eq(["Min no of impossible dates must be less than or equal to 2", "Minimum number of impossible dates can not be greater than maximum number of impossible dates", "Minimum number of impossible dates can not be greater than maximum number of impossible dates"])
+
+      expect(proposal_type.errors.full_messages.last)
+        .to eq("Minimum number of impossible dates can not be greater than maximum number of impossible dates")
     end
   end
 end

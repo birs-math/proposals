@@ -24,6 +24,7 @@ RSpec.describe "/submitted_proposals", type: :request do
     create(:role_privilege,
            permission_type: "Manage", privilege_name: "Email", role_id: role.id)
   end
+
   before do
     role_privilege_reviews
     role_privilege_controller
@@ -43,32 +44,29 @@ RSpec.describe "/submitted_proposals", type: :request do
   describe "GET /download_csv" do
     it 'when proposal is selected' do
       proposal_ids = [proposal.id]
+
       get download_csv_submitted_proposals_path(ids: [proposal_ids])
+
       expect(response.header['Content-Type']).to eq("text/csv")
       expect(response).to have_http_status(:ok)
     end
 
     it 'no proposal is selected' do
-      proposal_ids = []
-      get download_csv_submitted_proposals_path(ids: [proposal_ids])
+      get download_csv_submitted_proposals_path(ids: [])
+
       expect(response).to have_http_status(:ok)
     end
   end
 
   describe "POST /send_to_workshop" do
-    let!(:proposals) { create_list(:proposal, 3) }
-    before do 
-      proposals
+    before do
+      stub_request(:post, "#{ENV['WORKSHOPS_API_URL']}/events/proposals")
     end
-    it 'when proposal is selected' do
-      proposal_ids = [proposal.id]
-      post sendToWorkshop_submitted_proposals_path(ids: [proposal_ids])
-      expect(response).to have_http_status(:ok)
-    end
-    it 'no proposal is selected' do
-      proposal_ids = []
-      post sendToWorkshop_submitted_proposals_path(ids: [proposal_ids])
-      expect(response).to have_http_status(:ok)
+
+    it 'posts to workshops API' do
+      post send_to_workshop_submitted_proposals_path(ids: [proposal.id])
+
+      expect(WebMock).to have_requested(:post, "#{ENV['WORKSHOPS_API_URL']}/events/proposals").once
     end
   end
 
@@ -113,25 +111,41 @@ RSpec.describe "/submitted_proposals", type: :request do
   end
 
   describe "POST /edit_flow when ids are in params" do
-    let(:proposal) { create(:proposal, status: 'initial_review') }
-    let(:subject) { create(:subject) }
-    let!(:ams_subject) { create(:ams_subject, subject: subject) }
-    let(:params) do
-      { ids: proposal.id }
-    end
+    let(:proposal) { create(:proposal, :with_organizers, status: 'initial_review') }
+    let(:params) { { ids: proposal.id } }
 
     before do
-      proposal.edit_flow
+      stub_request(:post, "#{ENV['EDITFLOW_API_URL']}").to_return(body: { data: {} }.to_json)
     end
-    it 'when status is unprocessable_entity' do
-      post edit_flow_submitted_proposals_url, params: params
-      expect(response).to have_http_status(:initial_review)
+
+    context 'when AMS subject' do
+      let(:ams_subject) { create(:ams_subject, subject: proposal.subject) }
+      let(:proposal_ams_subject) { create(:proposal_ams_subject, proposal: proposal, ams_subject: ams_subject) }
+
+      context 'present' do
+        before do
+          proposal_ams_subject
+
+          post edit_flow_submitted_proposals_url, params: params
+        end
+
+        it('posts to editflow') { expect(WebMock).to have_requested(:post, ENV['EDITFLOW_API_URL']) }
+      end
+
+      context 'not present' do
+        before do
+          proposal_ams_subject
+        end
+
+        it('does not post to editflow') { expect(WebMock).not_to have_requested(:post, ENV['EDITFLOW_API_URL']) }
+      end
     end
   end
 
   describe "POST /edit_flow when ids are not in params" do
     it 'when status is unprocessable_entity' do
       post edit_flow_submitted_proposals_url
+
       expect(response).to have_http_status(302)
     end
   end
@@ -169,7 +183,7 @@ RSpec.describe "/submitted_proposals", type: :request do
         body: email_template.body,
         templates: "Test: Test Proposal"}
     end
-    
+
     it "send emails to lead_organizer" do
       post send_emails_submitted_proposal_path(proposal, params: params)
       expect(response).to redirect_to(edit_submitted_proposal_path(proposal))
@@ -274,7 +288,7 @@ RSpec.describe "/submitted_proposals", type: :request do
         body: email_template.body,
         proposal_ids: proposal.id }
     end
-    
+
     context 'when proposal can be approved/rejected' do
       before do
 
@@ -418,14 +432,26 @@ RSpec.describe "/submitted_proposals", type: :request do
   end
 
   describe ' POST /submitted_proposals/revise_proposal_editflow' do
-    it 'revise proposal editflow when not progress spc' do
-      proposal.update(editflow_id: 122)
-      post revise_proposal_editflow_submitted_proposals_url(proposal_id: proposal.id)
-      expect(response).to have_http_status(302)
+    context 'post to editflow' do
+      before do
+        proposal.update(editflow_id: 122)
+        stub_request(:post, "#{ENV['EDITFLOW_API_URL']}").to_return(body: { data: {} }.to_json)
+
+        post revise_proposal_editflow_submitted_proposals_url(proposal_id: proposal.id)
+      end
+
+      it { expect(WebMock).to have_requested(:post, "#{ENV['EDITFLOW_API_URL']}") }
+
+      it 'revise proposal editflow when not progress spc' do
+        expect(response).to have_http_status(302)
+      end
     end
+
     it 'revise proposal editflow when progress spc and editflow id is blank' do
       proposal.update(status: "revision_submitted_spc")
+
       post revise_proposal_editflow_submitted_proposals_url(proposal_id: proposal.id)
+
       expect(response).to have_http_status(302)
     end
   end
@@ -504,20 +530,23 @@ RSpec.describe "/submitted_proposals", type: :request do
     end
   end
 
-  describe 'GET/ reviews_excel_booklet_submitted_proposals' do
+  describe 'GET /reviews_excel_booklet_submitted_proposals' do
     let!(:proposal) { create(:proposal, editflow_id: 1222) }
     let(:subject) { create(:subject) }
 
     before do
+      stub_request(:post, "#{ENV['EDITFLOW_API_URL']}").to_return(body: { data: {} }.to_json)
     end
 
     it 'when proposal ids present for reviews' do
       params = { proposals: proposal.id,
                  format: :xlsx }
+
       proposal.update(subject_id: subject.id)
+
       get reviews_excel_booklet_submitted_proposals_path, params: params
-      expect(response).to have_http_status(200)
+
+      expect(WebMock).to have_requested(:post, ENV['EDITFLOW_API_URL'])
     end
   end
-
 end

@@ -9,7 +9,7 @@ class ImportReviewsService
   def proposal_reviews
     edit_flow_query = EditFlowService.new(@proposal).mutation
 
-    response = RestClient.post ENV.fetch('EDITFLOW_API_URL', nil),
+    response = RestClient.post ENV['EDITFLOW_API_URL'],
                                { query: edit_flow_query },
                                { x_editflow_api_token: ENV.fetch('EDITFLOW_API_TOKEN', nil) }
 
@@ -75,7 +75,7 @@ class ImportReviewsService
 
   def review_file_url(file_id)
     file_url_query = EditFlowService.new(@proposal).file_url(file_id)
-    response = RestClient.post ENV.fetch('EDITFLOW_API_URL', nil),
+    response = RestClient.post ENV['EDITFLOW_API_URL'],
                                { query: file_url_query },
                                { x_editflow_api_token: ENV.fetch('EDITFLOW_API_TOKEN', nil) }
 

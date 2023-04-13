@@ -11,7 +11,7 @@ FactoryBot.define do
 
     association :proposal_type, factory: :proposal_type, strategy: :create
     association :proposal_form, factory: :proposal_form, strategy: :create
-    # association :subject, factory: :subject, strategy: :create
+    association :subject, factory: :subject, strategy: :create
   end
 
   trait :with_organizers do
