@@ -1,4 +1,7 @@
 ENV['RAILS_ENV'] = 'test'
+# TODO: this should be moved to CircleCI
+ENV['WORKSHOPS_API_URL'] = 'workshops.example.com'
+ENV['EDITFLOW_API_URL'] = 'editflow.example.com'
 
 require_relative '../config/environment'
 require 'rails/test_help'
