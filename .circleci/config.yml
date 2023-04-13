@@ -90,7 +90,7 @@ jobs:
             - "9f:15:4c:07:65:8b:14:ca:f3:68:01:0a:cf:dd:67:95"
       - run:
           name: Run Capistrano
-          command: | 
+          command: |
             tar cvf - --exclude=".git" . | tar xf - -C /home/app/proposals/
             chown -R app:app /home/app/proposals
             cd /home/app/proposals
