@@ -41,24 +41,28 @@ module Proposals
     end
 
     def call
-      ActiveRecord::Base.transaction do
-        proposal.update(model_params.except(:year))
-        update_year
-        update_ams_subject_codes
-        submit_proposal
+      update_proposal
 
-        Result.new(submission: submission, proposal: proposal)
-      rescue
-        Result.new(submission: submission, proposal: proposal)
-      end
+      Result.new(submission: submission, proposal: proposal)
+    rescue
+      Result.new(submission: submission, proposal: proposal)
     end
 
     private
 
     attr_reader :proposal, :params, :current_user
 
+    def update_proposal
+      ActiveRecord::Base.transaction do
+        proposal.update(model_params.except(:year))
+        update_year
+        update_ams_subject_codes
+        submit_proposal
+      end
+    end
+
     def model_params
-      @model_params ||= params.slice(MODEL_ATTRS).tap do |proposal_params|
+      @model_params ||= params.slice(*MODEL_ATTRS).tap do |proposal_params|
         applied_date = proposal_params[:applied_date]
 
         if applied_date
@@ -76,7 +80,7 @@ module Proposals
     def update_year
       if limit_per_type_per_year_exhausted?
         proposal.errors.add(
-          :year,
+          :base,
           I18n.t('proposals.limit_per_type_per_year', proposal_type: proposal.proposal_type.name)
         )
       else

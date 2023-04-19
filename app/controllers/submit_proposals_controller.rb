@@ -203,10 +203,10 @@ class SubmitProposalsController < ApplicationController
 
   def staff_redirect
     if @submission.errors?
-      redirect_to edit_submitted_proposal_url(@proposal), alert: "Your submission has
+      redirect_to edit_submitted_proposal_path(@proposal), alert: "Your submission has
           errors: #{@submission.error_messages}.".squish
     else
-      redirect_to submitted_proposals_url(@proposal), notice: t('submit_proposals.staff_redirect.alert')
+      redirect_to submitted_proposals_path, notice: t('submit_proposals.staff_redirect.alert')
     end
   end
 
