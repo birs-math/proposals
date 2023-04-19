@@ -6,33 +6,29 @@ class SubmitProposalsController < ApplicationController
   end
 
   def create
-    @proposal.update(proposal_params)
-    update_assigned_date
-    update_applied_date
-    update_proposal_ams_subject_code
-    @submission = SubmitProposalService.new(@proposal, params)
-    @submission.save_answers
-    create_invite and return if params[:create_invite]
+    result = Proposals::Update.call(current_user: current_user, proposal: @proposal, params: proposal_service_params)
+    @submission = result.submission
+    @proposal = result.proposal
+
+    if result.errors?
+      flash[:alert] = result.flash_errors[:alert]
+    end
+
+    return create_invite if params[:create_invite]
 
     if current_user.staff_member?
       staff_redirect
-      nil
     else
       session[:is_submission] = @proposal.is_submission = @submission.final?
-      if @proposal.is_submission && @submission.errors?
-        flash[:alert] = []
-        @submission.error_messages.each do |msg|
-          flash[:alert] << msg.to_s
-        end
-        redirect_to edit_proposal_path(@proposal)
-        return
+
+      return redirect_to edit_proposal_path(@proposal) if result.errors?
+
+      if !@proposal.is_submission
+        return redirect_to edit_proposal_path(@proposal), notice: t('submit_proposals.create.alert')
+      else
+        @attachment = generate_proposal_pdf || return
+        confirm_submission
       end
-      unless @proposal.is_submission
-        redirect_to edit_proposal_path(@proposal), notice: t('submit_proposals.create.alert')
-        return
-      end
-      @attachment = generate_proposal_pdf || return
-      confirm_submission
     end
   end
 
@@ -46,9 +42,13 @@ class SubmitProposalsController < ApplicationController
     when 'participant'
       @email_template = EmailTemplate.find_by(email_type: "participant_invitation_type")
     end
-    preview_placeholders
-    render json: { subject: @email_template.subject, body: @template_body },
-           status: :ok
+
+    if @template_body.blank?
+      redirect_to new_email_template_path, alert: t('submit_proposals.preview_placeholders.failure')
+    else
+      render json: { subject: @email_template&.subject, body: @template_body },
+             status: :ok
+    end
   end
 
   private
@@ -65,6 +65,7 @@ class SubmitProposalsController < ApplicationController
 
       invalid_email_error_message
     end
+
     render json: { errors: @errors, counter: @counter }, status: :ok
   end
 
@@ -117,9 +118,13 @@ class SubmitProposalsController < ApplicationController
 
   def proposal_params
     params.permit(:title, :year, :subject_id, :ams_subject_ids, :location_ids,
-                  :no_latex, :preamble, :bibliography, :cover_letter,
+                  :no_latex, :preamble, :bibliography, :cover_letter, :applied_date,
                   :same_week_as, :week_after, :assigned_date, :assigned_size)
           .merge(no_latex: params[:no_latex] == 'on')
+  end
+
+  def proposal_service_params
+    proposal_params.merge(ams_subjects: params[:ams_subjects])
   end
 
   def proposal_id_param
@@ -187,8 +192,7 @@ class SubmitProposalsController < ApplicationController
   def preview_placeholders
     @template_body = @email_template&.body
     if @template_body.blank?
-      redirect_to new_email_template_path, alert: t('submit_proposals.preview_placeholders.failure')
-      return
+      return redirect_to new_email_template_path, alert: t('submit_proposals.preview_placeholders.failure')
     end
     placing_holders
   end

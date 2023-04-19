@@ -53,6 +53,7 @@ RSpec.describe "/submit_proposals", type: :request do
       role_privilege
       user.roles << role
       sign_in user
+
       post submit_proposals_url, params: params, xhr: true
     end
 
@@ -143,7 +144,7 @@ RSpec.describe "/submit_proposals", type: :request do
       it "does not update the proposal invites count" do
         expect(proposal.invites.count).to eq(0)
       end
-    end 
+    end
 
     context 'with invalid invite params, as lead organizer' do
       before do
