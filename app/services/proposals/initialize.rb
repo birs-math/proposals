@@ -3,9 +3,14 @@
 module Proposals
   class Initialize
     include Callable
-    include Rails.application.routes.url_helpers
 
-    Result = Struct.new(:flash_message, :proposal, url: nil, keyword_init: true) do
+    Result = Struct.new(:flash_message, :proposal, :url, keyword_init: true) do
+      include Rails.application.routes.url_helpers
+
+      def initialize(flash_message:, proposal:, url: nil)
+        super
+      end
+
       def redirect_url
         return url if url
 
