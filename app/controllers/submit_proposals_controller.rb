@@ -14,7 +14,7 @@ class SubmitProposalsController < ApplicationController
       flash[:alert] = result.flash_errors[:alert]
     end
 
-    return create_invite if params[:create_invite]
+    return create_invite if params[:create_invite] && request.xhr?
 
     if current_user.staff_member?
       staff_redirect
