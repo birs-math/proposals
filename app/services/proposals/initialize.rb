@@ -32,20 +32,27 @@ module Proposals
     end
 
     def call
-      ActiveRecord::Base.transaction do
-        attach_form
-        new_proposal.save!
-        ensure_organizer_role
+      create_proposal
 
-        Result.new(flash_message: { notice: I18n.t('proposals.initialize', proposal_type: new_proposal.proposal_type.name) }, proposal: new_proposal)
-      rescue
-        Result.new(flash_message: { alert: new_proposal.errors.full_messages }, proposal: new_proposal)
-      end
+      Result.new(
+        flash_message: { notice: I18n.t('proposals.initialize', proposal_type: new_proposal.proposal_type.name) },
+        proposal: new_proposal
+      )
+    rescue
+      Result.new(flash_message: { alert: new_proposal.errors.full_messages }, proposal: new_proposal)
     end
 
     private
 
     attr_reader :current_user, :proposal_params
+
+    def create_proposal
+      ActiveRecord::Base.transaction do
+        attach_form
+        new_proposal.save
+        ensure_organizer_role
+      end
+    end
 
     def attach_form
       new_proposal.proposal_form = ProposalForm.active_form(new_proposal.proposal_type_id)
