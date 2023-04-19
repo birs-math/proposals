@@ -9,8 +9,8 @@ module Proposals
                   same_week_as week_after assigned_date assigned_size]
 
     Result = Struct.new(:submission, :proposal, keyword_init: true) do
-      def flash_errors
-        return @flash_errors if defined?(@flash_errors)
+      def flash_message
+        return @flash_message if defined?(@flash_message)
 
         if errors?
           messages = { alert: [] }
@@ -23,9 +23,9 @@ module Proposals
             messages[:alert] << error.to_s
           end
 
-          @flash_errors = messages
+          @flash_message = messages
         else
-          @flash_errors = {}
+          @flash_message = {}
         end
       end
 
@@ -78,7 +78,7 @@ module Proposals
     end
 
     def update_year
-      if limit_per_type_per_year_exhausted?
+      if limit_per_type_per_year_exceeded?
         proposal.errors.add(
           :base,
           I18n.t('proposals.limit_per_type_per_year', proposal_type: proposal.proposal_type.name)
@@ -88,7 +88,7 @@ module Proposals
       end
     end
 
-    def limit_per_type_per_year_exhausted?
+    def limit_per_type_per_year_exceeded?
       return @exists_query_result if defined?(@exists_query_result)
 
       current_user_proposal_ids = ProposalRole.joins(:role, :person)
@@ -103,13 +103,25 @@ module Proposals
     end
 
     def update_ams_subject_codes
-      first_ams_subject = ProposalAmsSubject.find_or_initialize_by(proposal: proposal, code: 'code1')
-      first_ams_subject.ams_subject_id = params.dig(:ams_subjects, :code1)
-      first_ams_subject.save!
+      if first_ams_subject
+        first_ams_subject = ProposalAmsSubject.find_or_initialize_by(proposal: proposal, code: 'code1')
+        first_ams_subject.ams_subject_id = first_ams_subject
+        first_ams_subject.save!
+      end
 
-      second_ams_subject = ProposalAmsSubject.find_or_initialize_by(proposal: proposal, code: 'code2')
-      second_ams_subject.ams_subject_id = params.dig(:ams_subjects, :code2)
-      second_ams_subject.save!
+      if second_ams_subject
+        second_ams_subject = ProposalAmsSubject.find_or_initialize_by(proposal: proposal, code: 'code2')
+        second_ams_subject.ams_subject_id = second_ams_subject
+        second_ams_subject.save!
+      end
+    end
+
+    def first_ams_subject
+      params.dig(:ams_subjects, :code1)
+    end
+
+    def second_ams_subject
+      params.dig(:ams_subjects, :code2)
     end
 
     def submit_proposal

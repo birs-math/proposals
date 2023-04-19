@@ -11,7 +11,7 @@ class SubmitProposalsController < ApplicationController
     @proposal = result.proposal
 
     if result.errors?
-      flash[:alert] = result.flash_errors[:alert]
+      flash[:alert] = result.flash_message[:alert]
     end
 
     return create_invite if params[:create_invite] && request.xhr?
