@@ -8,11 +8,15 @@ module Proposals
                   no_latex preamble bibliography cover_letter applied_date
                   same_week_as week_after assigned_date assigned_size]
 
-    Result = Struct.new(:submission, :proposal, keyword_init: true) do
+    Result = Struct.new(:submission, :proposal, :error_messages, keyword_init: true) do
+      def initialize(submission:, proposal:, error_messages: [])
+        super
+      end
+
       def flash_message
         return @flash_message if defined?(@flash_message)
 
-        if errors?
+        if errors? || error_messages.present?
           messages = { alert: [] }
 
           proposal.errors.full_messages.each do |error|
@@ -21,6 +25,10 @@ module Proposals
 
           submission.error_messages.each do |error|
             messages[:alert] << error.to_s
+          end
+
+          error_messages.each do |error|
+            messages[:alert] << error
           end
 
           @flash_message = messages
@@ -44,8 +52,8 @@ module Proposals
       update_proposal
 
       Result.new(submission: submission, proposal: proposal)
-    rescue
-      Result.new(submission: submission, proposal: proposal)
+    rescue ActiveRecord::RecordInvalid => e
+      Result.new(submission: submission, proposal: proposal, error_messages: [e.message])
     end
 
     private
@@ -103,24 +111,24 @@ module Proposals
     end
 
     def update_ams_subject_codes
-      if first_ams_subject
+      if first_ams_subject_id
         first_ams_subject = ProposalAmsSubject.find_or_initialize_by(proposal: proposal, code: 'code1')
-        first_ams_subject.ams_subject_id = first_ams_subject
+        first_ams_subject.ams_subject_id = first_ams_subject_id
         first_ams_subject.save!
       end
 
-      if second_ams_subject
+      if second_ams_subject_id
         second_ams_subject = ProposalAmsSubject.find_or_initialize_by(proposal: proposal, code: 'code2')
-        second_ams_subject.ams_subject_id = second_ams_subject
+        second_ams_subject.ams_subject_id = second_ams_subject_id
         second_ams_subject.save!
       end
     end
 
-    def first_ams_subject
+    def first_ams_subject_id
       params.dig(:ams_subjects, :code1)
     end
 
-    def second_ams_subject
+    def second_ams_subject_id
       params.dig(:ams_subjects, :code2)
     end
 

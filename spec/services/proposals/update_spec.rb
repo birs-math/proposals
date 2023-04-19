@@ -48,5 +48,15 @@ RSpec.describe Proposals::Update do
         expect(proposal.year).not_to eq(params[:year])
       end
     end
+
+    context 'when error' do
+      before do
+        allow_any_instance_of(described_class).to receive(:first_ams_subject_id).and_return(1)
+      end
+
+      it 'shows error' do
+        expect(service_call.flash_message[:alert]).to eq(['Validation failed: Ams subject must exist'])
+      end
+    end
   end
 end

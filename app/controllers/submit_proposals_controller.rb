@@ -10,9 +10,7 @@ class SubmitProposalsController < ApplicationController
     @submission = result.submission
     @proposal = result.proposal
 
-    if result.errors?
-      flash[:alert] = result.flash_message[:alert]
-    end
+    return redirect_to edit_proposal_path(@proposal), **result.flash_message if result.errors?
 
     return create_invite if params[:create_invite] && request.xhr?
 
