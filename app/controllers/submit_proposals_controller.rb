@@ -43,12 +43,9 @@ class SubmitProposalsController < ApplicationController
       @email_template = EmailTemplate.find_by(email_type: "participant_invitation_type")
     end
 
-    if @template_body.blank?
-      redirect_to new_email_template_path, alert: t('submit_proposals.preview_placeholders.failure')
-    else
-      render json: { subject: @email_template&.subject, body: @template_body },
-             status: :ok
-    end
+    preview_placeholders
+    render json: { subject: @email_template.subject, body: @template_body },
+           status: :ok
   end
 
   private
