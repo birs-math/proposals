@@ -22,7 +22,7 @@ module Proposals
       end
 
       def errors?
-        flash_message[:error].present? || flash_message[:alert].present?
+        flash_message[:alert].present?
       end
     end
 
@@ -39,7 +39,7 @@ module Proposals
         proposal: new_proposal
       )
     rescue
-      Result.new(flash_message: { alert: new_proposal.errors.full_messages }, proposal: new_proposal)
+      Result.new(flash_message: { alert: error_message }, proposal: new_proposal)
     end
 
     private
@@ -68,6 +68,14 @@ module Proposals
 
     def organizer_role
       @organizer_role ||= Role.organizer
+    end
+
+    def error_message
+      if new_proposal.errors.present?
+        new_proposal.errors.full_messages
+      else
+        I18n.t('errors.messages.something_went_wrong')
+      end
     end
   end
 end
