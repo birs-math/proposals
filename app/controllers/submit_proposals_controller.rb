@@ -61,6 +61,7 @@ class SubmitProposalsController < ApplicationController
 
   def invite_save
     return unless @invite.save
+
     log_activity(@invite)
     @counter += 1
   end
@@ -177,13 +178,14 @@ class SubmitProposalsController < ApplicationController
     if @template_body.blank?
       return redirect_to new_email_template_path, alert: t('submit_proposals.preview_placeholders.failure')
     end
+
     placing_holders
   end
 
   def placing_holders
-    placeholders = { "Proposal_lead_organizer_name" => @proposal&.lead_organizer&.fullname,
-                     "proposal_type" => @proposal.proposal_type&.name,
-                     "proposal_title" => @proposal&.title }
+    placeholders = { "Proposal_lead_organizer_name" => @proposal&.lead_organizer&.fullname.to_s,
+                     "proposal_type" => @proposal.proposal_type&.name.to_s,
+                     "proposal_title" => @proposal&.title.to_s }
     placeholders.each { |k, v| @template_body&.gsub!(k, v) }
   end
 
