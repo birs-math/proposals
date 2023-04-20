@@ -14,19 +14,15 @@ class SubmitProposalsController < ApplicationController
 
     return create_invite if params[:create_invite] && request.xhr?
 
-    if current_user.staff_member?
-      staff_redirect
+    return staff_redirect if current_user.staff_member?
+
+    session[:is_submission] = @proposal.is_submission = @submission.final?
+
+    if !@proposal.is_submission
+      redirect_to edit_proposal_path(@proposal), notice: t('submit_proposals.create.alert')
     else
-      session[:is_submission] = @proposal.is_submission = @submission.final?
-
-      return redirect_to edit_proposal_path(@proposal) if result.errors?
-
-      if !@proposal.is_submission
-        return redirect_to edit_proposal_path(@proposal), notice: t('submit_proposals.create.alert')
-      else
-        @attachment = generate_proposal_pdf || return
-        confirm_submission
-      end
+      @attachment = generate_proposal_pdf || return
+      confirm_submission
     end
   end
 
