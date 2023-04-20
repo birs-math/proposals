@@ -25,7 +25,9 @@ RSpec.describe Proposals::Update do
 
     context 'proposal per type per year limit exceeded' do
       let(:role) { create(:role, name: 'lead_organizer') }
-      let(:old_proposal) { create(:proposal, proposal_type: proposal.proposal_type, year: params[:year]) }
+      let(:old_proposal) do
+        create(:proposal, proposal_type: proposal.proposal_type, year: params[:year], status: :submitted)
+      end
 
       before do
         create(:proposal_role, proposal: old_proposal, role: role, person: user.person)

@@ -33,10 +33,9 @@ RSpec.describe "/submit_proposals", type: :request do
 
     let(:person) { user.person }
     let(:role) { user_role.role }
-    let(:user_role) { create(:user_role, role: create(:role, name: role_name)) }
     let(:proposal_role) { create(:proposal_role, role: role, proposal: proposal, person: person) }
     let(:role_name) { 'Staff' }
-    let(:user) { user_role.user }
+    let(:user) { create(:user) }
     let(:role_privilege) do
       create(:role_privilege,
              permission_type: 'Manage', privilege_name: 'SubmitProposalsController', role_id: role.id)
@@ -56,14 +55,38 @@ RSpec.describe "/submit_proposals", type: :request do
     end
 
     before do
-      proposal_role
       role_privilege
+      proposal_role
+      user_role
       sign_in user
 
       post submit_proposals_url, params: params, xhr: true
     end
 
+    describe 'normal behavior' do
+      let(:user_role) { create(:user_role, role: create(:role, name: role_name), user: user) }
+      let(:role_name) { 'Staff' }
+
+      it 'will not create invite' do
+        expect(proposal.invites.count).to eq(0)
+      end
+
+      it 'updates the proposal' do
+        proposal.reload
+        expect(proposal.title).to eq('Test proposal')
+        expect(proposal.year).to eq('2023')
+        expect(proposal.assigned_date).to eq(Date.today)
+        expect(proposal.applied_date).to eq(Date.today)
+        expect(proposal.subject_id).to eq(subject.id)
+        expect(proposal.location_ids).to eq([location.id])
+        expect(proposal.ams_subjects).to eq(ams_subjects)
+        expect(proposal.no_latex).to eq(false)
+      end
+    end
+
     describe 'redirects' do
+      let(:user_role) { create(:user_role, role: create(:role, name: role_name), user: user) }
+
       context 'when staff' do
         let(:role_name) { 'Staff' }
 
@@ -77,25 +100,12 @@ RSpec.describe "/submit_proposals", type: :request do
       end
     end
 
-    it 'will not create invite' do
-      expect(proposal.invites.count).to eq(0)
-    end
-
-    it 'updates the proposal' do
-      proposal.reload
-      expect(proposal.title).to eq('Test proposal')
-      expect(proposal.year).to eq('2023')
-      expect(proposal.assigned_date).to eq(Date.today)
-      expect(proposal.applied_date).to eq(Date.today)
-      expect(proposal.subject_id).to eq(subject.id)
-      expect(proposal.location_ids).to eq([location.id])
-      expect(proposal.ams_subjects).to eq(ams_subjects)
-      expect(proposal.no_latex).to eq(false)
-    end
-
-    context 'when user exhausts proposal type per year limit' do
+    context 'when user exceeds proposal type per year limit' do
+      let(:user_role) { create(:user_role, role: create(:role, name: role_name), user: user) }
       let(:role_name) { 'lead_organizer' }
-      let(:old_proposal) { create(:proposal, proposal_type: proposal.proposal_type, year: params[:year]) }
+      let(:old_proposal) do
+        create(:proposal, proposal_type: proposal.proposal_type, year: params[:year], status: :submitted)
+      end
 
       before do
         create(:proposal_role, proposal: old_proposal, role: role, person: user.person)

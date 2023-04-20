@@ -99,15 +99,11 @@ module Proposals
     def limit_per_type_per_year_exceeded?
       return @exists_query_result if defined?(@exists_query_result)
 
-      current_user_proposal_ids = ProposalRole.joins(:role, :person)
-        .where(roles: { name: 'lead_organizer' }, person: { id: current_user.person.id })
-        .pluck(:proposal_id)
+      @exists_query_result = current_user
+                              .person
+                              .lead_organizer_proposals
+                              .exists?(proposal_type_id: proposal.proposal_type_id, year: model_params[:year])
 
-      @exists_query_result = Proposal.exists?(
-        proposal_type_id: proposal.proposal_type_id,
-        year: model_params[:year],
-        id: current_user_proposal_ids
-      )
     end
 
     def update_ams_subject_codes
