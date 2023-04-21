@@ -1,5 +1,5 @@
 class SubmitProposalsController < ApplicationController
-  before_action :set_proposal, only: %i[create invitation_template]
+  before_action :set_proposal, only: %i[create invitation_template create_invite]
   before_action :authorize_user, only: %w[create create_invite]
   def new
     @proposals = ProposalForm.new
@@ -12,17 +12,15 @@ class SubmitProposalsController < ApplicationController
 
     return redirect_to edit_proposal_path(@proposal), **result.flash_message if result.errors?
 
-    return create_invite if params[:create_invite] && request.xhr?
-
     return staff_redirect if current_user.staff_member?
 
     session[:is_submission] = @proposal.is_submission = @submission.final?
 
-    if !@proposal.is_submission
-      redirect_to edit_proposal_path(@proposal), notice: t('submit_proposals.create.alert')
-    else
-      @attachment = generate_proposal_pdf || return
+    if @proposal.is_submission
+      @attachment = generate_proposal_pdf
       confirm_submission
+    else
+      redirect_to edit_proposal_path(@proposal), notice: t('submit_proposals.create.alert')
     end
   end
 
@@ -42,10 +40,8 @@ class SubmitProposalsController < ApplicationController
            status: :ok
   end
 
-  private
-
   def create_invite
-    return unless request.xhr?
+    return record_not_found unless request.xhr?
 
     @errors = []
     @counter = 0
@@ -59,6 +55,8 @@ class SubmitProposalsController < ApplicationController
 
     render json: { errors: @errors, counter: @counter }, status: :ok
   end
+
+  private
 
   def invite_save
     return unless @invite.save
@@ -115,11 +113,11 @@ class SubmitProposalsController < ApplicationController
   end
 
   def proposal_service_params
-    proposal_params.merge(ams_subjects: params[:ams_subjects])
+    proposal_params.merge(ams_subjects: params[:ams_subjects], commit: params[:commit])
   end
 
   def proposal_id_param
-    params.permit(:proposal)['proposal'].to_i
+    params.permit(:proposal)['proposal']
   end
 
   def set_proposal
@@ -206,8 +204,9 @@ class SubmitProposalsController < ApplicationController
 
   def change_proposal_status
     unless @proposal.active!
-      redirect_to edit_proposal_path(@proposal), alert: "Your proposal has
-                  errors: #{@proposal.errors.full_messages}.".squish and return
+
+      return redirect_to edit_proposal_path(@proposal),
+        alert: @proposal.errors.full_messages.map { |message| "Your proposal has errors: #{message}" }
     end
 
     change_proposal_version

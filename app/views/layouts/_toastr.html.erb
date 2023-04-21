@@ -3,7 +3,7 @@
   <script type="text/javascript">
     <% flash.each do |key, value| %>
       <% type = key.to_s.gsub('alert', 'error').gsub('notice', 'success') %>
-        <% if value.kind_of?(Array) %>
+        <% if value.respond_to?(:each) %>
           <% value&.each do |msg| %>
             toastr.<%= type %>('<%= msg %>')
           <% end %>

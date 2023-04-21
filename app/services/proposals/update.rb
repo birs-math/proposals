@@ -62,8 +62,8 @@ module Proposals
 
     def update_proposal
       ActiveRecord::Base.transaction do
+        assign_year
         proposal.update(model_params.except(:year))
-        update_year
         update_ams_subject_codes
         submit_proposal
       end
@@ -85,14 +85,14 @@ module Proposals
       end
     end
 
-    def update_year
+    def assign_year
       if limit_per_type_per_year_exceeded?
         proposal.errors.add(
           :base,
           I18n.t('proposals.limit_per_type_per_year', proposal_type: proposal.proposal_type.name)
         )
       else
-        proposal.update(year: model_params[:year])
+        proposal.assign_attributes(year: model_params[:year])
       end
     end
 
@@ -102,8 +102,8 @@ module Proposals
       @exists_query_result = current_user
                               .person
                               .lead_organizer_proposals
+                              .where.not(id: proposal.id)
                               .exists?(proposal_type_id: proposal.proposal_type_id, year: model_params[:year])
-
     end
 
     def update_ams_subject_codes

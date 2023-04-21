@@ -107,6 +107,7 @@ Rails.application.routes.draw do
     collection do
       get :thanks
       post :invitation_template
+      post :create_invite
     end
   end
   resources :proposal_types do

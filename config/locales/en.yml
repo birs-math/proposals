@@ -35,6 +35,7 @@ en:
       invites:
         invalid_code: This invitation code is invalid
       something_went_wrong: 'Something went wrong.'
+      resource_not_found: 'Requested resource not found'
       email_verifier:
         email_not_real: must point to a real mail account
         out_of_mail_server: appears to point to dead mail server
