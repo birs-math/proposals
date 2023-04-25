@@ -6,7 +6,6 @@ class InvitesController < ApplicationController
   before_action :set_invite_proposal, only: %i[show]
 
   def show
-    redirect_to root_path, alert: "Invite code is invalid" and return if @invite.nil?
     redirect_to root_path and return if @invite.confirmed?
     redirect_to cancelled_path and return if @invite.cancelled?
 
@@ -50,13 +49,22 @@ class InvitesController < ApplicationController
 
   def inviter_response
     if invalid_response?
-      redirect_to invite_url(code: @invite&.code), alert: t('invites.inviter_response.failure')
-      return
+      return redirect_to invite_url(code: @invite&.code), alert: t('invites.inviter_response.failure')
     end
 
-    invite_response_status
+    @invite.response = response_params
+    @invite.status = set_invite_status
+    @invite.skip_deadline_validation = true
 
-    redirect_on_response
+    redirect_to invite_url(code: @invite&.code),
+                alert: "Problem saving response: #{@invite.errors.full_messages}" unless @invite.save
+
+    if (@invite.no? || @invite.maybe?) && @invite.save
+      send_email_on_response
+    elsif @invite.yes?
+      session[:is_invited_person] = true
+      redirect_to new_person_path(code: @invite.code, response: @invite.response)
+    end
   end
 
   def invite_reminder
@@ -138,26 +146,10 @@ class InvitesController < ApplicationController
     %w[yes no maybe].none?(response_params)
   end
 
-  def invite_response_status
-    @invite.response = response_params
-    @invite.status = set_invite_status
-    @invite.skip_deadline_validation = true
-  end
-
-  def redirect_on_response
-    if (@invite.no? || @invite.maybe?) && @invite.save
-      send_email_on_response
-    elsif @invite.yes?
-      session[:is_invited_person] = true
-      redirect_to new_person_path(code: @invite.code, response: @invite.response)
-    else
-      redirect_to invite_url(code: @invite&.code),
-                  alert: "Problem saving response: #{@invite.errors.full_messages}"
-    end
-  end
-
   def set_invite
-    @invite = Invite.find_by(code: params[:code])
+    @invite = Invite.safe_find(code: params[:code])
+
+    redirect_to root_path, alert: I18n.t('errors.messages.invites.invalid_code') if @invite.blank?
   end
 
   def set_proposal

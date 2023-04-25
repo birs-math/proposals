@@ -26,6 +26,14 @@ class Invite < ApplicationRecord
   enum status: { pending: 0, confirmed: 1, cancelled: 2 }
   enum response: { yes: 0, maybe: 1, no: 2 }
 
+  class << self
+    def safe_find(code:)
+      invite = find_by(code: code)
+
+      invite if invite&.code_valid?
+    end
+  end
+
   def email_downcase
     email.downcase!
   end
@@ -60,6 +68,14 @@ class Invite < ApplicationRecord
     person.lastname = lastname
     person.email = email
     return true if person.save(validate: false)
+  end
+
+  def code_expired?
+    !code_valid?
+  end
+
+  def code_valid?
+    deadline_date >= DateTime.current.beginning_of_day
   end
 
   private
