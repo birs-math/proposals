@@ -13,7 +13,7 @@
         <p class='lead text-center'>You have been invited by <%= @invite.proposal.lead_organizer&.fullname %> to <%= invited_role(@invite) %> a proposed workshop facilitated by the Banff International Research Station entitled: <br>
         <strong><%= @invite.proposal.title %></strong>
         </p>
-        <p class='lead text-center'>If the proposal is selected by the peer review process in the last quarter of this year, it will be scheduled to take place in <%= @invite.proposal.year %>. Assuming that your schedule allows for it, are you interested in attending?</p>
+        <p class='lead text-center'>If this workshop is accepted to take place in <%= @invite.proposal.year %>, would you be interested in attending, in principle? Please note that this is a request for expression of interest, not confirmation of participation</p>
       </div>
 
       <div class="jumbotron answers">
