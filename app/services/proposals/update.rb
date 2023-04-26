@@ -62,15 +62,15 @@ module Proposals
 
     def update_proposal
       ActiveRecord::Base.transaction do
-        assign_year
-        proposal.update(model_params.except(:year))
+        proposal.update(model_params)
+        run_validation
         update_ams_subject_codes
         submit_proposal
       end
     end
 
     def model_params
-      @model_params ||= params.slice(*MODEL_ATTRS).tap do |proposal_params|
+      @model_params ||= params.dup.slice(*MODEL_ATTRS).tap do |proposal_params|
         applied_date = proposal_params[:applied_date]
 
         if applied_date
@@ -82,28 +82,32 @@ module Proposals
         if assigned_date
           proposal_params[:assigned_date] = Date.parse(assigned_date.split(' - ').first)
         end
-      end
+
+        if limit_per_type_per_year_exceeded?
+          proposal_params[:year] = nil
+        end
+      end.compact
     end
 
-    def assign_year
+    def run_validation
       if limit_per_type_per_year_exceeded?
         proposal.errors.add(
           :base,
           I18n.t('proposals.limit_per_type_per_year', proposal_type: proposal.proposal_type.name)
         )
-      else
-        proposal.assign_attributes(year: model_params[:year])
       end
     end
 
     def limit_per_type_per_year_exceeded?
       return @exists_query_result if defined?(@exists_query_result)
 
+      return @exists_query_result = false unless params[:year]
+
       @exists_query_result = current_user
                               .person
                               .lead_organizer_proposals
                               .where.not(id: proposal.id)
-                              .exists?(proposal_type_id: proposal.proposal_type_id, year: model_params[:year])
+                              .exists?(proposal_type_id: proposal.proposal_type_id, year: params[:year])
     end
 
     def update_ams_subject_codes
