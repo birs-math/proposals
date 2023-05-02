@@ -2,7 +2,7 @@ class InvitesController < ApplicationController
   before_action :authenticate_user!, except: %i[show inviter_response thanks cancelled]
   before_action :set_proposal, only: %i[invite_reminder invite_email new_invite]
   before_action :set_invite,
-                only: %i[show inviter_response cancel invite_reminder invite_email new_invite cancel_confirmed_invite]
+                only: %i[show inviter_response cancel invite_reminder new_invite cancel_confirmed_invite]
   before_action :set_invite_proposal, only: %i[show]
 
   def show
@@ -56,14 +56,16 @@ class InvitesController < ApplicationController
     @invite.status = set_invite_status
     @invite.skip_deadline_validation = true
 
-    redirect_to invite_url(code: @invite&.code),
-                alert: "Problem saving response: #{@invite.errors.full_messages}" unless @invite.save
-
-    if (@invite.no? || @invite.maybe?) && @invite.save
-      send_email_on_response
-    elsif @invite.yes?
-      session[:is_invited_person] = true
-      redirect_to new_person_path(code: @invite.code, response: @invite.response)
+    if @invite.save
+      if @invite.no? || @invite.maybe?
+        send_email_on_response
+      elsif @invite.yes?
+        session[:is_invited_person] = true
+        redirect_to new_person_path(code: @invite.code, response: @invite.response)
+      end
+    else
+      redirect_to invite_url(code: @invite&.code),
+                  alert: "Problem saving response: #{@invite.errors.full_messages}"
     end
   end
 
