@@ -6,7 +6,7 @@ environment.plugins.prepend('Provide',
     $: 'jquery/src/jquery',
     'window.$': 'jquery/src/jquery',
     jquery: 'jquery/src/jquery',
-    'window.jQuery': 'jquery',
+    'window.jQuery': 'jquery/src/jquery',
     jQuery: 'jquery/src/jquery',
     Popper: ['popper.js', 'default']
   })
