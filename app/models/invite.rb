@@ -23,12 +23,13 @@ class Invite < ApplicationRecord
   scope :organizer, -> { where(invited_as: "Organizer") }
   scope :participant, -> { where(invited_as: "Participant") }
   scope :confirmed, -> { where(status: 1) }
+  scope :not_cancelled, -> { where.not(status: :cancelled) }
   enum status: { pending: 0, confirmed: 1, cancelled: 2 }
   enum response: { yes: 0, maybe: 1, no: 2 }
 
   class << self
     def safe_find(code:)
-      invite = find_by(code: code)
+      invite = not_cancelled.find_by(code: code)
 
       invite if invite&.code_valid?
     end
