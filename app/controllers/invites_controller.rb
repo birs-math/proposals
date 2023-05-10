@@ -2,8 +2,9 @@ class InvitesController < ApplicationController
   before_action :authenticate_user!, except: %i[show inviter_response thanks cancelled]
   before_action :set_proposal, only: %i[invite_reminder invite_email new_invite]
   before_action :set_invite,
-                only: %i[show inviter_response cancel invite_reminder new_invite cancel_confirmed_invite]
+                only: %i[show inviter_response invite_reminder]
   before_action :set_invite_proposal, only: %i[show]
+  before_action :unsafe_set_invite, only: %i[cancel new_invite cancel_confirmed_invite]
 
   def show
     redirect_to root_path and return if @invite.confirmed?
@@ -90,6 +91,7 @@ class InvitesController < ApplicationController
   def cancel
     @invite.skip_deadline_validation = true if @invite.deadline_date < Date.current
     @invite.update(status: 'cancelled')
+
     if current_user.staff_member?
       redirect_to edit_submitted_proposal_url(@invite.proposal), notice: t('invites.cancel.success')
     else
@@ -128,11 +130,11 @@ class InvitesController < ApplicationController
   def set_invite_status
     case response_params
     when 'no'
-      nil
+      :cancelled
     when 'maybe'
-      'pending'
+      :pending
     when 'yes'
-      'confirmed'
+      :confirmed
     end
   end
 
@@ -151,7 +153,11 @@ class InvitesController < ApplicationController
   def set_invite
     @invite = Invite.safe_find(code: params[:code])
 
-    redirect_to root_path, alert: I18n.t('errors.messages.invites.invalid_code') if @invite.blank?
+    if @invite.blank?
+      @lead_organizer = Invite.find_by(code: params[:code])&.proposal&.lead_organizer
+
+      render 'invalid_code', layout: 'devise'
+    end
   end
 
   def set_proposal
@@ -192,5 +198,9 @@ class InvitesController < ApplicationController
       redirect_to edit_proposal_path(@proposal),
                   notice: "Invite reminder has been sent to #{@invite.person.fullname}!"
     end
+  end
+
+  def unsafe_set_invite
+    @invite = Invite.find_by(code: params[:code])
   end
 end

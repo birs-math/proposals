@@ -29,6 +29,8 @@ class Invite < ApplicationRecord
 
   class << self
     def safe_find(code:)
+      return unless code
+
       invite = not_cancelled.find_by(code: code)
 
       invite if invite&.code_valid?

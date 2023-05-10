@@ -34,7 +34,7 @@ en:
   errors:
     messages:
       invites:
-        invalid_code: Invite code is invalid
+        invalid_code: This invitation code is invalid
       email_verifier:
         email_not_real: must point to a real mail account
         out_of_mail_server: appears to point to dead mail server
