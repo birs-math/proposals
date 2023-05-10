@@ -142,7 +142,7 @@ class BookletPdfService
   end
 
   def selected_proposals_subjects(proposals)
-    subjects_with_proposals = proposals.sort_by { |p| p&.subject&.title }.group_by(&:subject_id)
+    subjects_with_proposals = proposals.sort_by { |p| p&.subject&.title || '' }.group_by(&:subject_id)
     first_subject_proposal(subjects_with_proposals)
     subjects_with_proposals
   end
