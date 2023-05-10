@@ -126,6 +126,7 @@ Rails.application.routes.draw do
     member do
       get :location_based_fields
       get :proposal_type_locations
+      get :years
     end
   end
   resources :locations do

@@ -8,7 +8,8 @@ environment.plugins.prepend('Provide',
     jquery: 'jquery/src/jquery',
     'window.jQuery': 'jquery/src/jquery',
     jQuery: 'jquery/src/jquery',
-    Popper: ['popper.js', 'default']
+    Popper: ['popper.js', 'default'],
+    'window.Turbo': 'Turbo',
   })
 )
 

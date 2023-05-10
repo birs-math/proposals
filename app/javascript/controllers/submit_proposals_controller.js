@@ -2,10 +2,12 @@ import { Controller } from "stimulus"
 import Sortable from "sortablejs"
 import Rails from '@rails/ujs'
 
+import { get } from '@rails/request.js'
+
 export default class extends Controller {
 
-  static targets = [ 'proposalType', 'locationSpecificQuestions', 'locationIds', 'text', 'tabs', 
-                    'dragLocations', 'latexPreamble', 'latexBibliography', 'proposalVersion' ]
+  static targets = [ 'proposalType', 'locationSpecificQuestions', 'locationIds', 'text', 'tabs',
+                    'dragLocations', 'latexPreamble', 'latexBibliography', 'proposalVersion', 'yearSelect' ]
   static values = { proposalTypeId: Number, proposal: Number }
 
   connect() {
@@ -128,5 +130,14 @@ export default class extends Controller {
       this.latexPreambleTarget.classList.remove("hidden")
       this.latexBibliographyTarget.classList.remove("hidden")
     }
+  }
+
+  fillProposalYears(event) {
+    let id = event.target.selectedOptions[0].value
+    let target = this.yearSelectTarget.id
+
+    get(`/proposal_types/${id}/years?target=${target}`, {
+      responseKind: 'turbo-stream'
+    })
   }
 }

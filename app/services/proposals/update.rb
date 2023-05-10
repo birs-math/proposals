@@ -3,6 +3,7 @@
 module Proposals
   class Update
     include Callable
+    include UpsertProposalValidator
 
     MODEL_ATTRS = %i[title year subject_id ams_subject_ids location_ids
                   no_latex preamble bibliography cover_letter applied_date
@@ -63,7 +64,7 @@ module Proposals
     def update_proposal
       ActiveRecord::Base.transaction do
         proposal.update(model_params)
-        run_validation
+        validate
         update_ams_subject_codes
         submit_proposal
       end
@@ -87,27 +88,6 @@ module Proposals
           proposal_params[:year] = nil
         end
       end.compact
-    end
-
-    def run_validation
-      if limit_per_type_per_year_exceeded?
-        proposal.errors.add(
-          :base,
-          I18n.t('proposals.limit_per_type_per_year', proposal_type: proposal.proposal_type.name)
-        )
-      end
-    end
-
-    def limit_per_type_per_year_exceeded?
-      return @exists_query_result if defined?(@exists_query_result)
-
-      return @exists_query_result = false unless params[:year]
-
-      @exists_query_result = current_user
-                              .person
-                              .lead_organizer_proposals
-                              .where.not(id: proposal.id)
-                              .exists?(proposal_type_id: proposal.proposal_type_id, year: params[:year])
     end
 
     def update_ams_subject_codes

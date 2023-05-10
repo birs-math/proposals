@@ -11,6 +11,8 @@ import "jquery"
 import "bootstrap"
 import "@fortawesome/fontawesome-free/css/all"
 import "@yaireo/tagify"
+import "@hotwired/turbo-rails"
+import "@rails/request.js"
 
 import "../../../vendor/assets/javascripts/spark"
 

@@ -6,7 +6,7 @@
       </h1>
       <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-           <li class="breadcrumb-item"> <%= link_to "Dashboard", dashboards_path %> </a></li>
+           <li class="breadcrumb-item"> <%= link_to "Dashboard", dashboards_path %></li>
           <li class="breadcrumb-item active" aria-current="page"><%= link_to "Proposals", proposals_path %></li>
           <li class="breadcrumb-item active" aria-current="page">New</li>
         </ol>
@@ -18,11 +18,15 @@
           <div class="card-body">
             <div data-controller="submit-proposals">
               <h2>Start a New Proposal Application</h2>
-              <%= form_for @proposal do  |f| %>
+              <%= form_for @proposal do |f| %>
                 <div class="col-lg-8">
                   <div class="mb-3">
                     <%= f.label :proposal_types, "Select the type of proposal to create:", class: 'form-label' %>
-                    <%= f.select :proposal_type_id, options_for_select(proposal_types), {}, class: 'form-select w-50' %>
+                    <%= f.select :proposal_type_id, options_for_select(proposal_types), {}, { class: 'form-select w-50',  data: { action: 'change->submit-proposals#fillProposalYears' } } %>
+                  </div>
+                  <div class="mb-3">
+                    <%= f.label :year %>
+                    <%= f.select :year, [], {}, { class: "form-select w-25", data: { 'submit-proposals_target' => 'yearSelect' } } %>
                   </div>
                   <div class="form-group">
                     <%= f.submit 'Submit', class:'btn btn-primary' %>

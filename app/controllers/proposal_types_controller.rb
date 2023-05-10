@@ -51,6 +51,15 @@ class ProposalTypesController < ApplicationController
 
   def show; end
 
+  def years
+    @target = params[:target]
+    @proposal_types_years = ProposalType.find_by(id: params[:id])&.year&.split(",")&.map(&:strip) || [Date.current.year + 2]
+
+    respond_to do |format|
+      format.turbo_stream
+    end
+  end
+
   private
 
   def proposal_type_params

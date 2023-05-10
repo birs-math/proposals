@@ -16,10 +16,10 @@ module ProposalsHelper
           .where.not(status: 'cancelled')
   end
 
-  def proposal_type_year(proposal_type)
-    return [Date.current.year + 2] if proposal_type.year.blank?
+  def proposal_type_year(proposal_type = nil)
+    return [Date.current.year + 2] if proposal_type&.year.blank?
 
-    proposal_type.year&.split(",")&.map(&:strip)
+    proposal_type&.year&.split(",")&.map(&:strip)
   end
 
   def approved_proposals(proposal)
