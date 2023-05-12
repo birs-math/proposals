@@ -19,6 +19,8 @@ import "../../../vendor/assets/javascripts/spark"
 import "../stylesheets/application"
 import "../js/common";
 
+window.Turbo = require("@hotwired/turbo")
+
 // Toastr flash messages
 global.toastr = require("toastr")
 toastr.options.closeButton = true;

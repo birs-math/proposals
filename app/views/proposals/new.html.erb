@@ -22,11 +22,11 @@
                 <div class="col-lg-8">
                   <div class="mb-3">
                     <%= f.label :proposal_types, "Select the type of proposal to create:", class: 'form-label' %>
-                    <%= f.select :proposal_type_id, options_for_select(proposal_types), {}, { class: 'form-select w-50',  data: { action: 'change->submit-proposals#fillProposalYears' } } %>
+                    <%= f.select :proposal_type_id, options_for_select(proposal_types), { include_blank: true }, { class: 'form-select w-50', required: true, data: { action: 'change->submit-proposals#fillProposalYears' } } %>
                   </div>
                   <div class="mb-3">
                     <%= f.label :year %>
-                    <%= f.select :year, [], {}, { class: "form-select w-25", data: { 'submit-proposals_target' => 'yearSelect' } } %>
+                    <%= f.select :year, [], {}, { class: "form-select w-25", required: true, data: { 'submit-proposals_target' => 'yearSelect' } } %>
                   </div>
                   <div class="form-group">
                     <%= f.submit 'Submit', class:'btn btn-primary' %>
