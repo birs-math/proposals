@@ -8,13 +8,13 @@ module UpsertProposalValidator
     validate
     rollback_invalid_attributes
 
-    unless validation_errors? && halt_on_error
+    if validation_errors? && halt_on_error
+      raise ActiveRecord::RecordInvalid
+    else
       proposal.save
     end
-
+  ensure
     populate_errors
-
-    raise ActiveRecord::RecordInvalid if validation_errors? && halt_on_error
   end
 
   private
