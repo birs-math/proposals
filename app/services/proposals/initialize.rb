@@ -3,11 +3,12 @@
 module Proposals
   class Initialize
     include Callable
+    include UpsertProposalValidator
 
     Result = Struct.new(:flash_message, :proposal, :url, keyword_init: true) do
       include Rails.application.routes.url_helpers
 
-      def initialize(flash_message:, proposal:, url: nil)
+      def initialize(proposal:, flash_message: {}, url: nil)
         super
       end
 
@@ -35,44 +36,45 @@ module Proposals
       create_proposal
 
       Result.new(
-        flash_message: { notice: I18n.t('proposals.initialize', proposal_type: new_proposal.proposal_type.name) },
-        proposal: new_proposal
+        flash_message: { notice: I18n.t('proposals.initialize', proposal_type: proposal.proposal_type.name) },
+        proposal: proposal
       )
     rescue
-      Result.new(flash_message: { alert: error_message }, proposal: new_proposal)
+      Result.new(flash_message: { alert: error_messages }, proposal: proposal)
     end
 
     private
 
     attr_reader :current_user, :proposal_params
+    alias :params :proposal_params
 
     def create_proposal
       ActiveRecord::Base.transaction do
         attach_form
-        new_proposal.save
+        validate_and_save(halt_on_error: true)
         ensure_organizer_role
       end
     end
 
     def attach_form
-      new_proposal.proposal_form = ProposalForm.active_form(new_proposal.proposal_type_id)
+      proposal.proposal_form = ProposalForm.active_form(proposal.proposal_type_id)
     end
 
     def ensure_organizer_role
-      new_proposal.create_organizer_role(current_user.person, organizer_role)
+      proposal.create_organizer_role(current_user.person, organizer_role)
     end
 
-    def new_proposal
-      @new_proposal ||= Proposal.new(proposal_params)
+    def proposal
+      @proposal ||= Proposal.new(proposal_params)
     end
 
     def organizer_role
       @organizer_role ||= Role.organizer
     end
 
-    def error_message
-      if new_proposal.errors.present?
-        new_proposal.errors.full_messages
+    def error_messages
+      if proposal.errors.present?
+        proposal.errors.full_messages
       else
         I18n.t('errors.messages.something_went_wrong')
       end

@@ -63,8 +63,8 @@ module Proposals
 
     def update_proposal
       ActiveRecord::Base.transaction do
-        proposal.update(model_params)
-        validate
+        proposal.assign_attributes(model_params)
+        validate_and_save
         update_ams_subject_codes
         submit_proposal
       end
@@ -82,10 +82,6 @@ module Proposals
 
         if assigned_date
           proposal_params[:assigned_date] = Date.parse(assigned_date.split(' - ').first)
-        end
-
-        if limit_per_type_per_year_exceeded?
-          proposal_params[:year] = nil
         end
       end.compact
     end

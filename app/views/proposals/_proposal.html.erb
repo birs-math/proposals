@@ -134,7 +134,7 @@
 
                         <div class="mb-3">
                           <%= f.label :year %>
-                          <%= f.select :year, options_for_select(proposal_type_year(@proposal.proposal_type),  @proposal.year), {}, disabled: action, class: "form-select w-25", data: {'action': 'focus->auto-save-proposal#onFocus blur->auto-save-proposal#onBlur'} %>
+                          <%= f.select :year, options_for_select(proposal_type_year(@proposal.proposal_type),  @proposal.year), { include_blank: true }, disabled: action, class: "form-select w-25", data: {'action': 'focus->auto-save-proposal#onFocus blur->auto-save-proposal#onBlur'} %>
                         </div>
                         <div class="mb-3 row">
                           <h3 class="form-section">Subject Areas</h3>
