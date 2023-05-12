@@ -89,13 +89,13 @@ module Proposals
     end
 
     def update_ams_subject_codes
-      if first_ams_subject_id
+      if first_ams_subject_id.present?
         first_ams_subject = ProposalAmsSubject.find_or_initialize_by(proposal: proposal, code: 'code1')
         first_ams_subject.ams_subject_id = first_ams_subject_id
         first_ams_subject.save!
       end
 
-      if second_ams_subject_id
+      if second_ams_subject_id.present?
         second_ams_subject = ProposalAmsSubject.find_or_initialize_by(proposal: proposal, code: 'code2')
         second_ams_subject.ams_subject_id = second_ams_subject_id
         second_ams_subject.save!
