@@ -7,7 +7,7 @@ class Person < ApplicationRecord
   has_many :proposal_roles, dependent: :destroy
   has_many :proposals, through: :proposal_roles
   has_many :proposal_organizer_roles, -> { lead_organizer }, class_name: 'ProposalRole'
-  has_many :lead_organizer_proposals, -> { not_draft }, source: :proposal, through: :proposal_organizer_roles
+  has_many :lead_organizer_proposals, source: :proposal, through: :proposal_organizer_roles
   has_one :demographic_data, dependent: :destroy
   has_many :reviews, dependent: :destroy
   before_save :downcase_email
