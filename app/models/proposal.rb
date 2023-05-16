@@ -128,8 +128,6 @@ class Proposal < ApplicationRecord
     where(status: 'submitted')
   }
 
-  scope :not_draft, -> { where.not(status: 'draft') }
-
   scope :no_of_participants, lambda { |id, invited_as|
     joins(:invites).where('invites.invited_as = ?
       AND invites.proposal_id = ?', invited_as, id)
