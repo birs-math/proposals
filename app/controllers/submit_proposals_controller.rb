@@ -105,15 +105,8 @@ class SubmitProposalsController < ApplicationController
                 alert: error_message and return
   end
 
-  def proposal_params
-    params.permit(:title, :year, :subject_id, :ams_subject_ids, :location_ids,
-                  :no_latex, :preamble, :bibliography, :cover_letter, :applied_date,
-                  :same_week_as, :week_after, :assigned_date, :assigned_size)
-          .merge(no_latex: params[:no_latex] == 'on')
-  end
-
   def proposal_service_params
-    proposal_params.merge(ams_subjects: params[:ams_subjects], commit: params[:commit])
+    params.merge(ams_subjects: params[:ams_subjects], commit: params[:commit], no_latex: params[:no_latex] == 'on')
   end
 
   def proposal_id_param
