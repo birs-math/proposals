@@ -56,7 +56,6 @@ group :development do
   gem "capistrano-rails", "~> 1.6", require: false
   gem 'letter_opener'
   gem 'listen', '~> 3.3'
-  gem 'rack-mini-profiler', '~> 2.0'
   gem 'rubocop-rails'
   gem 'spring'
   gem 'web-console', '>= 4.1.0'
