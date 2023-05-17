@@ -114,7 +114,8 @@ RSpec.describe "/submit_proposals", type: :request do
       end
 
       it 'will alert' do
-        expect(flash[:alert]).to eq([I18n.t('proposals.limit_per_type_per_year', proposal_type: proposal.proposal_type.name)])
+        expect(flash[:alert])
+          .to eq(["Year #{I18n.t('proposals.limit_per_type_per_year', proposal_type: proposal.proposal_type.name)}"])
       end
     end
   end

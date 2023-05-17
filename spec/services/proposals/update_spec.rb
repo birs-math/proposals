@@ -39,7 +39,7 @@ RSpec.describe Proposals::Update do
 
       it 'has error message' do
         expect(service_call.flash_message[:alert])
-          .to eq([I18n.t('proposals.limit_per_type_per_year', proposal_type: proposal.proposal_type.name)])
+          .to eq(["Year #{I18n.t('proposals.limit_per_type_per_year', proposal_type: proposal.proposal_type.name)}"])
       end
 
       it 'updates attributes except year' do

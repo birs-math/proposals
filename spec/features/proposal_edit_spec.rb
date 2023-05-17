@@ -20,7 +20,7 @@ RSpec.feature "Proposal edit", type: :feature do
   end
 
   scenario "there is a Year field containing the year" do
-    expect(page).to have_select('year', options: @proposal.proposal_type.year.split(','))
+    expect(page).to have_select('year', options: [''] + @proposal.proposal_type.year.split(','))
   end
 
   context "Subject Areas" do

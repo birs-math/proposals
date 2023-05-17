@@ -8,7 +8,8 @@ RSpec.describe Proposals::Initialize do
   let(:user) { create(:user) }
   let(:proposal_form) { create(:proposal_form, status: 'active', proposal_type: proposal_type) }
   let(:proposal_type) { create(:proposal_type) }
-  let(:params) { { proposal_type_id: proposal_type.id } }
+  let(:year) { '2021' }
+  let(:params) { { proposal_type_id: proposal_type.id, year: year } }
   let(:proposal) { service_call.proposal }
 
   describe '.call' do
@@ -30,6 +31,27 @@ RSpec.describe Proposals::Initialize do
 
     it 'has notice' do
       expect(service_call.flash_message[:notice]).to eq(I18n.t('proposals.initialize', proposal_type: proposal_type.name))
+    end
+
+    context 'when exists proposal with same type, year and organizer' do
+      before do
+        proposal = create(:proposal, proposal_type: proposal_type, year: year)
+        lead_role = create(:role, name: 'lead_organizer')
+        proposal.create_organizer_role(user.person, lead_role)
+      end
+
+      it 'does not create proposal' do
+        expect { service_call }.not_to change(Proposal, :count)
+      end
+
+      it 'returns redirect url to proposal/new' do
+        expect(service_call.redirect_url).to eq('/proposals/new')
+      end
+
+      it 'shows the error' do
+        expect(service_call.flash_message)
+          .to eq(alert: ["Year #{I18n.t('proposals.limit_per_type_per_year', proposal_type: proposal_type.name)}"])
+      end
     end
 
     context 'when error' do

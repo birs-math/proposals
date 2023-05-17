@@ -71,18 +71,14 @@ module Proposals
     end
 
     def model_params
-      @model_params ||= params.dup.permit(*MODEL_ATTRS).tap do |proposal_params|
+      @model_params ||= params.dup.slice(*MODEL_ATTRS).tap do |proposal_params|
         applied_date = proposal_params[:applied_date]
 
-        if applied_date
-          proposal_params[:applied_date] = Date.parse(applied_date.split(' - ').first)
-        end
+        proposal_params[:applied_date] = Date.parse(applied_date.split(' - ').first) if applied_date
 
         assigned_date = proposal_params[:assigned_date]
 
-        if assigned_date
-          proposal_params[:assigned_date] = Date.parse(assigned_date.split(' - ').first)
-        end
+        proposal_params[:assigned_date] = Date.parse(assigned_date.split(' - ').first) if assigned_date
       end.compact
     end
 
