@@ -106,7 +106,7 @@ class SubmitProposalsController < ApplicationController
   end
 
   def proposal_service_params
-    params.merge(ams_subjects: params[:ams_subjects], commit: params[:commit], no_latex: params[:no_latex] == 'on')
+    params.merge(no_latex: params[:no_latex] == 'on')
   end
 
   def proposal_id_param
