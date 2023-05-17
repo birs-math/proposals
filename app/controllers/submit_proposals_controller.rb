@@ -17,7 +17,8 @@ class SubmitProposalsController < ApplicationController
     session[:is_submission] = @proposal.is_submission = @submission.final?
 
     if @proposal.is_submission
-      @attachment = generate_proposal_pdf
+      # TODO: move sending email with pdf attachment to a job
+      @attachment = generate_proposal_pdf || return
       confirm_submission
     else
       redirect_to edit_proposal_path(@proposal), notice: t('submit_proposals.create.alert')
