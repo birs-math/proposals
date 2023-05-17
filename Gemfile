@@ -49,6 +49,7 @@ group :test do
   gem 'simplecov-lcov'
   gem 'webdrivers'
   gem 'webmock'
+  gem 'rails-controller-testing'
 end
 
 group :development do

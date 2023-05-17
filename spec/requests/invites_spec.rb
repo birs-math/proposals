@@ -78,8 +78,7 @@ RSpec.describe "/proposals/:proposal_id/invites", type: :request do
           post inviter_response_proposal_invite_path(params)
         end
 
-        it { expect(response).to redirect_to(root_path) }
-        it { expect(flash[:alert]).to eq(I18n.t('errors.messages.invites.invalid_code')) }
+        it { expect(response).to have_rendered(:invalid_code) }
       end
     end
   end
@@ -93,7 +92,7 @@ RSpec.describe "/proposals/:proposal_id/invites", type: :request do
     context 'when invite is empty' do
       let(:code) { '' }
 
-      it { expect(response).to redirect_to(root_path) }
+      it { expect(response).to have_rendered(:invalid_code) }
     end
 
     context 'when status is pending' do
@@ -111,7 +110,7 @@ RSpec.describe "/proposals/:proposal_id/invites", type: :request do
     context 'when status is cancelled' do
       let(:status) { 'cancelled' }
 
-      it { expect(response).to redirect_to(cancelled_path) }
+      it { expect(response).to have_rendered(:invalid_code) }
     end
 
     context 'when deadline' do
@@ -139,8 +138,7 @@ RSpec.describe "/proposals/:proposal_id/invites", type: :request do
           get invite_path(code: code)
         end
 
-        it { expect(response).to redirect_to(root_path) }
-        it { expect(flash[:alert]).to eq(I18n.t('errors.messages.invites.invalid_code')) }
+        it { expect(response).to have_rendered(:invalid_code) }
       end
     end
   end
@@ -235,15 +233,15 @@ RSpec.describe "/proposals/:proposal_id/invites", type: :request do
       authenticate_for_controllers(person)
       proposal_role.role.update(name: "Organizer")
       person.proposal_roles << proposal_role
-      role.update(name: role_user.name)
+      role.update(name: role_name)
 
       post cancel_confirmed_invite_path(code: invite.code), params: { invite: invite }
     end
 
     context 'when current user is staff member' do
-      let(:role_user) { create(:role, name: 'Staff') }
+      let(:role_name) { 'Staff' }
 
-      it { expect(person.user.staff_member?).to be_truthy }
+      it { expect(user.staff_member?).to be_truthy }
 
       it "updates the invite status" do
         expect(invite.reload.status).to eq('cancelled')
@@ -252,9 +250,9 @@ RSpec.describe "/proposals/:proposal_id/invites", type: :request do
     end
 
     context 'when current user is not staff member' do
-      let(:role_user) { create(:role, name: 'lead_organizer') }
+      let(:role_name) { 'lead_organizer' }
 
-      it { expect(person.user.staff_member?).to be_falsey }
+      it { expect(user.staff_member?).to be_falsey }
 
       it "updates the invite status" do
         expect(invite.reload.status).to eq('cancelled')
@@ -266,13 +264,13 @@ RSpec.describe "/proposals/:proposal_id/invites", type: :request do
   describe "POST /new_invite" do
     before do
       authenticate_for_controllers
-      role.update(name: role_user.name)
+      role.update(name: role_name)
       post new_invite_proposal_invite_path(id: invite.id, code: invite.code, proposal_id: proposal.id),
            params: { invite: invite }
     end
 
     context 'when current user is staff member' do
-      let(:role_user) { create(:role, name: 'Staff') }
+      let(:role_name) { 'Staff' }
 
       it "updates the invite status" do
         expect(invite.reload.status).to eq('pending')
@@ -281,7 +279,7 @@ RSpec.describe "/proposals/:proposal_id/invites", type: :request do
     end
 
     context 'when current user is not staff member' do
-      let(:role_user) { create(:role, name: 'lead_organizer') }
+      let(:role_name) { 'lead_organizer' }
 
       it "updates the invite status" do
         expect(invite.reload.status).to eq('pending')
@@ -329,14 +327,14 @@ RSpec.describe "/proposals/:proposal_id/invites", type: :request do
   describe "POST /inviter_reminder with staff member" do
     before do
       authenticate_for_controllers
-      role.update(name: role_user.name)
+      role.update(name: role_name)
       params = { proposal_id: proposal.id, id: invite1.id, code: invite1.code }
       post invite_reminder_proposal_invite_path(params)
     end
 
     context 'when status is pending' do
       let(:invite1) { create(:invite, status: 'pending') }
-      let(:role_user) { create(:role, name: 'Staff') }
+      let(:role_name) { 'Staff' }
       it "sends invite reminder when invite status is pending" do
         expect(response).to have_http_status(:found)
         expect(response).to redirect_to(edit_submitted_proposal_url(proposal.id))
@@ -345,7 +343,7 @@ RSpec.describe "/proposals/:proposal_id/invites", type: :request do
 
     context 'when status is confirmed' do
       let(:invite1) { create(:invite, status: 'confirmed') }
-      let(:role_user) { create(:role, name: 'Staff') }
+      let(:role_name) { 'Staff' }
       it "does not send invite reminder when invite status is pending" do
         expect(response).to have_http_status(:found)
         expect(response).to redirect_to(edit_proposal_path(proposal.id))
@@ -356,14 +354,14 @@ RSpec.describe "/proposals/:proposal_id/invites", type: :request do
   describe "POST /inviter_reminder without staff member" do
     before do
       authenticate_for_controllers
-      role.update(name: role_user.name)
+      role.update(name: role_name)
       params = { proposal_id: proposal.id, id: invite1.id, code: invite1.code }
       post invite_reminder_proposal_invite_path(params)
     end
 
     context 'when status is pending' do
       let(:invite1) { create(:invite, status: 'pending') }
-      let(:role_user) { create(:role, name: 'lead_organizer') }
+      let(:role_name) { 'lead_organizer' }
       it "sends invite reminder when invite status is pending" do
         expect(response).to have_http_status(:found)
         expect(response).to redirect_to(edit_proposal_url(proposal.id))
@@ -372,7 +370,7 @@ RSpec.describe "/proposals/:proposal_id/invites", type: :request do
 
     context 'when status is confirmed' do
       let(:invite1) { create(:invite, status: 'confirmed') }
-      let(:role_user) { create(:role, name: 'lead_organizer') }
+      let(:role_name) { 'lead_organizer' }
       it "does not send invite reminder when invite status is pending" do
         expect(response).to have_http_status(:found)
         expect(response).to redirect_to(edit_proposal_path(proposal.id))
