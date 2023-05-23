@@ -16,11 +16,14 @@ Rails.application.routes.draw do
   get 'dashboards', to: 'proposal_types#index'
 
   resources :submitted_proposals do
+    get :booklet_log, on: :collection
+
     collection do
       get :download_csv
       post :send_to_workshop
       post :proposals_booklet
       get :download_booklet
+      get :download_file
       post :edit_flow
       post :revise_proposal_editflow
       post :approve_decline_proposals
