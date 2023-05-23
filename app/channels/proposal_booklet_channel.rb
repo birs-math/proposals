@@ -1,6 +1,6 @@
 class ProposalBookletChannel < ApplicationCable::Channel
   def subscribed
-    stream_from "proposal_booklet_channel_#{current_user.id}"
+    stream_for current_user
   end
 
   def unsubscribed

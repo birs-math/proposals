@@ -9,14 +9,14 @@ class ProposalBookletJob < ApplicationJob
 
     create_file
 
-    ActionCable.server.broadcast(
-      "proposal_booklet_channel_#{current_user.id}",
+    ProposalBookletChannel.broadcast_to(
+      current_user,
       { success: "Created proposals booklet. Now, it will download itself." }
     )
   rescue ActionView::Template::Error => e
     Rails.logger.info { "\n\nLaTeX error:\n #{e.message}\n\n" }
     log = create_log_record(e.cause)
-    ActionCable.server.broadcast("proposal_booklet_channel_#{current_user.id}", { alert: e.message, log_id: log.id })
+    ProposalBookletChannel.broadcast_to(current_user, { alert: e.message, log_id: log.id })
   end
 
   private
