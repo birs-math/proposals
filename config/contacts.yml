@@ -1,32 +1,25 @@
 # contact emails
 # use: Rails.application.config_for(:contacts)['webmaster_email']
+
+default: &default
+  webmaster_email: <%= ENV['WEBMASTER_EMAIL'] %>
+  birs_coordinator: <%= ENV['BIRS_COORD'] %>
+  birs_email: <%= ENV['BIRS_EMAIL'] %>
+  cmo_coordinator: <%= ENV['CMO_COORD'] %>
+  cmo_email: <%= ENV['CMO_EMAIL'] %>
+  iasm_coordinator: <%= ENV['IASM_COORD'] %>
+  iasm_email: <%= ENV['IASM_EMAIL'] %>
+  ubco_coordinator: <%= ENV['UBCO_COORD'] %>
+  ubco_email: <%= ENV['UBCO_EMAIL'] %>
+
 development:
-  webmaster_email: <%= ENV['WEBMASTER_EMAIL'] %>
-  birs_coordinator: <%= ENV['BIRS_COORD'] %>
-  birs_email: <%= ENV['BIRS_EMAIL'] %>
-  cmo_coordinator: <%= ENV['CMO_COORD'] %>
-  cmo_email: <%= ENV['CMO_EMAIL'] %>
-  iasm_coordinator: <%= ENV['IASM_COORD'] %>
-  iasm_email: <%= ENV['IASM_EMAIL'] %>
-  ubco_coordinator: <%= ENV['UBCO_COORD'] %>
-  ubco_email: <%= ENV['UBCO_EMAIL'] %>
+  <<: *default
+
+staging:
+ <<: *default
+
 test:
-  webmaster_email: <%= ENV['WEBMASTER_EMAIL'] %>
-  birs_coordinator: <%= ENV['BIRS_COORD'] %>
-  birs_email: <%= ENV['BIRS_EMAIL'] %>
-  cmo_coordinator: <%= ENV['CMO_COORD'] %>
-  cmo_email: <%= ENV['CMO_EMAIL'] %>
-  iasm_coordinator: <%= ENV['IASM_COORD'] %>
-  iasm_email: <%= ENV['IASM_EMAIL'] %>
-  ubco_coordinator: <%= ENV['UBCO_COORD'] %>
-  ubco_email: <%= ENV['UBCO_EMAIL'] %>
+  <<: *default
+
 production:
-  webmaster_email: <%= ENV['WEBMASTER_EMAIL'] %>
-  birs_coordinator: <%= ENV['BIRS_COORD'] %>
-  birs_email: <%= ENV['BIRS_EMAIL'] %>
-  cmo_coordinator: <%= ENV['CMO_COORD'] %>
-  cmo_email: <%= ENV['CMO_EMAIL'] %>
-  iasm_coordinator: <%= ENV['IASM_COORD'] %>
-  iasm_email: <%= ENV['IASM_EMAIL'] %>
-  ubco_coordinator: <%= ENV['UBCO_COORD'] %>
-  ubco_email: <%= ENV['UBCO_EMAIL'] %>
+  <<: *default
