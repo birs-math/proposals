@@ -1,7 +1,7 @@
 # See: https://github.com/phusion/passenger-docker
 # Latest image versions:
 # https://github.com/phusion/passenger-docker/blob/master/CHANGELOG.md
-FROM phusion/passenger-ruby27:2.0.0
+FROM phusion/passenger-ruby27:2.4.1
 
 ENV HOME /root
 
