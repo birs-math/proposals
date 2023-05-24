@@ -21,14 +21,14 @@ rm /etc/timezone
 rm /etc/localtime
 dpkg-reconfigure --frontend noninteractive tzdata
 
-if [ ! -e /usr/local/rvm/gems/ruby-2.7.4 ]; then
+if [ ! -e /usr/local/rvm/gems/ruby-2.7.7 ]; then
   echo
   echo "Create gemset..."
   gpg --keyserver keys.openpgp.org --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB
   /usr/bin/curl -sSL https://get.rvm.io | bash -s stable
-  bash -lc 'rvm --default use ruby-2.7.4'
-  /usr/local/rvm/bin/rvm gemset create ruby-2.7.4
-  /usr/local/rvm/bin/rvm gemset use ruby-2.7.4@global
+  bash -lc 'rvm --default use ruby-2.7.7'
+  /usr/local/rvm/bin/rvm gemset create ruby-2.7.7
+  /usr/local/rvm/bin/rvm gemset use ruby-2.7.7@global
   /usr/local/rvm/bin/rvm cleanup all
   /usr/local/rvm/bin/rvm reload
 fi
@@ -47,12 +47,12 @@ yarn --version
 
 echo
 echo "Installing latest bundler..."
-/usr/local/rvm/bin/rvm-exec 2.7.4 gem install bundler
+/usr/local/rvm/bin/rvm-exec 2.7.7 gem install bundler
 
-if [ ! -e /usr/local/rvm/gems/ruby-2.7.4/gems/rails-6.1.4.1 ]; then
+if [ ! -e /usr/local/rvm/gems/ruby-2.7.7/gems/rails-6.1.4.1 ]; then
   echo
   echo "Installing Rails 6.1.4.1..."
-  su - app -c "cd /home/app/proposals; /usr/local/rvm/bin/rvm-exec 2.7.4 gem install rails -v 6.1.4.1"
+  su - app -c "cd /home/app/proposals; /usr/local/rvm/bin/rvm-exec 2.7.7 gem install rails -v 6.1.4.1"
 fi
 
 if [ ! -e /home/app/proposals/bin ]; then
