@@ -47,9 +47,9 @@ ENV APP_HOME /home/app/proposals
 # disabled because we mount host directory in $APP_HOME
 COPY . $APP_HOME
 WORKDIR $APP_HOME
-RUN /usr/local/rvm/bin/rvm default use 2.7.4
-RUN /usr/local/rvm/bin/rvm-exec 2.7.4 gem install bundler
-RUN /usr/local/rvm/bin/rvm-exec 2.7.4 gem uninstall turbo-rails
+RUN /usr/local/rvm/bin/rvm default use 2.7.7
+RUN /usr/local/rvm/bin/rvm-exec 2.7.7 gem install bundler
+RUN /usr/local/rvm/bin/rvm-exec 2.7.7 gem uninstall turbo-rails
 RUN bundle install
 RUN RAILS_ENV=development bundle exec cap install
 RUN RAILS_ENV=development bundle exec rails webpacker:install
@@ -64,8 +64,8 @@ COPY entrypoint.sh /sbin/
 RUN chmod 755 /sbin/entrypoint.sh
 RUN mkdir -p /etc/my_init.d
 RUN ln -s /sbin/entrypoint.sh /etc/my_init.d/entrypoint.sh
-RUN echo 'export PATH=./bin:$PATH:/usr/local/rvm/rubies/ruby-2.7.4/bin' >> /root/.bashrc
-RUN echo 'export PATH=./bin:$PATH:/usr/local/rvm/rubies/ruby-2.7.4/bin' >> /home/app/.bashrc
+RUN echo 'export PATH=./bin:$PATH:/usr/local/rvm/rubies/ruby-2.7.7/bin' >> /root/.bashrc
+RUN echo 'export PATH=./bin:$PATH:/usr/local/rvm/rubies/ruby-2.7.7/bin' >> /home/app/.bashrc
 RUN echo 'alias rspec="bundle exec rspec"' >> /root/.bashrc
 RUN echo 'alias rspec="bundle exec rspec"' >> /home/app/.bashrc
 RUN echo 'alias restart="passenger-config restart-app /home/app/proposals & tail -f log/production.log"' >> /root/.bashrc
