@@ -1,7 +1,7 @@
 # See: https://github.com/phusion/passenger-docker
 # Latest image versions:
 # https://github.com/phusion/passenger-docker/blob/master/CHANGELOG.md
-FROM phusion/passenger-ruby27:2.0.0
+FROM phusion/passenger-ruby27:2.4.1
 
 ENV HOME /root
 
@@ -24,7 +24,7 @@ RUN apt-get install --yes --fix-missing pkg-config apt-utils build-essential \
               texlive-latex-extra texlive-extra-utils
 
 # NodeJS
-RUN curl -sL https://deb.nodesource.com/setup_lts.x -o nodesource_setup.sh
+RUN curl -sL https://deb.nodesource.com/setup_16.x -o nodesource_setup.sh
 RUN bash nodesource_setup.sh
 RUN apt install --yes --fix-missing nodejs yarn
 
@@ -47,12 +47,13 @@ ENV APP_HOME /home/app/proposals
 # disabled because we mount host directory in $APP_HOME
 COPY . $APP_HOME
 WORKDIR $APP_HOME
-RUN /usr/local/rvm/bin/rvm default use 2.7.4
-RUN /usr/local/rvm/bin/rvm-exec 2.7.4 gem install bundler
-RUN /usr/local/rvm/bin/rvm-exec 2.7.4 gem uninstall turbo-rails
+RUN /usr/local/rvm/bin/rvm default use 2.7.7
+RUN /usr/local/rvm/bin/rvm-exec 2.7.7 gem install bundler
+RUN /usr/local/rvm/bin/rvm-exec 2.7.7 gem uninstall turbo-rails
 RUN bundle install
 RUN RAILS_ENV=development bundle exec cap install
-RUN RAILS_ENV=development bundle exec rails webpacker:install
+# Answer no to overwrite prompts
+RUN RAILS_ENV=development yes n | bundle exec rails webpacker:install
 RUN RAILS_ENV=development bundle exec rails turbo:install
 RUN yarn install
 RUN chown app:app -R /usr/local/rvm/gems
@@ -64,8 +65,8 @@ COPY entrypoint.sh /sbin/
 RUN chmod 755 /sbin/entrypoint.sh
 RUN mkdir -p /etc/my_init.d
 RUN ln -s /sbin/entrypoint.sh /etc/my_init.d/entrypoint.sh
-RUN echo 'export PATH=./bin:$PATH:/usr/local/rvm/rubies/ruby-2.7.4/bin' >> /root/.bashrc
-RUN echo 'export PATH=./bin:$PATH:/usr/local/rvm/rubies/ruby-2.7.4/bin' >> /home/app/.bashrc
+RUN echo 'export PATH=./bin:$PATH:/usr/local/rvm/rubies/ruby-2.7.7/bin' >> /root/.bashrc
+RUN echo 'export PATH=./bin:$PATH:/usr/local/rvm/rubies/ruby-2.7.7/bin' >> /home/app/.bashrc
 RUN echo 'alias rspec="bundle exec rspec"' >> /root/.bashrc
 RUN echo 'alias rspec="bundle exec rspec"' >> /home/app/.bashrc
 RUN echo 'alias restart="passenger-config restart-app /home/app/proposals & tail -f log/production.log"' >> /root/.bashrc

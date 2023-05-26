@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-ruby '2.7.4'
+ruby '2.7.7'
 
 gem 'aasm', '~> 5.1', '>= 5.1.1'
 gem 'acts_as_list'
@@ -56,7 +56,6 @@ group :development do
   gem "capistrano-rails", "~> 1.6", require: false
   gem 'letter_opener'
   gem 'listen', '~> 3.3'
-  gem 'rack-mini-profiler', '~> 2.0'
   gem 'rubocop-rails'
   gem 'spring'
   gem 'web-console', '>= 4.1.0'
