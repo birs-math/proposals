@@ -9,7 +9,7 @@
     "@rails/actiontext": "^6.1.4",
     "@rails/activestorage": "^6.0.0",
     "@rails/ujs": "^6.0.0",
-    "@rails/webpacker": "5.4.0",
+    "@rails/webpacker": "5.4.4",
     "@yaireo/tagify": "^4.8.1",
     "bootstrap": "5.0.1",
     "chart.js": "2.9.4",
@@ -39,7 +39,7 @@
   "version": "0.1.0",
   "devDependencies": {
     "webpack-cli": "^3.3.12",
-    "webpack-dev-server": "^3.11.2"
+    "webpack-dev-server": "^3"
   },
   "scripts": {
     "startdev": "webpack serve --mode development --env development --hot --port 3000"

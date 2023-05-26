@@ -52,7 +52,8 @@ RUN /usr/local/rvm/bin/rvm-exec 2.7.7 gem install bundler
 RUN /usr/local/rvm/bin/rvm-exec 2.7.7 gem uninstall turbo-rails
 RUN bundle install
 RUN RAILS_ENV=development bundle exec cap install
-RUN RAILS_ENV=development bundle exec rails webpacker:install
+# Answer no to overwrite prompts
+RUN RAILS_ENV=development yes n | bundle exec rails webpacker:install
 RUN RAILS_ENV=development bundle exec rails turbo:install
 RUN yarn install
 RUN chown app:app -R /usr/local/rvm/gems
