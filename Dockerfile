@@ -24,7 +24,7 @@ RUN apt-get install --yes --fix-missing pkg-config apt-utils build-essential \
               texlive-latex-extra texlive-extra-utils
 
 # NodeJS
-RUN curl -sL https://deb.nodesource.com/setup_lts.x -o nodesource_setup.sh
+RUN curl -sL https://deb.nodesource.com/setup_16.x -o nodesource_setup.sh
 RUN bash nodesource_setup.sh
 RUN apt install --yes --fix-missing nodejs yarn
 
