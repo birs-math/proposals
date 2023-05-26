@@ -71,7 +71,9 @@ module Proposals
     end
 
     def model_params
-      @model_params ||= params.dup.slice(*MODEL_ATTRS).tap do |proposal_params|
+      return @model_params if defined?(@model_params)
+
+      @model_params = params.dup.slice(*MODEL_ATTRS).tap do |proposal_params|
         applied_date = proposal_params[:applied_date]
 
         proposal_params[:applied_date] = Date.parse(applied_date.split(' - ').first) if applied_date.present?
@@ -82,6 +84,8 @@ module Proposals
 
         proposal_params.permit(*MODEL_ATTRS) if proposal_params.respond_to?(:permit)
       end.compact
+
+      @model_params = @model_params.permit(*MODEL_ATTRS) if @model_params.respond_to?(:permit)
     end
 
     def update_ams_subject_codes
