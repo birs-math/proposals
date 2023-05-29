@@ -211,7 +211,7 @@ class SubmittedProposalsController < ApplicationController
   end
 
   def download_file
-    log = LatexToPdfLog.find_by(log_id: params[:log_id])
+    log = LatexToPdfLog.find_by(id: params[:log_id])
 
     return head(:not_found) if log.blank?
 
