@@ -124,6 +124,8 @@ GEM
     devise-encryptable (0.2.0)
       devise (>= 2.1.0)
     diff-lcs (1.5.0)
+    discard (1.2.1)
+      activerecord (>= 4.2, < 8)
     dnsruby (1.70.0)
       simpleidn (~> 0.2.1)
     docile (1.4.0)
@@ -421,6 +423,7 @@ DEPENDENCIES
   deep_cloneable (~> 3.1.0)
   devise
   devise-encryptable
+  discard (~> 1.2)
   ed25519
   email_verifier
   factory_bot_rails
