@@ -22,9 +22,18 @@ class Invite < ApplicationRecord
   default_scope { order(created_at: :asc) }
   scope :organizer, -> { where(invited_as: "Organizer") }
   scope :participant, -> { where(invited_as: "Participant") }
-  scope :confirmed, -> { where(status: 1) }
   enum status: { pending: 0, confirmed: 1, cancelled: 2 }
   enum response: { yes: 0, maybe: 1, no: 2 }
+
+  class << self
+    def safe_find(code:)
+      return unless code
+
+      invite = not_cancelled.find_by(code: code)
+
+      invite if invite&.code_valid?
+    end
+  end
 
   def email_downcase
     email.downcase!
@@ -60,6 +69,14 @@ class Invite < ApplicationRecord
     person.lastname = lastname
     person.email = email
     return true if person.save(validate: false)
+  end
+
+  def code_expired?
+    !code_valid?
+  end
+
+  def code_valid?
+    deadline_date >= DateTime.current.beginning_of_day
   end
 
   private

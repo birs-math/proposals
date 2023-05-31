@@ -2,11 +2,11 @@ class InvitesController < ApplicationController
   before_action :authenticate_user!, except: %i[show inviter_response thanks cancelled]
   before_action :set_proposal, only: %i[invite_reminder invite_email new_invite]
   before_action :set_invite,
-                only: %i[show inviter_response cancel invite_reminder invite_email new_invite cancel_confirmed_invite]
+                only: %i[show inviter_response invite_reminder]
   before_action :set_invite_proposal, only: %i[show]
+  before_action :unsafe_set_invite, only: %i[cancel new_invite cancel_confirmed_invite]
 
   def show
-    redirect_to root_path, alert: "Invite code is invalid" and return if @invite.nil?
     redirect_to root_path and return if @invite.confirmed?
     redirect_to cancelled_path and return if @invite.cancelled?
 
@@ -50,13 +50,24 @@ class InvitesController < ApplicationController
 
   def inviter_response
     if invalid_response?
-      redirect_to invite_url(code: @invite&.code), alert: t('invites.inviter_response.failure')
-      return
+      return redirect_to invite_url(code: @invite&.code), alert: t('invites.inviter_response.failure')
     end
 
-    invite_response_status
+    @invite.response = response_params
+    @invite.status = set_invite_status
+    @invite.skip_deadline_validation = true
 
-    redirect_on_response
+    if @invite.save
+      if @invite.no? || @invite.maybe?
+        send_email_on_response
+      elsif @invite.yes?
+        session[:is_invited_person] = true
+        redirect_to new_person_path(code: @invite.code, response: @invite.response)
+      end
+    else
+      redirect_to invite_url(code: @invite&.code),
+                  alert: "Problem saving response: #{@invite.errors.full_messages}"
+    end
   end
 
   def invite_reminder
@@ -80,6 +91,7 @@ class InvitesController < ApplicationController
   def cancel
     @invite.skip_deadline_validation = true if @invite.deadline_date < Date.current
     @invite.update(status: 'cancelled')
+
     if current_user.staff_member?
       redirect_to edit_submitted_proposal_url(@invite.proposal), notice: t('invites.cancel.success')
     else
@@ -118,11 +130,11 @@ class InvitesController < ApplicationController
   def set_invite_status
     case response_params
     when 'no'
-      nil
+      :cancelled
     when 'maybe'
-      'pending'
+      :pending
     when 'yes'
-      'confirmed'
+      :confirmed
     end
   end
 
@@ -138,26 +150,14 @@ class InvitesController < ApplicationController
     %w[yes no maybe].none?(response_params)
   end
 
-  def invite_response_status
-    @invite.response = response_params
-    @invite.status = set_invite_status
-    @invite.skip_deadline_validation = true
-  end
-
-  def redirect_on_response
-    if (@invite.no? || @invite.maybe?) && @invite.save
-      send_email_on_response
-    elsif @invite.yes?
-      session[:is_invited_person] = true
-      redirect_to new_person_path(code: @invite.code, response: @invite.response)
-    else
-      redirect_to invite_url(code: @invite&.code),
-                  alert: "Problem saving response: #{@invite.errors.full_messages}"
-    end
-  end
-
   def set_invite
-    @invite = Invite.find_by(code: params[:code])
+    @invite = Invite.safe_find(code: params[:code])
+
+    if @invite.blank?
+      @lead_organizer = Invite.find_by(code: params[:code])&.proposal&.lead_organizer
+
+      render 'invalid_code', layout: 'devise'
+    end
   end
 
   def set_proposal
@@ -198,5 +198,9 @@ class InvitesController < ApplicationController
       redirect_to edit_proposal_path(@proposal),
                   notice: "Invite reminder has been sent to #{@invite.person.fullname}!"
     end
+  end
+
+  def unsafe_set_invite
+    @invite = Invite.find_by(code: params[:code])
   end
 end

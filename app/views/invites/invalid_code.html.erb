@@ -1,0 +1,11 @@
+<div class="container h-100">
+  <div class="row h-100 justify-content-center  align-items-center">
+    <div class="col-6">
+      <h1 class="pb-4">There was a problem with invitation:</h1>
+      <div id="error_explanation"><%= I18n.t('errors.messages.invites.invalid_code') %></div>
+      <% if @lead_organizer %>
+        <h3 class="pt-3">Please contact <%= mail_to @lead_organizer.email, @lead_organizer.fullname %> to issue a new one.</h3>
+      <% end %>
+    </div>
+  </div>
+</div>

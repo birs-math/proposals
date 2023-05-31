@@ -7,12 +7,12 @@ import Rails from "@rails/ujs"
 import * as ActiveStorage from "@rails/activestorage"
 import "channels"
 import "controllers"
-import "bootstrap"
 import "jquery"
+import "bootstrap"
 import "@fortawesome/fontawesome-free/css/all"
 import "@yaireo/tagify"
 
-import "spark"; // vendor/assets/javascripts
+import "../../../vendor/assets/javascripts/spark"
 
 import "../stylesheets/application"
 import "../js/common";

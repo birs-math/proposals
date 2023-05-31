@@ -88,6 +88,7 @@ services:
       - SCHEDULE_API_KEY=
       - WORKSHOPS_API_URL=
       - WORKSHOPS_API_KEY=
+      - MAILHOG_HOST=localhost
 
 
 volumes:

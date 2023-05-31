@@ -15,17 +15,54 @@ RSpec.describe "/person", type: :request do
     before do
       role_privilege
       user.roles << role
-      sign_in user
     end
 
-    it "renders a successful response" do
-      get new_person_url(code: invite.code, response: 'yes')
-      expect(response).to have_http_status(:ok)
+    context 'with signed in user' do
+      before { sign_in user }
+
+      it "renders a successful response" do
+        get new_person_url(code: invite.code, response: 'yes')
+
+        expect(response).to have_http_status(:ok)
+      end
+
+      it "renders a successful response when invite is not present" do
+        get new_person_url(code: 'test', response: 'yes')
+
+        expect(response).to have_http_status(:ok)
+      end
     end
 
-    it "renders a successful response when invite is not present" do
-      get new_person_url(code: 'test', response: 'yes')
-      expect(response).to have_http_status(:ok)
+    context 'when invite' do
+      let(:invite) { create(:invite, proposal: proposal, deadline_date: deadline) }
+      let(:deadline) { DateTime.current }
+
+      context 'is today' do
+        let(:deadline) { DateTime.current }
+
+        before { get new_person_url(code: invite.code, response: 'yes') }
+
+        it { expect(response).to have_http_status(:ok) }
+      end
+
+      context 'is tomorrow' do
+        let(:deadline) { DateTime.current + 1.day }
+
+        before { get new_person_url(code: invite.code, response: 'yes') }
+
+        it { expect(response).to have_http_status(:ok) }
+      end
+
+      context 'was yesterday' do
+        before do
+          invite.update_attribute(:deadline_date, DateTime.current - 1.day )
+
+          get new_person_url(code: invite.code, response: 'yes')
+        end
+
+        it { expect(response).to redirect_to(root_path) }
+        it { expect(flash[:alert]).to eq(I18n.t('people.new.alert')) }
+      end
     end
   end
 

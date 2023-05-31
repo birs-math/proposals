@@ -55,11 +55,11 @@ class PeopleController < ApplicationController
   end
 
   def set_person
-    @person = invited_person || current_user.person
+    @person = invited_person || current_user&.person
   end
 
   def invite
-    Invite.find_by(code: params[:code])
+    Invite.safe_find(code: params[:code])
   end
 
   def invited_person
