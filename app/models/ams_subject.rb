@@ -1,6 +1,5 @@
 class AmsSubject < ApplicationRecord
   include Discard::Model
-  default_scope -> { kept }
 
   validates :title, :code, presence: true
   belongs_to :subject, optional: true

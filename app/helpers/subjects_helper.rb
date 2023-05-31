@@ -4,7 +4,7 @@ module SubjectsHelper
   end
 
   def ams_subjects_code
-    AmsSubject.order(:title).pluck(:title, :id)
+    AmsSubject.kept.order(:title).pluck(:title, :id)
   end
 
   def ams_subject_title(ams_subject)
