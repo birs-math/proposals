@@ -18,6 +18,12 @@ development:
   username: <%= ENV['DB_USER'] %>
   password: <%= ENV['DB_PASS'] %>
 
+staging:
+  <<: *default
+  database: proposals_development
+  username: <%= ENV['DB_USER'] %>
+  password: <%= ENV['DB_PASS'] %>
+
 test:
   <<: *default
   database: proposals_test

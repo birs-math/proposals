@@ -1,6 +1,11 @@
 development:
   adapter: async
 
+staging:
+  adapter: redis
+  url: <%= ENV.fetch("REDIS_URL", "redis://localhost/:6379/0") %>
+  channel_prefix: proposals_staging
+
 test:
   adapter: test
 
