@@ -1,7 +1,7 @@
 <main class="content">
   <div class="container-fluid">
     <div class="header">
-       <% if params[:action] == 'show'%>
+       <% if params[:action] == 'show'%>  
         <div class="d-flex flex-row-reverse float-end" >
            <%= link_to "Edit Proposal", edit_submitted_proposal_url(@proposal) ,class:'btn btn-primary' %>
         </div>
@@ -11,7 +11,7 @@
       </h1>
       <nav aria-label="breadcrumb">
         <ol class="breadcrumb" data-turbo="false">
-          <li class="breadcrumb-item"> <%= link_to "Dashboard", dashboards_path %></li>
+          <li class="breadcrumb-item"> <%= link_to "Dashboard", dashboards_path %> </a></li>
           <li class="breadcrumb-item active" aria-current="page"><%= link_to "Submitted Proposals", submitted_proposals_path %></li>
           <% if params[:action] == 'edit' %>
             <li class="breadcrumb-item active" aria-current="page">Edit</li>
@@ -32,7 +32,7 @@
                 data-nested-invites-max-participant-value="<%= @proposal.proposal_type.participant %>"
                 data-nested-invites-max-organizer-value="<%= @proposal.proposal_type.co_organizer %>"
                 data-nested-invites-organizer-value="<%= confirmed_participants(@proposal.id, 'Organizer').count %>"
-                data-nested-invites-participant-value="<%= confirmed_participants(@proposal.id, 'Participant').count %>"
+                data-nested-invites-participant-value="<%= confirmed_participants(@proposal.id, 'Participant').count %>" 
               >
                 <input type="hidden" id="proposal_id" name="proposal_id" value="<%= @proposal.id %>">
                 <div class="col-12 col-lg-12">
@@ -70,7 +70,7 @@
                               Please list all the changes you have made to your proposal here.
                             </p>
                             <p>
-                              For example, you could say, "As requested by the BIRS program committee, we have increased our number of early-career participants by inviting the following people ... ".
+                              For example, you could say, "As requested by the BIRS program committee, we have increased our number of early-career participants by inviting the following people ... ". 
                             </p>
                             <%= f.text_area(:cover_letter, size: '5x5', class:'form-control', value: @proposal&.cover_letter, disabled: action) %>
                           </div>
@@ -97,7 +97,7 @@
                             <%= label_tag :assigned_location_id %>
                           </div>
                           <div class="mb-3">
-                            <%= f.text_field :assigned_location_id, id: 'location_field', class: 'form-control w-25 d-inline-block', disabled: action, value: @proposal.assigned_location&.code %>
+                            <%= f.text_field :assigned_location_id, id: 'location_field', class: 'form-control w-25 d-inline-block', disabled: action, value: @proposal.assigned_location&.code %>       
                           </div>
                           <div>
                             <%= label_tag :assigned_size %>
@@ -105,7 +105,7 @@
                           <div class="mb-3">
                             <%= select_tag :assigned_size, options_for_select(['', 'Full', 'Half'], @proposal.assigned_size), disabled: action, class: "form-select w-25", data: {'action': 'change->auto-save-proposal#onBlur'} %>
                           </div>
-                          <div class="mb-3">
+                          <div class="mb-3">  
                             <%= label_tag :applied_date %>
                             <%= select_tag :applied_date, options_for_select(assigned_dates(@proposal.assigned_location), seleted_assigned_date(@proposal)), disabled: action, class: "form-select w-25", data: {'action': 'change->auto-save-proposal#onBlur'} %>
                           </div>
@@ -133,124 +133,24 @@
                           <%= select_tag :year, options_for_select(proposal_type_year(@proposal.proposal_type),  @proposal.year), disabled: action, class: "form-select w-25", data: {'action': 'focus->auto-save-proposal#onFocus blur->auto-save-proposal#onBlur'} %>
                         </div>
                         <div class="mb-3 row">
-                          <h4>Subject Areas</h4>
-                          <div class="col-6 mt-2">
-                            <label class="required">Subject Area</label>
-                            <%= select_tag :subject_id, options_for_select(subjects_area, @proposal.subject&.id), include_blank: '' , disabled: action, class: "form-select", data: {'action': 'focus->auto-save-proposal#onFocus blur->auto-save-proposal#onBlur'} %>
-                            <% if @submission && @proposal.subject&.id.nil? %>
-                              <p class="field-validation">Subject is required</p>
-                            <% end %>
-                          </div>
-                          <div class="col-6 mt-2">
-                            <div class="mb-3">
-                              <label class="required">AMS Subject Code 1</label>
-                              <%= select_tag :ams_subjects, options_for_select(ams_subjects_code, proposal_ams_subjects_code(@proposal, 'code1')), include_blank: '', disabled: action, class: "form-select", name:'ams_subjects[code1]', data: {'action': 'focus->auto-save-proposal#onFocus blur->auto-save-proposal#onBlur'} %>
-                              <% if @submission && proposal_ams_subjects_code(@proposal, 'code1').blank? %>
-                                <p class="field-validation">AMS Subject Code 1 is required</p>
-                              <% end %>
-                            </div>
-
-                            <div class="mb-3">
-                              <label class="required">AMS Subject Code 2</label>
-                              <%= select_tag :ams_subjects, options_for_select(ams_subjects_code, proposal_ams_subjects_code(@proposal, 'code2')), include_blank: '', disabled: action, class: "form-select", name:'ams_subjects[code2]', data: {'action': 'focus->auto-save-proposal#onFocus blur->auto-save-proposal#onBlur'} %>
-                              <% if @submission && proposal_ams_subjects_code(@proposal, 'code2').blank? %>
-                                <p class="field-validation">AMS Subject Code 2 is required</p>
-                              <% end %>
-                            </div>
-                          </div>
+                          <%= render partial: 'proposals/form/subject_area', locals: { form: f, disabled: action } %>
                           <div>
                             <% if params[:action] == 'edit' %>
-                              <%= render partial: 'proposals/lead_organizer' %>
-                              <div>
-                                <h3 class="form-section">Add Supporting Organizers:</h3>
-                                <p><%= @proposal.proposal_type.organizer_description&.html_safe %></p>
-
-                                <% if @proposal.invites.organizer %>
-                                  <%= render partial: 'proposals/organizer', locals: { invites: @proposal.invites.organizer } %>
-                                <% end %>
-                                <div>
-                                  <% if max_invitations(@proposal, 'Organizer') %>
-                                    <% date = @proposal.invites.where(invited_as: 'Organizer').first&.deadline_date&.to_date %>
-                                    <% unless date.nil? %>
-                                      <% date = date  < DateTime.current.to_date ? DateTime.current.to_date : @proposal.invites.where(invited_as: 'Organizer').first&.deadline_date&.to_date %>
-                                    <% end %>
-                                    <div class="mb-3">
-                                      <template data-nested-invites-target="template">
-                                        <%= f.fields_for :invites, Invite.new, child_index: 'NEW_RECORD' do |invite| %>
-                                          <%= render partial: 'proposals/invite', locals: { f: invite, invited_as: 'Organizer', date: date } %>
-                                        <% end %>
-                                      </template>
-                                      <div data-nested-invites-target="target"></div>
-                                        <button type="button" class="btn btn-light" data-action="nested-invites#addOrganizers" id="add-more-organizer">
-                                          Queue More Organizer Invitations
-                                        </button>
-                                    </div>
-                                    <div class="mb-3">
-                                      <button id="organizer" data-action="click->nested-invites#invitePreview" data-id="<%= @proposal.id %>" class="btn btn-primary">Invite Organizer(s)</button>
-                                    </div>
-                                  <% end %>
-                                </div>
-                              </div>
-                              <div class="mt-4">
-                                <div class="mb-3">
-                                  <h3 class="form-section">Add Participants:</h3>
-                                  <p><%= @proposal.proposal_type.participant_description&.html_safe %></p>
-
-                                  <% if @proposal.invites.participant %>
-                                    <%= render partial: 'proposals/organizer', locals: { invites: @proposal.invites.participant } %>
-                                  <% end %>
-                                  <div>
-                                    <% if max_invitations(@proposal, 'Participant') %>
-                                      <% date = @proposal.invites.where(invited_as: 'Participant').first&.deadline_date&.to_date %>
-                                      <% unless date.nil? %>
-                                        <% date = date < DateTime.current.to_date ? DateTime.current.to_date : @proposal.invites.where(invited_as: 'Participant').first&.deadline_date&.to_date %>
-                                      <% end %>
-                                      <div class="mb-3">
-                                        <template data-nested-invites-target="templateOne">
-                                          <%= f.fields_for :invites, Invite.new, child_index: 'NEW_RECORD' do |invite| %>
-                                            <%= render partial: 'proposals/invite', locals: { f: invite, invited_as: 'Participant', date: date } %>
-                                          <% end %>
-                                        </template>
-                                        <div data-nested-invites-target="targetOne"></div>
-                                          <button type="button" class="btn btn-light" data-action="nested-invites#addParticipants" id="add-more-participant">
-                                            Queue More Participant Invitations
-                                          </button>
-                                      </div>
-                                      <div class="mb-3">
-                                        <button id="participant" data-action="click->nested-invites#invitePreview" data-id="<%= @proposal.id %>" class="btn btn-primary">Invite Participant(s)</button>
-                                      </div>
-                                    <% end %>
-                                  </div>
-                                </div>
-                              </div>
+                              <%= render partial: 'proposals/form/invites_form', locals: { form: f } %>
                             <% end %>
-                            <% if params[:action] == 'show' %>
-                              <div>
-                                <%= render partial: 'proposals/lead_organizer' %>
-                                <div>
-                                  <h3 class="form-section">Supporting Organizers:</h3>
-                                  <% if @proposal.invites.organizer %>
-                                    <%= render partial: 'proposals/organizer', locals: { invites: @proposal.invites.organizer } %>
-                                  <% end %>
-                                </div>
-                                <div class="mt-4">
-                                  <div class="mb-3">
-                                    <h3 class="form-section">Participants:</h3>
-                                    <% if @proposal.invites.participant %>
-                                      <%= render partial: 'proposals/organizer', locals: { invites: @proposal.invites.participant } %>
-                                    <% end %>
-                                  </div>
-                                </div>
-                              </div>
-                            <% end %>
-                            <div class="mt-4">
+                             <div class="mt-4">
                               <div class="mb-3">
                                 <% unless @proposal.get_confirmed_participant(@proposal).blank? %>
                                   <h3 class="form-section">Confirmed Participants:</h3>
-                                  <%= render partial: 'proposals/confirm_participant', locals: { confirmed_participants: @proposal.get_confirmed_participant(@proposal) } %>
+                                      <%= render partial: 'proposals/confirm_participant', locals: { confirmed_participants: @proposal.get_confirmed_participant(@proposal) } %>
                                 <% end %>
                               </div>
                             </div>
+
+                            <% if params[:action] == 'show' %>
+                              <%= render partial: 'proposals/form/invitees' %>
+                            <% end %>
+                            <%= render partial: 'proposals/form/confirmed_participants' %>
                             <div class="mt-4" data-controller="multi-upload">
                               <h3 class="form-section">Supplementary Files:</h3>
                               <p>
@@ -290,7 +190,7 @@
                               <% end %>
                             </div>
                           </div>
-                          <div class="d-flex flex-row-reverse">
+                          <div class="d-flex flex-row-reverse">                          
                             <button id="changeTab" class="p-2 btn btn-primary" data-action='click->submit-proposals#nextTab'>Next</button> &nbsp;&nbsp;
                             <% if params[:action] == 'edit' %>
                               <%= f.submit 'Update', disabled: action, class:'btn btn-primary p-2  d-inline-block' %>
@@ -331,7 +231,7 @@
                           <button id="changeTab" class="p-2 btn btn-primary" data-action='click->submit-proposals#nextTab'>Next</button>
                          </div>
                       </div>
-
+                      
                       <div class="tab-pane" id="tab-3" role="tabpanel">
                         <div class="mb-3">
                           <p><%= @proposal.proposal_form.introduction3&.html_safe %></p>
@@ -405,7 +305,7 @@
                                     <% ethnicity_data(@proposal).each do |key, value| %>
                                     <tr>
                                       <td><%= key %></td>
-                                      <td><%= value %></td>
+                                      <td><%=  value %></td>
                                     </tr>
                                     <% end %>
                                   </tbody>
@@ -441,7 +341,7 @@
                               </div>
                             </div>
                           </div>
-                          <div class="d-flex flex-row-reverse">
+                          <div class="d-flex flex-row-reverse">          
                             <button id="changeTab" class="p-2 btn btn-primary" data-action='click->submit-proposals#nextTab'>Next</button>
                           </div>
                         </div>
@@ -490,7 +390,7 @@
                     </div>
                   </div>
                 </div>
-              </div>
+              </div> 
             </div>
           </div>
         </div>
