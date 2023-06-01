@@ -26,9 +26,9 @@
       <td><%= proposal.title %></td>
       <td><%= proposal.proposal_type.name %></td>
       <td><%= proposal.lead_organizer&.fullname %></td>
-      <td> 
+      <td>
         <% proposal.locations.each do |loc| %>
-         <%= loc.name %><br>
+         <%= loc.code %><br>
         <% end %>
       </td>
       <td>
