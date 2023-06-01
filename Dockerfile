@@ -41,19 +41,18 @@ ENV LC_ALL en_CA.utf8
 # Match deployment userid
 RUN /usr/sbin/usermod -u 40130 app
 
-USER app
-
 ENV APP_HOME /home/app/proposals
-# disabled because we mount host directory in $APP_HOME
 COPY --chown=app . $APP_HOME
 WORKDIR $APP_HOME
+
 RUN /usr/local/rvm/bin/rvm --default use 2.7.7
 RUN /usr/local/rvm/bin/rvm-exec 2.7.7 gem install bundler
 RUN bundle install
-RUN yarn install
 RUN chown app:app -R /usr/local/rvm/gems
+
+RUN yarn install
 RUN chown app:app -R /home/app/proposals/node_modules
-RUN chmod 755 /home/app/proposals/node_modules
+RUN chmod -R 755 /home/app/proposals/node_modules
 
 RUN echo "disable-ipv6" >> ~/.gnupg/dirmngr.conf
 EXPOSE 80 443
