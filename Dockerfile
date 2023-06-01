@@ -51,8 +51,8 @@ RUN /usr/local/rvm/bin/rvm --default use 2.7.7
 RUN /usr/local/rvm/bin/rvm-exec 2.7.7 gem install bundler
 RUN bundle install
 RUN yarn install
-RUN --chown=app -R /usr/local/rvm/gems
-RUN --chown=app -R /home/app/proposals/node_modules
+RUN chown app:app -R /usr/local/rvm/gems
+RUN chown app:app -R /home/app/proposals/node_modules
 RUN chmod 755 /home/app/proposals/node_modules
 
 RUN echo "disable-ipv6" >> ~/.gnupg/dirmngr.conf
