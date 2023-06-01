@@ -22,17 +22,13 @@ class InvitesController < ApplicationController
   def update
     @proposal = Proposal.find(params[:proposal_id])
     @invite = @proposal.invites.find(params[:id])
-    if @invite.update(invite_params)
-      if @invite.update_invited_person(params["invite"]["affiliation"])
-        flash[:success] = t('invites.update.success')
-      else
-        flash[:alert] = t('invites.update.failure')
-      end
-    end
+
+    result = Invites::Update.new(invite: @invite, params: params[:invite]).call
+
     if lead_organizer?
-      redirect_to edit_proposal_path(@invite.proposal_id)
+      redirect_to edit_proposal_path(@invite.proposal_id), **result.flash_message
     else
-      redirect_to edit_submitted_proposal_url(@invite.proposal_id)
+      redirect_to edit_submitted_proposal_url(@invite.proposal_id), **result.flash_message
     end
   end
 
