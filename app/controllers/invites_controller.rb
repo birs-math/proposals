@@ -156,7 +156,7 @@ class InvitesController < ApplicationController
     if @invite.blank?
       @lead_organizer = Invite.find_by(code: params[:code])&.proposal&.lead_organizer
 
-      render 'invalid_code', layout: 'devise'
+      render 'invalid_code', layout: 'devise', status: :unprocessable_entity
     end
   end
 
