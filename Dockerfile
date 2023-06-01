@@ -41,23 +41,19 @@ ENV LC_ALL en_CA.utf8
 # Match deployment userid
 RUN /usr/sbin/usermod -u 40130 app
 
-#COPY rails-env.conf /etc/nginx/main.d/rails-env.conf
-#RUN chmod 644 /etc/nginx/main.d/rails-env.conf
+USER app
+
 ENV APP_HOME /home/app/proposals
 # disabled because we mount host directory in $APP_HOME
-COPY . $APP_HOME
+COPY --chown=app . $APP_HOME
 WORKDIR $APP_HOME
-RUN /usr/local/rvm/bin/rvm default use 2.7.7
+RUN /usr/local/rvm/bin/rvm --default use 2.7.7
 RUN /usr/local/rvm/bin/rvm-exec 2.7.7 gem install bundler
-RUN /usr/local/rvm/bin/rvm-exec 2.7.7 gem uninstall turbo-rails
 RUN bundle install
-RUN RAILS_ENV=development bundle exec cap install
-# Answer no to overwrite prompts
-RUN RAILS_ENV=development yes n | bundle exec rails webpacker:install
-RUN RAILS_ENV=development bundle exec rails turbo:install
 RUN yarn install
-RUN chown app:app -R /usr/local/rvm/gems
-RUN chown app:app -R /home/app/proposals
+RUN --chown=app -R /usr/local/rvm/gems
+RUN --chown=app -R /home/app/proposals/node_modules
+RUN chmod 755 /home/app/proposals/node_modules
 
 RUN echo "disable-ipv6" >> ~/.gnupg/dirmngr.conf
 EXPOSE 80 443
