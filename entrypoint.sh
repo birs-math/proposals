@@ -49,21 +49,21 @@ fi
 if [ $RAILS_ENV == "production" ]; then
   echo
   echo "Compiling Assets..."
-  su - app -c "SECRET_KEY_BASE=$SECRET_KEY_BASE bundle exec rails assets:precompile --trace"
+  bundle exec rails assets:precompile --trace
   # Update release tag
   rake birs:release_tag
 fi
 
 echo
 echo "Running: webpack --verbose --progress..."
-su - app -c "bin/webpack --verbose --progress"
+bundle exec bin/webpack --verbose --progress
 echo
 echo "Done compiling assets!"
 
 if [ $RAILS_ENV == "development" ]; then
   echo
   echo "Launching webpack-dev-server..."
-  su - app -c "SECRET_KEY_BASE=$SECRET_KEY_BASE bundle exec bin/webpack-dev-server &"
+  bundle exec bin/webpack-dev-server
 fi
 
 echo
