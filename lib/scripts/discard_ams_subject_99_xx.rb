@@ -5,9 +5,9 @@
 ams_subject = AmsSubject.find_by(code: '99-XX')
 
 if ams_subject
-  Rails.logger.debug 'Found AMS subject with code 99-XX'
+  p 'Found AMS subject with code 99-XX'
   ams_subject.discard!
-  Rails.logger.debug 'Soft deleted AMS subject with code 99-XX'
+  p 'Soft deleted AMS subject with code 99-XX'
 else
-  Rails.logger.debug 'Did not found AMS subject with code 99-XX'
+  p 'Did not found AMS subject with code 99-XX'
 end
