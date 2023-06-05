@@ -81,11 +81,11 @@ module Proposals
         assigned_date = proposal_params[:assigned_date]
 
         proposal_params[:assigned_date] = Date.parse(assigned_date.split(' - ').first) if assigned_date.present?
-
-        proposal_params.permit(*MODEL_ATTRS) if proposal_params.respond_to?(:permit)
       end.compact
 
       @model_params = @model_params.permit(*MODEL_ATTRS) if @model_params.respond_to?(:permit)
+
+      @model_params
     end
 
     def update_ams_subject_codes
