@@ -1,7 +1,7 @@
 <main class="content">
   <div class="container-fluid">
     <div class="header">
-       <% if params[:action] == 'show'%>  
+       <% if params[:action] == 'show'%>
         <div class="d-flex flex-row-reverse float-end" >
            <%= link_to "Edit Proposal", edit_submitted_proposal_url(@proposal) ,class:'btn btn-primary' %>
         </div>
@@ -32,7 +32,7 @@
                 data-nested-invites-max-participant-value="<%= @proposal.proposal_type.participant %>"
                 data-nested-invites-max-organizer-value="<%= @proposal.proposal_type.co_organizer %>"
                 data-nested-invites-organizer-value="<%= confirmed_participants(@proposal.id, 'Organizer').count %>"
-                data-nested-invites-participant-value="<%= confirmed_participants(@proposal.id, 'Participant').count %>" 
+                data-nested-invites-participant-value="<%= confirmed_participants(@proposal.id, 'Participant').count %>"
               >
                 <input type="hidden" id="proposal_id" name="proposal_id" value="<%= @proposal.id %>">
                 <div class="col-12 col-lg-12">
@@ -70,7 +70,7 @@
                               Please list all the changes you have made to your proposal here.
                             </p>
                             <p>
-                              For example, you could say, "As requested by the BIRS program committee, we have increased our number of early-career participants by inviting the following people ... ". 
+                              For example, you could say, "As requested by the BIRS program committee, we have increased our number of early-career participants by inviting the following people ... ".
                             </p>
                             <%= f.text_area(:cover_letter, size: '5x5', class:'form-control', value: @proposal&.cover_letter, disabled: action) %>
                           </div>
@@ -97,7 +97,7 @@
                             <%= label_tag :assigned_location_id %>
                           </div>
                           <div class="mb-3">
-                            <%= f.text_field :assigned_location_id, id: 'location_field', class: 'form-control w-25 d-inline-block', disabled: action, value: @proposal.assigned_location&.code %>       
+                            <%= f.text_field :assigned_location_id, id: 'location_field', class: 'form-control w-25 d-inline-block', disabled: action, value: @proposal.assigned_location&.code %>
                           </div>
                           <div>
                             <%= label_tag :assigned_size %>
@@ -105,7 +105,7 @@
                           <div class="mb-3">
                             <%= select_tag :assigned_size, options_for_select(['', 'Full', 'Half'], @proposal.assigned_size), disabled: action, class: "form-select w-25", data: {'action': 'change->auto-save-proposal#onBlur'} %>
                           </div>
-                          <div class="mb-3">  
+                          <div class="mb-3">
                             <%= label_tag :applied_date %>
                             <%= select_tag :applied_date, options_for_select(assigned_dates(@proposal.assigned_location), seleted_assigned_date(@proposal)), disabled: action, class: "form-select w-25", data: {'action': 'change->auto-save-proposal#onBlur'} %>
                           </div>
@@ -140,9 +140,9 @@
                             <% end %>
                              <div class="mt-4">
                               <div class="mb-3">
-                                <% unless @proposal.get_confirmed_participant(@proposal).blank? %>
+                                <% unless @proposal.confirmed_participants(@proposal).blank? %>
                                   <h3 class="form-section">Confirmed Participants:</h3>
-                                      <%= render partial: 'proposals/confirm_participant', locals: { confirmed_participants: @proposal.get_confirmed_participant(@proposal) } %>
+                                      <%= render partial: 'proposals/confirm_participant', locals: { confirmed_participants: @proposal.confirmed_participants(@proposal) } %>
                                 <% end %>
                               </div>
                             </div>
@@ -190,7 +190,7 @@
                               <% end %>
                             </div>
                           </div>
-                          <div class="d-flex flex-row-reverse">                          
+                          <div class="d-flex flex-row-reverse">
                             <button id="changeTab" class="p-2 btn btn-primary" data-action='click->submit-proposals#nextTab'>Next</button> &nbsp;&nbsp;
                             <% if params[:action] == 'edit' %>
                               <%= f.submit 'Update', disabled: action, class:'btn btn-primary p-2  d-inline-block' %>
@@ -231,7 +231,7 @@
                           <button id="changeTab" class="p-2 btn btn-primary" data-action='click->submit-proposals#nextTab'>Next</button>
                          </div>
                       </div>
-                      
+
                       <div class="tab-pane" id="tab-3" role="tabpanel">
                         <div class="mb-3">
                           <p><%= @proposal.proposal_form.introduction3&.html_safe %></p>
@@ -341,7 +341,7 @@
                               </div>
                             </div>
                           </div>
-                          <div class="d-flex flex-row-reverse">          
+                          <div class="d-flex flex-row-reverse">
                             <button id="changeTab" class="p-2 btn btn-primary" data-action='click->submit-proposals#nextTab'>Next</button>
                           </div>
                         </div>
@@ -390,7 +390,7 @@
                     </div>
                   </div>
                 </div>
-              </div> 
+              </div>
             </div>
           </div>
         </div>
