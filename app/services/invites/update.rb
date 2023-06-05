@@ -14,7 +14,7 @@ module Invites
         if success?
           { notice: I18n.t('invites.update.success') }
         else
-          { alert: invite.errors.full_messages || I18n.t('invites.update.failure') }
+          { alert: invite.errors.full_messages.presence || [I18n.t('invites.update.failure')] }
         end
       end
     end
