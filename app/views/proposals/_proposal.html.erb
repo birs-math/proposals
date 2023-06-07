@@ -225,44 +225,34 @@
                               </div>
                             </div>
                             <% end %>
+                            <% if params[:action] == 'show' %>
+                              <div>
+                                <%= render partial: 'lead_organizer' %>
+                                <div>
+                                  <h3 class="form-section">Supporting Organizers:</h3>
+                                  <% if @proposal.invites.organizer %>
+                                    <%= render partial: 'organizer', locals: { invites: @proposal.invites.organizer } %>
+                                  <% end %>
+                                </div>
+                                <div class="mt-4">
+                                  <div class="mb-3">
+                                    <h3 class="form-section">Participants:</h3>
+                                    <% if @proposal.invites.participant %>
+                                      <%= render partial: 'organizer', locals: { invites: @proposal.invites.participant } %>
+                                    <% end %>
+                                  </div>
+                                </div>
+                              </div>
+                            <% end %>
                             <div class="mt-4">
                               <div class="mb-3">
                                 <% unless @proposal.get_confirmed_participant(@proposal).blank? %>
                                   <h3 class="form-section">Confirmed Participants:</h3>
-                                      <%= render partial: 'confirm_participant', locals: { confirmed_participants: @proposal.get_confirmed_participant(@proposal) } %>
+                                  <%= render partial: 'confirm_participant', locals: { confirmed_participants: @proposal.get_confirmed_participant(@proposal) } %>
                                 <% end %>
                               </div>
                             </div>
-
-                            <% if params[:action] == 'show' %>
-                            <div>
-                              <%= render partial: 'lead_organizer' %>
-                              <div>
-                                <h3 class="form-section">Supporting Organizers:</h3>
-                                <% if @proposal.invites.organizer %>
-                                  <%= render partial: 'organizer', locals: { invites: @proposal.invites.organizer } %>
-                                <% end %>
-                              </div>
-                              <div class="mt-4">
-                                <div class="mb-3">
-                                  <h3 class="form-section">Participants:</h3>
-                                  <% if @proposal.invites.participant %>
-                                    <%= render partial: 'organizer', locals: { invites: @proposal.invites.participant } %>
-                                  <% end %>
-                                </div>
-                              </div>
-                              <div class="mt-4">
-                                <div class="mb-3">
-                                  <% unless @proposal.get_confirmed_participant(@proposal).blank? %>
-                                    <h3 class="form-section">Confirmed Participants:</h3>
-                                        <%= render partial: 'confirm_participant', locals: { confirmed_participants: @proposal.get_confirmed_participant(@proposal) } %>
-                                  <% end %>
-                                </div>
-                              </div>
-                            </div>
-                            <% end %>
-
-                          <div class="mt-4" data-controller="multi-upload">
+                            <div class="mt-4" data-controller="multi-upload">
                               <h3 class="form-section">Supplementary Files:</h3>
                               <p>
                                 You may upload PDF files by clicking the button below. Uploaded files are considered supplementary documentation, and not part of the main body of the proposal.
