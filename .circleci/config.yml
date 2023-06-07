@@ -8,10 +8,11 @@ jobs:
       - run:
           name: Build the image
           command: |
+            echo $CIRCLE_BRANCH
             if [ $CIRCLE_BRANCH == 'releases' ]; then
-              docker build -t birs/proposals:git-${git rev-parse --short HEAD} -t birs/proposals:latest .
+              docker build -t birs/proposals:git-`git rev-parse --short HEAD` -t birs/proposals:latest .
             else
-              docker build -t birs/proposals:git-${git rev-parse --short HEAD} .
+              docker build -t birs/proposals:git-`git rev-parse --short HEAD` .
             fi
           no_output_timeout: 30m
 
