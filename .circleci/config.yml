@@ -58,12 +58,12 @@ jobs:
             gem install bundler
             bundle install
       - run:
-          name: Run migrations
+          name: Load schema
           command: |
             echo "127.0.0.1 db" >> /etc/hosts
             chown -R app:app /home/app/proposals
             cd /home/app/proposals
-            SECRET_KEY_BASE=token DB_USER=$DB_USER DB_PASS=$DB_PASS bin/rails db:migrate RAILS_ENV=test
+            SECRET_KEY_BASE=token DB_USER=$DB_USER DB_PASS=$DB_PASS bin/rails db:schema:load RAILS_ENV=test
       - run:
           name: Run the tests
           command: |
