@@ -68,6 +68,7 @@ class Invite < ApplicationRecord
     person.firstname = firstname
     person.lastname = lastname
     person.email = email
+
     return true if person.save(validate: false)
   end
 
