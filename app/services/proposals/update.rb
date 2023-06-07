@@ -44,9 +44,9 @@ module Proposals
     end
 
     def initialize(current_user:, proposal:, params:)
-      @current_user = current_user
       @proposal = proposal
       @params = params
+      @current_user = find_performing_user(current_user)
     end
 
     def call
@@ -116,6 +116,17 @@ module Proposals
 
     def submission
       @submission ||= SubmitProposalService.new(proposal, params)
+    end
+
+    def find_performing_user(user)
+      lead_organizer = @proposal.lead_organizer
+
+      # Since staff can edit proposals use lead organizer as performing user when appropriate
+      if lead_organizer.present? && user.staff_member?
+        lead_organizer.user
+      else
+        user
+      end
     end
   end
 end
