@@ -148,8 +148,9 @@ class Proposal < ApplicationRecord
   end
 
   def demographics_data
-    DemographicData.where(person_id: invites.where(invited_as: 'Participant')
-                   .pluck(:person_id))
+    @demographic_data ||= DemographicData
+      .where(person_id: invites.where(invited_as: 'Participant')
+      .pluck(:person_id))
   end
 
   def invites_demographic_data

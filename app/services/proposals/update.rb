@@ -44,9 +44,9 @@ module Proposals
     end
 
     def initialize(current_user:, proposal:, params:)
-      @current_user = current_user
       @proposal = proposal
       @params = params
+      @current_user = find_performing_user(current_user)
     end
 
     def call
@@ -89,13 +89,13 @@ module Proposals
     end
 
     def update_ams_subject_codes
-      if first_ams_subject_id
+      if first_ams_subject_id.present?
         first_ams_subject = ProposalAmsSubject.find_or_initialize_by(proposal: proposal, code: 'code1')
         first_ams_subject.ams_subject_id = first_ams_subject_id
         first_ams_subject.save!
       end
 
-      if second_ams_subject_id
+      if second_ams_subject_id.present?
         second_ams_subject = ProposalAmsSubject.find_or_initialize_by(proposal: proposal, code: 'code2')
         second_ams_subject.ams_subject_id = second_ams_subject_id
         second_ams_subject.save!
@@ -116,6 +116,17 @@ module Proposals
 
     def submission
       @submission ||= SubmitProposalService.new(proposal, params)
+    end
+
+    def find_performing_user(user)
+      lead_organizer = @proposal.lead_organizer
+
+      # Since staff can edit proposals use lead organizer as performing user when appropriate
+      if lead_organizer.present? && user.staff_member?
+        lead_organizer.user
+      else
+        user
+      end
     end
   end
 end

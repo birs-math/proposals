@@ -23,7 +23,7 @@ class User < ApplicationRecord
   end
 
   def staff_member?
-    roles.exists?(name: 'Staff')
+    @staff_member ||= roles.exists?(name: 'Staff')
   end
 
   def organizer?(proposal)
