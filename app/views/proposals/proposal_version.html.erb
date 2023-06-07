@@ -6,7 +6,7 @@
       </h1>
       <nav aria-label="breadcrumb">
         <ol class="breadcrumb" data-turbo="false">
-          <li class="breadcrumb-item"> <%= link_to "Dashboard", dashboards_path %> </a></li>
+          <li class="breadcrumb-item"> <%= link_to "Dashboard", dashboards_path %></li>
           <% if current_user.staff_member? %>
             <li class="breadcrumb-item active" aria-current="page"><%= link_to "Submitted Proposals", submitted_proposals_path %></li>
           <% else %>
@@ -28,7 +28,7 @@
                 data-nested-invites-max-participant-value="<%= @proposal.proposal_type.participant %>"
                 data-nested-invites-max-organizer-value="<%= @proposal.proposal_type.co_organizer %>"
                 data-nested-invites-organizer-value="<%= confirmed_participants(@proposal.id, 'Organizer').count %>"
-                data-nested-invites-participant-value="<%= confirmed_participants(@proposal.id, 'Participant').count %>" 
+                data-nested-invites-participant-value="<%= confirmed_participants(@proposal.id, 'Participant').count %>"
               >
               <input type="hidden" name="version" data-submit-proposals-target="proposalVersion" value="<%= @version %>" id="proposal_version">
                 <div class="col-12 col-lg-12">
@@ -57,7 +57,7 @@
                               Please list all the changes you have made to your proposal here.
                             </p>
                             <p>
-                              For example, you could say, "As requested by the BIRS program committee, we have increased our number of early-career participants by inviting the following people ... ". 
+                              For example, you could say, "As requested by the BIRS program committee, we have increased our number of early-career participants by inviting the following people ... ".
                             </p>
                             <%= f.text_area(:cover_letter, size: '5x5', class:'form-control', value: @proposal&.cover_letter, disabled: action) %>
                           </div>
@@ -230,7 +230,7 @@
                           <button id="changeTab" class="p-2 btn btn-primary" data-action='click->submit-proposals#nextTab'>Next</button>
                          </div>
                       </div>
-                      
+
                       <div class="tab-pane" id="tab-3" role="tabpanel">
                         <div class="mb-3">
                           <p><%= @proposal.proposal_form.introduction3&.html_safe %></p>
@@ -365,11 +365,12 @@
                     </div>
                   </div>
                 </div>
-              </div> 
+              </div>
             </div>
           </div>
         </div>
       </div>
+    </div>
   </div>
 </main>
 

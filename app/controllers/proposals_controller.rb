@@ -6,8 +6,7 @@ class ProposalsController < ApplicationController
   before_action :set_careers, only: %w[show edit]
 
   def index
-    @proposals = current_user&.person&.proposals
-                             &.each_with_object([]) do |proposal, props|
+    @proposals = current_user&.person&.proposals&.each_with_object([]) do |proposal, props|
       props << proposal if current_user&.organizer?(proposal)
     end
   end
@@ -24,16 +23,9 @@ class ProposalsController < ApplicationController
   end
 
   def create
-    @proposal = start_new_proposal
-    limit_of_one_per_type and return unless no_proposal?
+    create_result = Proposals::Initialize.call(current_user: current_user, proposal_params: proposal_params)
 
-    if @proposal.save
-      @proposal.create_organizer_role(current_user.person, organizer)
-      redirect_to edit_proposal_path(@proposal), notice: "Started a new
-                              #{@proposal.proposal_type.name} proposal!".squish
-    else
-      redirect_to new_proposal_path, alert: @proposal.errors
-    end
+    redirect_to create_result.redirect_url, create_result.flash_message
   end
 
   def show
@@ -143,10 +135,6 @@ class ProposalsController < ApplicationController
     params.require(:proposal).permit(:proposal_type_id, :title, :year)
   end
 
-  def organizer
-    Role.find_or_create_by!(name: 'lead_organizer')
-  end
-
   def set_proposal
     @proposal = Proposal.find_by(id: params[:id])
     @submission = session[:is_submission]
@@ -154,16 +142,6 @@ class ProposalsController < ApplicationController
 
   def latex_params
     params.permit(:latex, :proposal_id, :format)
-  end
-
-  def start_new_proposal
-    prop = Proposal.new(proposal_params)
-    prop.proposal_form = ProposalForm.active_form(prop.proposal_type_id)
-    prop
-  end
-
-  def no_proposal?
-    @proposal.proposal_type.not_lead_organizer?(current_user.person)
   end
 
   def limit_of_one_per_type

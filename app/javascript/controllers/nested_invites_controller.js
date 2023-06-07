@@ -11,7 +11,7 @@ export default class extends Controller {
     organizer: Number,
     participant: Number
   }
- 
+
   initialize () {
     this.wrapperSelector = this.wrapperSelectorValue || '.nested-invites-wrapper'
   }
@@ -124,7 +124,7 @@ export default class extends Controller {
     let inviteParticipant = event.currentTarget.dataset.participant || 0
     let inviteOrganizer = event.currentTarget.dataset.organizer || 0
     var body = $('#email_body').text()
-    $.post(`/submit_proposals?proposal=${id}&create_invite=true.js`,
+    $.post(`/submit_proposals/create_invite?proposal=${id}`,
       $('form#submit_proposal').serialize(), function(data) {
         if (body.toLowerCase().includes("supporting organizer")) {
           invitedAs = 'Organizer'
@@ -136,7 +136,7 @@ export default class extends Controller {
         }
         _this.sendInviteEmails(id, invitedAs, inviteId, data)
       }
-    ) 
+    )
     .fail(function(response) {
       let errors = response.responseJSON
       $.each(errors, function(index, error) {

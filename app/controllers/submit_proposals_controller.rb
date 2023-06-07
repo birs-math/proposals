@@ -1,38 +1,27 @@
 class SubmitProposalsController < ApplicationController
-  before_action :set_proposal, only: %i[create invitation_template]
+  before_action :set_proposal, only: %i[create invitation_template create_invite]
   before_action :authorize_user, only: %w[create create_invite]
   def new
     @proposals = ProposalForm.new
   end
 
   def create
-    @proposal.update(proposal_params)
-    update_assigned_date
-    update_applied_date
-    update_proposal_ams_subject_code
-    @submission = SubmitProposalService.new(@proposal, params)
-    @submission.save_answers
-    create_invite and return if params[:create_invite]
+    result = Proposals::Update.call(current_user: current_user, proposal: @proposal, params: proposal_service_params)
+    @submission = result.submission
+    @proposal = result.proposal
 
-    if current_user.staff_member?
-      staff_redirect
-      nil
-    else
-      session[:is_submission] = @proposal.is_submission = @submission.final?
-      if @proposal.is_submission && @submission.errors?
-        flash[:alert] = []
-        @submission.error_messages.each do |msg|
-          flash[:alert] << msg.to_s
-        end
-        redirect_to edit_proposal_path(@proposal)
-        return
-      end
-      unless @proposal.is_submission
-        redirect_to edit_proposal_path(@proposal), notice: t('submit_proposals.create.alert')
-        return
-      end
+    return redirect_to edit_proposal_path(@proposal), **result.flash_message if result.errors?
+
+    return staff_redirect if current_user.staff_member?
+
+    session[:is_submission] = @proposal.is_submission = @submission.final?
+
+    if @proposal.is_submission
+      # TODO: move sending email with pdf attachment to a job
       @attachment = generate_proposal_pdf || return
       confirm_submission
+    else
+      redirect_to edit_proposal_path(@proposal), notice: t('submit_proposals.create.alert')
     end
   end
 
@@ -46,15 +35,14 @@ class SubmitProposalsController < ApplicationController
     when 'participant'
       @email_template = EmailTemplate.find_by(email_type: "participant_invitation_type")
     end
+
     preview_placeholders
     render json: { subject: @email_template.subject, body: @template_body },
            status: :ok
   end
 
-  private
-
   def create_invite
-    return unless request.xhr?
+    return record_not_found unless request.xhr?
 
     @errors = []
     @counter = 0
@@ -65,8 +53,11 @@ class SubmitProposalsController < ApplicationController
 
       invalid_email_error_message
     end
+
     render json: { errors: @errors, counter: @counter }, status: :ok
   end
+
+  private
 
   def invite_save
     return unless @invite.save
@@ -115,15 +106,12 @@ class SubmitProposalsController < ApplicationController
                 alert: error_message and return
   end
 
-  def proposal_params
-    params.permit(:title, :year, :subject_id, :ams_subject_ids, :location_ids,
-                  :no_latex, :preamble, :bibliography, :cover_letter,
-                  :same_week_as, :week_after, :assigned_date, :assigned_size)
-          .merge(no_latex: params[:no_latex] == 'on')
+  def proposal_service_params
+    params.merge(no_latex: params[:no_latex] == 'on')
   end
 
   def proposal_id_param
-    params.permit(:proposal)['proposal'].to_i
+    params.permit(:proposal)['proposal']
   end
 
   def set_proposal
@@ -187,8 +175,7 @@ class SubmitProposalsController < ApplicationController
   def preview_placeholders
     @template_body = @email_template&.body
     if @template_body.blank?
-      redirect_to new_email_template_path, alert: t('submit_proposals.preview_placeholders.failure')
-      return
+      return redirect_to new_email_template_path, alert: t('submit_proposals.preview_placeholders.failure')
     end
     placing_holders
   end
@@ -202,17 +189,18 @@ class SubmitProposalsController < ApplicationController
 
   def staff_redirect
     if @submission.errors?
-      redirect_to edit_submitted_proposal_url(@proposal), alert: "Your submission has
+      redirect_to edit_submitted_proposal_path(@proposal), alert: "Your submission has
           errors: #{@submission.error_messages}.".squish
     else
-      redirect_to submitted_proposals_url(@proposal), notice: t('submit_proposals.staff_redirect.alert')
+      redirect_to submitted_proposals_path, notice: t('submit_proposals.staff_redirect.alert')
     end
   end
 
   def change_proposal_status
     unless @proposal.active!
-      redirect_to edit_proposal_path(@proposal), alert: "Your proposal has
-                  errors: #{@proposal.errors.full_messages}.".squish and return
+
+      return redirect_to edit_proposal_path(@proposal),
+        alert: @proposal.errors.full_messages.map { |message| "Your proposal has errors: #{message}" }
     end
 
     change_proposal_version

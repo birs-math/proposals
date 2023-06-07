@@ -30,14 +30,18 @@
 # available at https://guides.rubyonrails.org/i18n.html.
 
 en:
-  hello: "Hello world"
   errors:
     messages:
       invites:
         invalid_code: This invitation code is invalid
+      something_went_wrong: 'Something went wrong.'
+      resource_not_found: 'Requested resource not found'
       email_verifier:
         email_not_real: must point to a real mail account
         out_of_mail_server: appears to point to dead mail server
         no_mail_server: appears to point to domain which doesn't handle e-mail
         failure:  delivery failed! The email you have entered not found.
         exception: could not be sent
+  proposals:
+    initialize: 'Started a new %{proposal_type} proposal!'
+    limit_per_type_per_year: 'There is a limit of one %{proposal_type} proposal per year.'

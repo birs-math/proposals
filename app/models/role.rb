@@ -8,4 +8,10 @@ class Role < ApplicationRecord
   has_many :proposal_roles, dependent: :destroy
 
   accepts_nested_attributes_for :role_privileges, reject_if: :all_blank, allow_destroy: true
+
+  class << self
+    def organizer
+      find_or_create_by!(name: 'lead_organizer')
+    end
+  end
 end
