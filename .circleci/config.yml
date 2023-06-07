@@ -7,14 +7,19 @@ jobs:
 
       - run:
           name: Build the image
-          command: docker build -t birs/proposals:latest .
+          command: |
+            if [ $CIRCLE_BRANCH == 'releases' ]; then
+              docker build -t birs/proposals:git-${git rev-parse --short HEAD} -t birs/proposals:latest .
+            else
+              docker build -t birs/proposals:git-${git rev-parse --short HEAD} .
+            fi
           no_output_timeout: 30m
 
       - run:
           name: Send to DockerHub
           command: |
             echo $DOCKER_PASSWORD | docker login -u $DOCKER_LOGIN --password-stdin
-            docker push birs/proposals:latest
+            docker push birs/proposals -a
 
   run_tests:
     docker:
@@ -127,14 +132,14 @@ workflows:
       - build_image:
           filters:
             branches:
-              only: new_image
+              only: /staging|releases/
 
   run_the_tests:
     jobs:
       - run_tests:
           filters:
             branches:
-              ignore: /main|releases|new_image/
+              ignore: /main|new_image/
 
   deploy_to_staging:
     jobs:
