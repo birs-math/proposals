@@ -49,7 +49,7 @@ jobs:
           command: |
             cd /home/app/proposals/db/pg-init
             sed s/DB_USER/$DB_USER/g db-init.sql | sed s/DB_PASS/$DB_PASS/g > setup.sql
-            PGPASSWORD=$POSTGRES_PASSWORD psql -h localhost -U postgres < setup.sql
+            PGPASSWORD=$POSTGRES_PASSWORD psql -h localhost -d proposals_test -U postgres < setup.sql
             rm setup.sql
       - run:
           name: Bundle install
