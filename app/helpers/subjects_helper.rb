@@ -4,11 +4,7 @@ module SubjectsHelper
   end
 
   def ams_subjects_select
-    @ams_subjects_select ||= AmsSubject.order(:title).pluck(:title, :id)
-  end
-
-  def disabled_ams_subjects
-    @disabled_ams_subjects ||= AmsSubject.discarded.pluck(:id)
+    @ams_subjects_select ||= AmsSubject.kept.order(:title).pluck(:title, :id)
   end
 
   def ams_subject_title(ams_subject)

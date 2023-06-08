@@ -10,7 +10,7 @@
   <div class="col-6 mt-2">
     <div class="mb-3">
       <label class="required">AMS Subject Code 1</label>
-      <%= form.select :ams_subjects, options_for_select(ams_subjects_select, selected: selected_ams_subjects_code(@proposal, 'code1'), disabled: disabled_ams_subjects), { include_blank: '' }, disabled: disabled, class: "form-select", name:'ams_subjects[code1]', data: { 'action': 'focus->auto-save-proposal#onFocus blur->auto-save-proposal#onBlur'} %>
+      <%= form.select :ams_subjects, options_for_select(ams_subjects_select, selected: selected_ams_subjects_code(@proposal, 'code1'), { include_blank: '' }, disabled: disabled, class: "form-select", name:'ams_subjects[code1]', data: { 'action': 'focus->auto-save-proposal#onFocus blur->auto-save-proposal#onBlur'} %>
       <% if @submission && selected_ams_subjects_code(@proposal, 'code1').blank? %>
         <p class="field-validation">AMS Subject Code 1 is required</p>
       <% end %>
@@ -18,7 +18,7 @@
 
     <div class="mb-3">
       <label class="required">AMS Subject Code 2</label>
-      <%= form.select :ams_subjects, options_for_select(ams_subjects_select, selected: selected_ams_subjects_code(@proposal, 'code2'), disabled: disabled_ams_subjects), { include_blank: '' }, disabled: disabled, class: "form-select", name:'ams_subjects[code2]', data: { 'action': 'focus->auto-save-proposal#onFocus blur->auto-save-proposal#onBlur'} %>
+      <%= form.select :ams_subjects, options_for_select(ams_subjects_select, selected: selected_ams_subjects_code(@proposal, 'code2')), { include_blank: '' }, disabled: disabled, class: "form-select", name:'ams_subjects[code2]', data: { 'action': 'focus->auto-save-proposal#onFocus blur->auto-save-proposal#onBlur'} %>
     </div>
   </div>
 </div>
