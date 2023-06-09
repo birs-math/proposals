@@ -141,8 +141,10 @@ module ProposalsHelper
     proposals[status]
   end
 
-  def invite_response_color(status)
-    case status
+  def invite_response_color(response, status)
+    return 'text-danger' if status == 'cancelled'
+
+    case response
     when "yes"
       "text-success"
     when "maybe"
