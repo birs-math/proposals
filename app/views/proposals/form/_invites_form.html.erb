@@ -1,7 +1,7 @@
 <%= render partial: 'proposals/lead_organizer' %>
 <% title_present = @proposal.title.present? %>
 <div>
-  <h3 class="form-section">Add Supporting Organizers:</h3>
+  <h3 class="form-section"><%= I18n.t('proposals.form.add_organizers') %></h3>
   <% unless title_present %>
     <p class="field-validation">Please, fill in title and save before proceeding</p>
   <% end %>
@@ -23,20 +23,20 @@
         </template>
         <div data-nested-invites-target="target"></div>
         <button type="button" class="btn btn-light" data-action="nested-invites#addOrganizers" id="add-more-organizer" <%= title_present ? '' : 'disabled' %>>
-          Queue More Organizer Invitations
+          <%= I18n.t('proposals.form.new_organizers_invite') %>
         </button>
       </div>
       <div class="mb-3">
-        <button id="organizer" data-action="click->nested-invites#invitePreview" data-id="<%= @proposal.id %>" class="btn btn-primary" <%= title_present ? '' : 'disabled' %>>Invite Organizer(s)</button>
+        <button id="organizer" data-action="click->nested-invites#invitePreview" data-id="<%= @proposal.id %>" class="btn btn-primary" <%= title_present ? '' : 'disabled' %>><%= I18n.t('proposals.form.invite_organizers') %></button>
       </div>
     <% end %>
   </div>
 </div>
 <div class="mt-4">
   <div class="mb-3">
-    <h3 class="form-section">Add Participants:</h3>
+    <h3 class="form-section"><%= I18n.t('proposals.form.add_participants') %></h3>
     <% unless title_present %>
-      <p class="field-validation">Please, fill in title and save before proceeding</p>
+      <p class="field-validation"><%= I18n.t('proposals.form.fill_in_title') %></p>
     <% end %>
     <p><%= @proposal.proposal_type.participant_description&.html_safe %></p>
 
@@ -57,11 +57,11 @@
           </template>
           <div data-nested-invites-target="targetOne"></div>
           <button type="button" class="btn btn-light" data-action="nested-invites#addParticipants" id="add-more-participant" <%= title_present ? '' : 'disabled' %>>
-            Queue More Participant Invitations
+            <%= I18n.t('proposals.form.new_participants_invite') %>
           </button>
         </div>
         <div class="mb-3">
-          <button id="participant" data-action="click->nested-invites#invitePreview" data-id="<%= @proposal.id %>" class="btn btn-primary" <%= title_present ? '' : 'disabled' %>>Invite Participant(s)</button>
+          <button id="participant" data-action="click->nested-invites#invitePreview" data-id="<%= @proposal.id %>" class="btn btn-primary" <%= title_present ? '' : 'disabled' %>><%= I18n.t('proposals.form.invite_participants') %></button>
         </div>
       <% end %>
     </div>

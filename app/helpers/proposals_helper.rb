@@ -110,7 +110,7 @@ module ProposalsHelper
     when "yes"
       "Invitation accepted"
     when "maybe"
-      "Invitation pending"
+      "Maybe attending"
     when nil
       "Not yet responded to invitation"
     when "no"
