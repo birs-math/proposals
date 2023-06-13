@@ -85,7 +85,7 @@ RSpec.feature "Proposal edit", type: :feature do
 
       it 'has disabled invite organizers buttons' do
         expect(page).to have_button('Invite Organizer(s)', disabled: true)
-        expect(page).to have_button('Queue More Organizer Invitations', disabled: true)
+        expect(page).to have_button('Click here to send out additional organizer invitation', disabled: true)
       end
 
       it 'has disabled add participants buttons' do
@@ -99,7 +99,7 @@ RSpec.feature "Proposal edit", type: :feature do
 
       it 'has invite organizers buttons' do
         expect(page).to have_button('Invite Organizer(s)', disabled: false)
-        expect(page).to have_button('Queue More Organizer Invitations', disabled: false)
+        expect(page).to have_button('Click here to send out additional organizer invitation', disabled: false)
       end
 
       it 'has add participants buttons' do

@@ -45,3 +45,10 @@ en:
   proposals:
     initialize: 'Started a new %{proposal_type} proposal!'
     limit_per_type_per_year: 'There is a limit of one %{proposal_type} proposal per year.'
+    form:
+      new_organizers_invite: Click here to send out additional organizer invitation
+      preamble: LaTeX Preamble
+      preamble_note: If you need to use custom LaTeX macros, enter them here to add them to the document preamble.
+      bibliography: Bibliography
+      bibliography_note: If you have a LaTeX bibliography, please enter it in this field. It will be included when you click the "Print Proposal" button.
+      see_guidelines: See Guidelines for more information

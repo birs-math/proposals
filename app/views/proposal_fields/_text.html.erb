@@ -9,8 +9,8 @@
 </div>
 <span><%= field.description.html_safe %></span>
 <% if field.guideline_link.present? %>
-  <p><a href="<%= field.guideline_link %>" target="_blank"> 
-    Learn More
+  <p><a href="<%= field.guideline_link %>" target="_blank">
+    <%= I18n.t('proposals.form.see_guidelines') %>
   </a></p>
 <% end %>
 <div>
