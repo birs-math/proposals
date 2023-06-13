@@ -11,7 +11,7 @@
       </h1>
       <nav aria-label="breadcrumb">
         <ol class="breadcrumb" data-turbo="false">
-          <li class="breadcrumb-item"> <%= link_to "Dashboard", dashboards_path %> </a></li>
+          <li class="breadcrumb-item"> <%= link_to "Dashboard", dashboards_path %></li>
           <li class="breadcrumb-item active" aria-current="page"><%= link_to "Submitted Proposals", submitted_proposals_path %></li>
           <% if params[:action] == 'edit' %>
             <li class="breadcrumb-item active" aria-current="page">Edit</li>
@@ -140,9 +140,9 @@
                             <% end %>
                              <div class="mt-4">
                               <div class="mb-3">
-                                <% unless @proposal.confirmed_participants(@proposal).blank? %>
+                                <% unless @proposal.confirmed_participants.blank? %>
                                   <h3 class="form-section">Confirmed Participants:</h3>
-                                      <%= render partial: 'proposals/confirm_participant', locals: { confirmed_participants: @proposal.confirmed_participants(@proposal) } %>
+                                      <%= render partial: 'proposals/confirm_participant', locals: { confirmed_participants: @proposal.confirmed_participants } %>
                                 <% end %>
                               </div>
                             </div>

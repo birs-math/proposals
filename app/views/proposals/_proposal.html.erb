@@ -4,7 +4,7 @@
         <% if params[:action] == 'show'%>
          <% unless proposal.submitted? || proposal.revision_submitted? ||
             proposal.revision_submitted_spc? || proposal.approved? || proposal.declined? || proposal.decision_email_sent? || proposal.decision_pending? || proposal.initial_review? || proposal.in_progress? || proposal.in_progress_spc? %>
-          
+
           <div class="d-flex flex-row-reverse float-end" >
                <%= link_to "Edit Proposal", edit_proposal_path(@proposal) ,class:'btn btn-primary' %>
           </div>
@@ -15,7 +15,7 @@
       </h1>
        <nav aria-label="breadcrumb">
          <ol class="breadcrumb" data-turbo="false">
-           <li class="breadcrumb-item"> <%= link_to "Dashboard", dashboards_path %> </a></li>
+           <li class="breadcrumb-item"> <%= link_to "Dashboard", dashboards_path %></li>
           <li class="breadcrumb-item active" aria-current="page"><%= link_to "Proposals", proposals_path %></li>
           <% if params[:action] == 'edit' %>
             <li class="breadcrumb-item active" aria-current="page"><%= link_to @proposal.proposal_type.name, edit_proposal_path(@proposal) %></li>
@@ -73,7 +73,7 @@
                               Please list all the changes you have made to your proposal here.
                             </p>
                             <p>
-                              For example, you could say, "As requested by the BIRS program committee, we have increased our number of early-career participants by inviting the following people ... ". 
+                              For example, you could say, "As requested by the BIRS program committee, we have increased our number of early-career participants by inviting the following people ... ".
                             </p>
                             <%= f.text_area(:cover_letter, size: '5x5', class:'form-control', value: @proposal&.cover_letter, disabled: action) %>
                           </div>
@@ -81,7 +81,7 @@
                         <div class="mb-3">
                           <p><%= @proposal.proposal_form.introduction&.html_safe %></p>
                         </div>
-                        <% if @proposal.code.present? && params[:action] == 'show' %> 
+                        <% if @proposal.code.present? && params[:action] == 'show' %>
                           <div class="mb-3">
                             <p>Code: <%= @proposal.code %></p>
                           </div>
@@ -108,7 +108,7 @@
                           <div class="mb-3">
                             <%= f.text_field :assigned_size, class: 'form-control w-25', disabled: true, value: @proposal.assigned_size %>
                           </div>
-                          <div class="mb-3">  
+                          <div class="mb-3">
                             <%= label_tag :applied_date %>
                             <%= f.text_field :applied_date, class: 'form-control w-25', disabled: true, value: @proposal.applied_date %>
                           </div>
@@ -134,7 +134,7 @@
 
                         <div class="mb-3">
                           <%= f.label :year %>
-                          <%= f.select :year, options_for_select(proposal_type_year(@proposal.proposal_type),  @proposal.year), {}, disabled: action, class: "form-select w-25", data: {'action': 'focus->auto-save-proposal#onFocus blur->auto-save-proposal#onBlur'} %>
+                          <%= f.select :year, options_for_select(proposal_type_year(@proposal.proposal_type),  @proposal.year), { include_blank: true }, disabled: action, class: "form-select w-25", data: {'action': 'focus->auto-save-proposal#onFocus blur->auto-save-proposal#onBlur'} %>
                         </div>
 
                         <%= render partial: 'proposals/form/subject_area', locals: { form: f, disabled: action } %>
