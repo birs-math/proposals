@@ -18,7 +18,7 @@ RSpec.describe SubjectsHelper, type: :helper do
 
     it 'returns ams subjects [title, id]' do
       ams_subject
-      expect(ams_subjects_code).to eq([[ams_subject.title, ams_subject.id]])
+      expect(ams_subjects_select).to eq([[ams_subject.title, ams_subject.id]])
     end
   end
 

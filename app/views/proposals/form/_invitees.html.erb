@@ -1,0 +1,17 @@
+<div>
+  <%= render partial: 'proposals/lead_organizer' %>
+  <div>
+    <h3 class="form-section">Supporting Organizers:</h3>
+    <% if @proposal.invites.organizer %>
+      <%= render partial: 'proposals/organizer', locals: { invites: @proposal.invites.organizer } %>
+    <% end %>
+  </div>
+  <div class="mt-4">
+    <div class="mb-3">
+      <h3 class="form-section">Participants:</h3>
+      <% if @proposal.invites.participant %>
+        <%= render partial: 'proposals/organizer', locals: { invites: @proposal.invites.participant } %>
+      <% end %>
+    </div>
+  </div>
+</div>

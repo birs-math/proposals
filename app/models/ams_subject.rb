@@ -1,4 +1,6 @@
 class AmsSubject < ApplicationRecord
+  include Discard::Model
+
   validates :title, :code, presence: true
   belongs_to :subject, optional: true
   has_many :proposal_ams_subjects, dependent: :destroy

@@ -1,10 +1,10 @@
 module SubjectsHelper
   def subjects_area
-    Subject.order(:title).map { |sub| [sub.title, sub.id] }
+    Subject.order(:title).pluck(:title, :id)
   end
 
-  def ams_subjects_code
-    AmsSubject.order(:title).map { |sub| [sub.title, sub.id] }
+  def ams_subjects_select
+    @ams_subjects_select ||= AmsSubject.kept.order(:title).pluck(:title, :id)
   end
 
   def ams_subject_title(ams_subject)

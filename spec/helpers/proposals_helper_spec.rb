@@ -91,7 +91,7 @@ RSpec.describe ProposalsHelper, type: :helper do
     end
 
     it 'returns id of proposal ams subject with provided code' do
-      expect(proposal_ams_subjects_code(proposal, 'code2')).to eq(ams_subject.id)
+      expect(selected_ams_subjects_code(proposal, 'code2')).to eq(ams_subject.id)
     end
   end
 

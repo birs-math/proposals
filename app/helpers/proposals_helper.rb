@@ -88,7 +88,7 @@ module ProposalsHelper
     lead_organizer?(proposal.proposal_roles)
   end
 
-  def proposal_ams_subjects_code(proposal, code)
+  def selected_ams_subjects_code(proposal, code)
     proposal.proposal_ams_subjects.find_by(code: code)&.ams_subject_id
   end
 

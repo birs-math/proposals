@@ -300,7 +300,7 @@ class ProposalPdfService
   end
 
   def participant_list(career)
-    @participants = proposal.get_confirmed_participant(@proposal)
+    @participants = proposal.confirmed_participants
     return '' if @participants.blank?
 
     text = "\\begin{enumerate}\n\n"

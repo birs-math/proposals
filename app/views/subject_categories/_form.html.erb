@@ -47,7 +47,7 @@
                 <div class="col-6 mt-2">
                   <div class="mb-3">
                     <label class="required">AMS Subject Code</label>
-                    <%= f.select :ams_subject_ids, options_for_select(ams_subjects_code, @subject_category.ams_subject_ids), {}, class: "form-select",  multiple: true %>
+                    <%= f.select :ams_subject_ids, options_for_select(ams_subjects_select, @subject_category.ams_subject_ids), {}, class: "form-select", multiple: true %>
                   </div>
                 </div>
               </div>

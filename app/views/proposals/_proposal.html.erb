@@ -34,8 +34,7 @@
             <div class="card-body">
               <div data-controller="submit-proposals proposal-form nested-invites"
                 data-submit-proposals-proposal-type-id-value="<%= @proposal.proposal_type.id %>"
-                data-submit-proposals-proposal-value="<%= @proposal.id %>"
-                data-nested-invites-wrapper-selector-value=".nested-invites-wrapper"
+                data-submit-proposals-proposal-value="<%= @proposal.id %>"data-nested-invites-wrapper-selector-value=".nested-invites-wrapper"
                 data-nested-invites-max-participant-value="<%= @proposal.proposal_type.participant %>"
                 data-nested-invites-max-organizer-value="<%= @proposal.proposal_type.co_organizer %>"
                 data-nested-invites-organizer-value="<%= confirmed_participants(@proposal.id, 'Organizer').count %>"
@@ -137,176 +136,63 @@
                           <%= f.label :year %>
                           <%= f.select :year, options_for_select(proposal_type_year(@proposal.proposal_type),  @proposal.year), { include_blank: true }, disabled: action, class: "form-select w-25", data: {'action': 'focus->auto-save-proposal#onFocus blur->auto-save-proposal#onBlur'} %>
                         </div>
-                        <div class="mb-3 row">
-                          <h3 class="form-section">Subject Areas</h3>
-                          <div class="col-6 mt-2">
-                            <label class="required">Subject Area</label>
-                            <%= f.select :subject_id, options_for_select(subjects_area, @proposal.subject&.id), { include_blank: '' }, disabled: action, class: "form-select", data: {'action': 'focus->auto-save-proposal#onFocus blur->auto-save-proposal#onBlur'} %>
-                            <% if @submission && @proposal.subject&.id.nil? %>
-                              <p class="field-validation">Subject is required</p>
-                            <% end %>
-                          </div>
-                          <div class="col-6 mt-2">
-                            <div class="mb-3">
-                              <label class="required">AMS Subject Code 1</label>
-                              <%= f.select :ams_subjects, options_for_select(ams_subjects_code, proposal_ams_subjects_code(@proposal, 'code1')), { include_blank: '' }, disabled: action, class: "form-select", name:'ams_subjects[code1]', data: {'action': 'focus->auto-save-proposal#onFocus blur->auto-save-proposal#onBlur'} %>
-                              <% if @submission && proposal_ams_subjects_code(@proposal, 'code1').blank? %>
-                                <p class="field-validation">AMS Subject Code 1 is required</p>
-                              <% end %>
-                            </div>
 
-                            <div class="mb-3">
-                              <label class="required">AMS Subject Code 2</label>
-                              <%= f.select :ams_subjects, options_for_select(ams_subjects_code, proposal_ams_subjects_code(@proposal, 'code2')), { include_blank: '' }, disabled: action, class: "form-select", name:'ams_subjects[code2]', data: {'action': 'focus->auto-save-proposal#onFocus blur->auto-save-proposal#onBlur'} %>
-                            </div>
-                          </div>
-                        </div>
-                          <div>
+                        <%= render partial: 'proposals/form/subject_area', locals: { form: f, disabled: action } %>
+                        <div>
+                          <% if params[:action] == 'edit' %>
+                            <%= render partial: 'proposals/form/invites_form', locals: { form: f } %>
+                          <% end %>
+                          <% if params[:action] == 'show' %>
+                            <%= render partial: 'proposals/form/invitees' %>
+                          <% end %>
+                          <%= render partial: 'proposals/form/confirmed_participants' %>
+                          <div class="mt-4" data-controller="multi-upload">
+                            <h3 class="form-section">Supplementary Files:</h3>
+                            <p>
+                              You may upload PDF files by clicking the button below. Uploaded files are considered supplementary documentation, and not part of the main body of the proposal.
+                              <br>
+                              Supported file types: *.pdf
+                            </p>
                             <% if params[:action] == 'edit' %>
-                              <%= render partial: 'lead_organizer' %>
-                              <% @has_title = @proposal.title.present? %>
                               <div>
-                                <h3 class="form-section">Add Supporting Organizers:</h3>
-                                <% unless @has_title %>
-                                  <p class="field-validation">Please, fill in title and save before proceeding</p>
-                                <% end %>
-                                <p><%= @proposal.proposal_type.organizer_description&.html_safe %></p>
-                                <% if @proposal.invites.organizer %>
-                                  <%= render partial: 'organizer', locals: { invites: @proposal.invites.organizer } %>
-                                <% end %>
-                                <div>
-                                  <% if max_invitations(@proposal, 'Organizer') %>
-                                    <% date = @proposal.invites.where(invited_as: 'Organizer').first&.deadline_date&.to_date %>
-                                      <% unless date.nil? %>
-                                        <% date = date  < DateTime.current.to_date ? DateTime.current.to_date : @proposal.invites.where(invited_as: 'Organizer').first&.deadline_date&.to_date %>
-                                      <% end %>
-                                    <div class="mb-3">
-                                      <template data-nested-invites-target="template">
-                                        <%= f.fields_for :invites, Invite.new, child_index: 'NEW_RECORD' do |invite| %>
-                                          <%= render partial: 'invite', locals: { f: invite, invited_as: 'Organizer', date: date } %>
-                                        <% end %>
-                                      </template>
-                                      <div data-nested-invites-target="target"></div>
-                                      <button type="button" class="btn btn-light" data-action="nested-invites#addOrganizers" id="add-more-organizer" <%= @has_title ? '' : 'disabled' %>>
-                                        Queue More Organizer Invitations
-                                      </button>
-                                    </div>
-                                    <div class="mb-3">
-                                      <button id="organizer" data-action="click->nested-invites#invitePreview" data-id="<%= @proposal.id %>" class="btn btn-primary" <%= @has_title ? '' : 'disabled' %>>Invite Organizer(s)</button>
-                                    </div>
-                                  <% end %>
-                                </div>
+                                <input type="file" id="file-upload" multiple accept="application/pdf" name="file-upload", data-action="multi-upload#uploadFile" data-proposal-form-id="<%= @proposal&.id %>">
                               </div>
-                              <div class="mt-4">
-                                <div class="mb-3">
-                                  <h3 class="form-section">Add Participants:</h3>
-                                  <% unless @has_title %>
-                                    <p class="field-validation">Please, fill in title and save before proceeding</p>
-                                  <% end %>
-                                  <p><%= @proposal.proposal_type.participant_description&.html_safe %></p>
 
-                                  <% if @proposal.invites.participant %>
-                                    <%= render partial: 'organizer', locals: { invites: @proposal.invites.participant } %>
+                              <% if @proposal&.files&.attached? %>
+                                <h4 class="file-uploads">Attached files:</h4>
+                                <ul class="list-group list-group-flush">
+                                  <% @proposal.files.each do |file| %>
+                                    <li class="list-group-item">
+                                      <%= link_to file.filename, rails_blob_path(file, disposition: 'preview') %>
+                                      <span data-proposal-id="<%= @proposal.id %>" data-attachment-id="<%= file.id %>" data-action="click->multi-upload#removeFile" class="btn btn-sm btn-light m-3">
+                                        Remove file
+                                      </span>
+                                    </li>
                                   <% end %>
-                                  <div>
-                                    <% if max_invitations(@proposal, 'Participant') %>
-                                      <% date = @proposal.invites.where(invited_as: 'Participant').first&.deadline_date&.to_date %>
-                                      <% unless date.nil? %>
-                                        <% date = date < DateTime.current.to_date ? DateTime.current.to_date : @proposal.invites.where(invited_as: 'Participant').first&.deadline_date&.to_date %>
-                                      <% end %>
-                                      <div class="mb-3">
-                                        <template data-nested-invites-target="templateOne">
-                                          <%= f.fields_for :invites, Invite.new, child_index: 'NEW_RECORD' do |invite| %>
-                                            <%= render partial: 'invite', locals: { f: invite, invited_as: 'Participant', date: date } %>
-                                          <% end %>
-                                        </template>
-                                        <div data-nested-invites-target="targetOne"></div>
-                                        <button type="button" class="btn btn-light" data-action="nested-invites#addParticipants" id="add-more-participant" <%= @has_title ? '' : 'disabled' %>>
-                                          Queue More Participant Invitations
-                                        </button>
-                                      </div>
-                                      <div class="mb-3">
-                                        <button id="participant" data-action="click->nested-invites#invitePreview" data-id="<%= @proposal.id %>" class="btn btn-primary" <%= @has_title ? '' : 'disabled' %>>Invite Participant(s)</button>
-                                      </div>
-                                    <% end %>
-                                  </div>
-                                </div>
-                              </div>
-                            <% end %>
-                            <% if params[:action] == 'show' %>
-                              <div>
-                                <%= render partial: 'lead_organizer' %>
-                                <div>
-                                  <h3 class="form-section">Supporting Organizers:</h3>
-                                  <% if @proposal.invites.organizer %>
-                                    <%= render partial: 'organizer', locals: { invites: @proposal.invites.organizer } %>
-                                  <% end %>
-                                </div>
-                                <div class="mt-4">
-                                  <div class="mb-3">
-                                    <h3 class="form-section">Participants:</h3>
-                                    <% if @proposal.invites.participant %>
-                                      <%= render partial: 'organizer', locals: { invites: @proposal.invites.participant } %>
-                                    <% end %>
-                                  </div>
-                                </div>
-                              </div>
-                            <% end %>
-                            <div class="mt-4">
-                              <div class="mb-3">
-                                <% unless @proposal.get_confirmed_participant(@proposal).blank? %>
-                                  <h3 class="form-section">Confirmed Participants:</h3>
-                                  <%= render partial: 'confirm_participant', locals: { confirmed_participants: @proposal.get_confirmed_participant(@proposal) } %>
-                                <% end %>
-                              </div>
-                            </div>
-                            <div class="mt-4" data-controller="multi-upload">
-                              <h3 class="form-section">Supplementary Files:</h3>
-                              <p>
-                                You may upload PDF files by clicking the button below. Uploaded files are considered supplementary documentation, and not part of the main body of the proposal.
-                                <br>
-                                Supported file types: *.pdf
-                              </p>
-                              <% if params[:action] == 'edit' %>
-                                <div>
-                                  <input type="file" id="file-upload" multiple accept="application/pdf" name="file-upload", data-action="multi-upload#uploadFile" data-proposal-form-id="<%= @proposal&.id %>">
-                                </div>
-
-                                <% if @proposal&.files&.attached? %>
-                                  <h4 class="file-uploads">Attached files:</h4>
-                                  <ul class="list-group list-group-flush">
-                                    <% @proposal.files.each do |file| %>
-                                      <li class="list-group-item">
-                                        <%= link_to file.filename, rails_blob_path(file, disposition: 'preview') %>
-                                        <span data-proposal-id="<%= @proposal.id %>" data-attachment-id="<%= file.id %>" data-action="click->multi-upload#removeFile" class="btn btn-sm btn-light m-3">
-                                          Remove file
-                                        </span>
-                                      </li>
-                                    <% end %>
-                                  </ul>
-                                <% end %>
-                              <% else %>
-                                <% if @proposal&.files&.attached? %>
-                                  <h4 class="file-uploads">Attached files:</h4>
-                                  <ul class="list-group list-group-flush">
-                                    <% @proposal.files.each do |file| %>
-                                      <li class="list-group-item">
-                                        <%= link_to file.filename, rails_blob_path(file, disposition: 'preview') %>
-                                      </li>
-                                    <% end %>
-                                  </ul>
-                                <% end %>
+                                </ul>
                               <% end %>
-                            </div>
-                          </div>
-
-                          <div class="d-flex flex-row-reverse">
-                            <button id="changeTab" class="p-2 btn btn-primary" data-action='click->submit-proposals#nextTab'>Next</button> &nbsp;&nbsp;
-                            <% if params[:action] == 'edit' %>
-                              <%= f.submit 'Update', disabled: action, class:'btn btn-primary p-2  d-inline-block' %>
+                            <% else %>
+                              <% if @proposal&.files&.attached? %>
+                                <h4 class="file-uploads">Attached files:</h4>
+                                <ul class="list-group list-group-flush">
+                                  <% @proposal.files.each do |file| %>
+                                    <li class="list-group-item">
+                                      <%= link_to file.filename, rails_blob_path(file, disposition: 'preview') %>
+                                    </li>
+                                  <% end %>
+                                </ul>
+                              <% end %>
                             <% end %>
                           </div>
                         </div>
+
+                        <div class="d-flex flex-row-reverse">
+                          <button id="changeTab" class="p-2 btn btn-primary" data-action='click->submit-proposals#nextTab'>Next</button> &nbsp;&nbsp;
+                          <% if params[:action] == 'edit' %>
+                            <%= f.submit 'Update', disabled: action, class:'btn btn-primary p-2  d-inline-block' %>
+                          <% end %>
+                        </div>
+                      </div>
 
                       <div class="tab-pane <%= active_tab(@proposal, 'two', params[:tab]) %> overflow-hidden" id="tab-2" role="tabpanel">
                         <div class="mb-3">

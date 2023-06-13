@@ -70,12 +70,12 @@ RSpec.describe Proposal, type: :model do
         expect(proposal.demographics_data).to eq([])
       end
     end
-  end  
+  end
 
 
   describe '#the_locations' do
     context "the locations" do
-      let(:location) { create(:location) } 
+      let(:location) { create(:location) }
       let!(:proposal) { create(:proposal) }
 
       before do
@@ -86,7 +86,7 @@ RSpec.describe Proposal, type: :model do
         expect(proposal.the_locations).to eq("")
       end
     end
-  end 
+  end
 
   describe '#supporting organizer fullnames' do
     context "supporting organizer fullnames" do
@@ -100,7 +100,7 @@ RSpec.describe Proposal, type: :model do
         expect(Proposal.supporting_organizer_fullnames(proposal)).to eq("#{proposal&.supporting_organizers&.first&.firstname}#{proposal&.supporting_organizers&.first&.lastname}" )
       end
     end
-  end 
+  end
 
   describe '#supporting organizer emails' do
     context "supporting organizer email" do
@@ -114,7 +114,7 @@ RSpec.describe Proposal, type: :model do
         expect(Proposal.supporting_organizer_emails(proposal)).to eq("#{proposal&.supporting_organizers&.first&.email}" )
       end
     end
-  end  
+  end
 
   describe '#participants fullnames' do
     context "participants fullnames" do
@@ -128,7 +128,7 @@ RSpec.describe Proposal, type: :model do
         expect(Proposal.participants_fullnames(proposal)).to eq("#{proposal&.participants&.first&.firstname}#{proposal&.participants&.first&.lastname}" )
       end
     end
-  end 
+  end
 
   describe '#participants emails' do
     context "participants emails" do
@@ -142,7 +142,7 @@ RSpec.describe Proposal, type: :model do
         expect(Proposal.participants_emails(proposal)).to eq("#{proposal&.participants&.first&.email}" )
       end
     end
-  end  
+  end
 
   describe '#list of organizers' do
     context "list of organizerss" do
@@ -157,7 +157,7 @@ RSpec.describe Proposal, type: :model do
         expect(proposal.list_of_organizers).to eq("")
       end
     end
-  end  
+  end
 
 
   describe '#supporting organizer' do
@@ -173,7 +173,7 @@ RSpec.describe Proposal, type: :model do
         expect(proposal.supporting_organizers).to eq([])
       end
     end
-  end 
+  end
 
 
   describe '#participants' do
@@ -189,7 +189,7 @@ RSpec.describe Proposal, type: :model do
         expect(proposal.participants).to eq([])
       end
     end
-  end 
+  end
 
   describe '#get confirmed participants' do
     context "get Confirmed participants" do
@@ -197,14 +197,14 @@ RSpec.describe Proposal, type: :model do
       let!(:proposal) { create(:proposal) }
 
       before do
-        proposal.get_confirmed_participant(proposal)
+        proposal.confirmed_participants
       end
 
       it 'returns confirm participants' do
-        expect(proposal.get_confirmed_participant(proposal)).to eq([])
+        expect(proposal.confirmed_participants).to eq([])
       end
     end
-  end   
+  end
 
   describe '#invites_demographic_data' do
     context "Invites Demographic data " do
@@ -229,7 +229,7 @@ RSpec.describe Proposal, type: :model do
       before do
         proposal.birs_emails
       end
-      
+
       it 'birs email' do
         expect(proposal.birs_emails).to eq(emails)
       end
@@ -244,7 +244,7 @@ RSpec.describe Proposal, type: :model do
       before do
         proposal.max_supporting_organizers
       end
-      
+
       it 'max supporting organizers' do
         expect(proposal.max_supporting_organizers).to eq(3)
       end
@@ -259,7 +259,7 @@ RSpec.describe Proposal, type: :model do
       before do
         proposal.max_participants
       end
-      
+
       it 'max participants' do
         expect(proposal.max_participants).to eq(proposal_type.participant)
       end
@@ -273,7 +273,7 @@ RSpec.describe Proposal, type: :model do
       before do
         proposal.max_virtual_participants
       end
-      
+
       it 'max virtual participants' do
         expect(proposal.max_virtual_participants).to eq(300)
       end
@@ -287,7 +287,7 @@ RSpec.describe Proposal, type: :model do
       before do
         proposal.max_total_participants
       end
-      
+
       it 'max virtual total participants' do
         expect(proposal.max_total_participants).to eq(302)
       end
@@ -301,7 +301,7 @@ RSpec.describe Proposal, type: :model do
       before do
         proposal.macros
       end
-      
+
       it 'macros' do
         expect(proposal.macros).to eq('')
       end
@@ -318,7 +318,7 @@ RSpec.describe Proposal, type: :model do
       before do
         proposal.pdf_file_type(file)
       end
-      
+
       it 'pdf_file_type' do
         expect(proposal.pdf_file_type(file)).to be_falsey
       end

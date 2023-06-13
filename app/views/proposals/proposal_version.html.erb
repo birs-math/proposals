@@ -102,73 +102,26 @@
                             <div class="col-6 mt-2">
                               <div class="mb-3">
                                 <label class="required">AMS Subject Code 1</label>
-                                <%= select_tag :ams_subjects, options_for_select(ams_subjects_code, @proposal_version.ams_subject_one), include_blank: '', disabled: true, class: "form-select", name:'ams_subjects[code1]' %>
+                                <%= select_tag :ams_subjects, options_for_select(ams_subjects_select, @proposal_version.ams_subject_one), include_blank: '', disabled: true, class: "form-select", name:'ams_subjects[code1]' %>
                               </div>
 
                               <div class="mb-3">
                                 <label class="required">AMS Subject Code 2</label>
-                                <%= select_tag :ams_subjects, options_for_select(ams_subjects_code, @proposal_version.ams_subject_two), include_blank: '', disabled: true, class: "form-select", name:'ams_subjects[code2]' %>
+                                <%= select_tag :ams_subjects, options_for_select(ams_subjects_select, @proposal_version.ams_subject_two), include_blank: '', disabled: true, class: "form-select", name:'ams_subjects[code2]' %>
                               </div>
                             </div>
                           <% else %>
                             <div class="mb-3">
-                            <%= label_tag :year %>
-                            <%= select_tag :year, options_for_select(proposal_type_year(@proposal.proposal_type),  @proposal.year), disabled: true, class: "form-select w-25" %>
-                          </div>
-                          <div class="mb-3 row">
-                            <h4>Subject Areas</h4>
-                            <div class="col-6 mt-2">
-                              <label class="required">Subject Area</label>
-                              <%= select_tag :subject_id, options_for_select(subjects_area, @proposal.subject&.id), include_blank: '' , disabled: true, class: "form-select" %>
-                              <% if @submission && @proposal.subject&.id.nil? %>
-                                <p class="field-validation">Subject is required</p>
-                              <% end %>
+                              <%= label_tag :year %>
+                              <%= select_tag :year, options_for_select(proposal_type_year(@proposal.proposal_type),  @proposal.year), disabled: true, class: "form-select w-25" %>
                             </div>
-                            <div class="col-6 mt-2">
-                              <div class="mb-3">
-                                <label class="required">AMS Subject Code 1</label>
-                                <%= select_tag :ams_subjects, options_for_select(ams_subjects_code, proposal_ams_subjects_code(@proposal, 'code1')), include_blank: '', disabled: true, class: "form-select", name:'ams_subjects[code1]' %>
-                                <% if @submission && proposal_ams_subjects_code(@proposal, 'code1').blank? %>
-                                  <p class="field-validation">AMS Subject Code 1 is required</p>
-                                <% end %>
-                              </div>
-
-                              <div class="mb-3">
-                                <label class="required">AMS Subject Code 2</label>
-                                <%= select_tag :ams_subjects, options_for_select(ams_subjects_code, proposal_ams_subjects_code(@proposal, 'code2')), include_blank: '', disabled: true, class: "form-select", name:'ams_subjects[code2]' %>
-                                <% if @submission && proposal_ams_subjects_code(@proposal, 'code2').blank? %>
-                                  <p class="field-validation">AMS Subject Code 2 is required</p>
-                                <% end %>
-                              </div>
-                            </div>
+                            <div class="mb-3 row">
+                              <%= render partial: 'proposals/form/subject_area', locals: { form: f, disabled: true } %>
                           <% end %>
                           <div>
                             <% if params[:action] == 'proposal_version' %>
-                              <div>
-                                <%= render partial: 'lead_organizer' %>
-                                <div>
-                                  <h3 class="form-section">Supporting Organizers:</h3>
-                                  <% if @proposal.invites.organizer %>
-                                    <%= render partial: 'organizer', locals: { invites: @proposal.invites.organizer } %>
-                                  <% end %>
-                                </div>
-                                <div class="mt-4">
-                                  <div class="mb-3">
-                                    <h3 class="form-section">Participants:</h3>
-                                    <% if @proposal.invites.participant %>
-                                      <%= render partial: 'organizer', locals: { invites: @proposal.invites.participant } %>
-                                    <% end %>
-                                  </div>
-                                </div>
-                                <div class="mt-4">
-                                  <div class="mb-3">
-                                    <% unless @proposal.get_confirmed_participant(@proposal).blank? %>
-                                      <h3 class="form-section">Confirmed Participants:</h3>
-                                          <%= render partial: 'proposals/confirm_participant', locals: { confirmed_participants: @proposal.get_confirmed_participant(@proposal) } %>
-                                    <% end %>
-                                  </div>
-                                </div>
-                              </div>
+                              <%= render partial: 'proposals/form/invitees' %>
+                              <%= render partial: 'proposals/form/confirmed_participants' %>
                             <% end %>
 
                             <div class="mt-4" data-controller="multi-upload">
