@@ -10,7 +10,7 @@
     <% end %>
   </div>
   <span><%= field.description.html_safe %></span>
-  <%= render partial: 'guideline_link', locals: { field: field } %>
+  <%= render partial: 'proposal_fields/guideline_link', locals: { field: field } %>
   <% if @version.present? %>
     <div class="row">
       <div class="col-6">

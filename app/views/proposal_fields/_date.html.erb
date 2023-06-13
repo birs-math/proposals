@@ -10,7 +10,7 @@
 </div>
 
 <span><%= field.description.html_safe %></span>
-<%= render partial: 'guideline_link', locals: { field: field } %>
+<%= render partial: 'proposal_fields/guideline_link', locals: { field: field } %>
 <div class="mb-3">
   <% if @version.present? %>
     <input name="<%= field.id %>" <%= action ? 'disabled' : '' %> class="form-control" type="date" value='<%= answer_with_version(field, @proposal, @version) %>'  data-action="focus->auto-save-proposal#onFocus blur->auto-save-proposal#onBlur" />
