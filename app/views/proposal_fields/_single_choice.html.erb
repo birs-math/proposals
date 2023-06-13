@@ -9,11 +9,7 @@
 	  <% end %>
   </div>
   <span><%= field.description.html_safe %></span>
-  <% if field.guideline_link.present? %>
-    <p><a href="<%= field.guideline_link %>" target="_blank"> 
-      Learn More
-    </a></p>
-  <% end %>
+  <%= render partial: 'guideline_link', locals: { field: field } %>
   <% if @version.present? %>
     <%= select_tag "Option", options_for_select(proposal_field_options(field), answer_with_version(field, @proposal, @version)), class: 'form-select', disabled: action, name: field.id, data: {'action': 'focus->auto-save-proposal#onFocus blur->auto-save-proposal#onBlur'} %>
   <% else %>

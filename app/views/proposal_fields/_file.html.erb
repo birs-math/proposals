@@ -8,11 +8,7 @@
   <% end %>
 </div>
 <span><%= field.description.html_safe %></span>
-<% if field.guideline_link.present? %>
-  <p><a href="<%= field.guideline_link %>" target="_blank"> 
-    Learn More
-  </a></p>/
-<% end %>
+<%= render partial: 'guideline_link', locals: { field: field } %>
 <div>
   <% if current_user&.staff_member? %>
     <input type="file" disabled="true">

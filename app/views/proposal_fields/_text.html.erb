@@ -8,11 +8,7 @@
   <% end %>
 </div>
 <span><%= field.description.html_safe %></span>
-<% if field.guideline_link.present? %>
-  <p><a href="<%= field.guideline_link %>" target="_blank">
-    <%= I18n.t('proposals.form.see_guidelines') %>
-  </a></p>
-<% end %>
+<%= render partial: 'guideline_link', locals: { field: field } %>
 <div>
   <% if @version.present? %>
     <textarea name="<%= field.id %>" <%= action ? 'disabled' : '' %> id="" data-value='<%= field.id %>' cols="30" rows="5" class="form-control" data-proposal-form-target="textField" data-action="focus->auto-save-proposal#onFocus blur->auto-save-proposal#onBlur"><%= answer_with_version(field, @proposal, @version) %></textarea>
