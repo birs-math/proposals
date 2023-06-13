@@ -138,15 +138,6 @@
                             <% if params[:action] == 'edit' %>
                               <%= render partial: 'proposals/form/invites_form', locals: { form: f } %>
                             <% end %>
-                             <div class="mt-4">
-                              <div class="mb-3">
-                                <% unless @proposal.confirmed_participants.blank? %>
-                                  <h3 class="form-section">Confirmed Participants:</h3>
-                                      <%= render partial: 'proposals/confirm_participant', locals: { confirmed_participants: @proposal.confirmed_participants } %>
-                                <% end %>
-                              </div>
-                            </div>
-
                             <% if params[:action] == 'show' %>
                               <%= render partial: 'proposals/form/invitees' %>
                             <% end %>
