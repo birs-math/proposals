@@ -34,7 +34,7 @@ class SubmittedProposalsController < ApplicationController
 
   def edit_flow
     params[:ids]&.split(',')&.each do |id|
-      @proposal = Proposal.find_by(id: id.to_i)
+      @proposal = Proposal.find(id)
       check_proposal_status and return unless @proposal.may_progress?
 
       next unless post_to_editflow
@@ -48,7 +48,7 @@ class SubmittedProposalsController < ApplicationController
   end
 
   def revise_proposal_editflow
-    @proposal = Proposal.find_by(id: params[:proposal_id].to_i)
+    @proposal = Proposal.find(params[:proposal_id])
 
     unless @proposal.may_requested? || @proposal.may_revision?
       return redirect_to versions_proposal_url(@proposal),
@@ -448,7 +448,7 @@ class SubmittedProposalsController < ApplicationController
   end
 
   def set_proposal
-    @proposal = Proposal.find_by(id: params[:id])
+    @proposal = Proposal.find(params[:id])
   end
 
   def template_params
@@ -479,7 +479,7 @@ class SubmittedProposalsController < ApplicationController
   end
 
   def create_birs_email(id)
-    @proposal = Proposal.find_by(id: id)
+    @proposal = Proposal.find(id)
     @email = Email.new(email_params.merge(proposal_id: @proposal.id))
     change_status
   end
@@ -539,7 +539,7 @@ class SubmittedProposalsController < ApplicationController
 
     pids = @proposal_ids&.is_a?(String) ? @proposal_ids&.split(',') : @proposal_ids
     pids&.each do |id|
-      @proposal = Proposal.find_by(id: id)
+      @proposal = Proposal.find(id)
       reviews_conditions
     end
   end

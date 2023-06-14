@@ -1,9 +1,9 @@
 class ProposalsController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_proposal, only: %w[show edit destroy ranking locations versions proposal_version]
-  before_action :check_status, only: %w[edit]
-  before_action :authorize_user, only: %w[show edit]
-  before_action :set_careers, only: %w[show edit]
+  before_action :set_proposal, except: %i[index create new latex_input]
+  before_action :check_status, only: %i[edit]
+  before_action :authorize_user, only: %i[show edit]
+  before_action :set_careers, only: %i[show edit]
 
   def index
     @proposals = current_user&.person&.proposals&.each_with_object([]) do |proposal, props|
@@ -44,16 +44,13 @@ class ProposalsController < ApplicationController
   def latex_input
     proposal_id = latex_params[:proposal_id]
     session[:proposal_id] = proposal_id
-    ProposalPdfService.new(proposal_id, latex_temp_file, latex_params[:latex], current_user)
-                      .generate_latex_file
+    ProposalPdfService.new(proposal_id, latex_temp_file, latex_params[:latex], current_user).generate_latex_file
 
     head :ok
   end
 
   # GET /proposals/:id/rendered_proposal.pdf
   def latex_output
-    proposal_id = params[:id]
-    @proposal = Proposal.find_by(id: proposal_id)
     generate_file
     errors = @proposal_pdf.file_errors.join(', ')
 
@@ -65,25 +62,13 @@ class ProposalsController < ApplicationController
 
   # GET /proposals/:id/rendered_field.pdf
   def latex_field
-    prop_id = params[:id]
-    return if prop_id.blank?
+    return if @proposal.blank?
 
-    @proposal = Proposal.find_by(id: prop_id)
     @year = @proposal&.year || (Date.current.year.to_i + 2)
 
     @latex_infile = ProposalPdfService.new(@proposal.id, latex_temp_file, field_input, current_user)
                                       .generate_latex_file.to_s
     render_latex
-  end
-
-  def field_input
-    temp_file = "#{Rails.root}/tmp/#{latex_temp_file}"
-    field_input = 'all'
-    if File.exist?(temp_file)
-      field_input = File.read(temp_file)
-      field_input = LatexToPdf.escape_latex(field_input) if @proposal.no_latex
-    end
-    field_input
   end
 
   def destroy
@@ -97,7 +82,6 @@ class ProposalsController < ApplicationController
   end
 
   def upload_file
-    @proposal = Proposal.find(params[:id])
     params[:files]&.each do |file|
       if @proposal.pdf_file_type(file)
         @proposal.files.attach(file)
@@ -136,7 +120,7 @@ class ProposalsController < ApplicationController
   end
 
   def set_proposal
-    @proposal = Proposal.find_by(id: params[:id])
+    @proposal = Proposal.find(params[:id])
     @submission = session[:is_submission]
   end
 
@@ -176,7 +160,6 @@ class ProposalsController < ApplicationController
   end
 
   def delete_file_message
-    @proposal = Proposal.find(params[:id])
     file = @proposal.files.where(id: params[:attachment_id])
     file.purge_later
 
@@ -211,5 +194,15 @@ class ProposalsController < ApplicationController
     @proposal_pdf = ProposalPdfService.new(@proposal.id, latex_temp_file, 'all', current_user, version)
                                       .generate_latex_file
     @latex_infile = @proposal_pdf.to_s
+  end
+
+  def field_input
+    temp_file = "#{Rails.root}/tmp/#{latex_temp_file}"
+    field_input = 'all'
+    if File.exist?(temp_file)
+      field_input = File.read(temp_file)
+      field_input = LatexToPdf.escape_latex(field_input) if @proposal.no_latex
+    end
+    field_input
   end
 end

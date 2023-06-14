@@ -137,6 +137,10 @@ class Proposal < ApplicationRecord
     joins(:proposal_type).where(proposal_type: { name: type })
   }
 
+  def to_param
+    code || id.to_s
+  end
+
   def self.find(param)
     return if param.blank?
 

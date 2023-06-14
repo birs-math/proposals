@@ -337,7 +337,7 @@ RSpec.describe "/proposals/:proposal_id/invites", type: :request do
       let(:role_name) { 'Staff' }
       it "sends invite reminder when invite status is pending" do
         expect(response).to have_http_status(:found)
-        expect(response).to redirect_to(edit_submitted_proposal_url(proposal.id))
+        expect(response).to redirect_to(edit_submitted_proposal_url(proposal))
       end
     end
 
@@ -346,7 +346,7 @@ RSpec.describe "/proposals/:proposal_id/invites", type: :request do
       let(:role_name) { 'Staff' }
       it "does not send invite reminder when invite status is pending" do
         expect(response).to have_http_status(:found)
-        expect(response).to redirect_to(edit_proposal_path(proposal.id))
+        expect(response).to redirect_to(edit_proposal_path(proposal))
       end
     end
   end
@@ -364,7 +364,7 @@ RSpec.describe "/proposals/:proposal_id/invites", type: :request do
       let(:role_name) { 'lead_organizer' }
       it "sends invite reminder when invite status is pending" do
         expect(response).to have_http_status(:found)
-        expect(response).to redirect_to(edit_proposal_url(proposal.id))
+        expect(response).to redirect_to(edit_proposal_url(proposal))
       end
     end
 
@@ -373,7 +373,7 @@ RSpec.describe "/proposals/:proposal_id/invites", type: :request do
       let(:role_name) { 'lead_organizer' }
       it "does not send invite reminder when invite status is pending" do
         expect(response).to have_http_status(:found)
-        expect(response).to redirect_to(edit_proposal_path(proposal.id))
+        expect(response).to redirect_to(edit_proposal_path(proposal))
       end
     end
   end
