@@ -137,10 +137,6 @@ class Proposal < ApplicationRecord
     joins(:proposal_type).where(proposal_type: { name: type })
   }
 
-  def to_param
-    code || id.to_s
-  end
-
   def self.find(param)
     return if param.blank?
 
@@ -178,20 +174,21 @@ class Proposal < ApplicationRecord
   end
 
   def list_of_organizers
-    invites.where(invites: { invited_as: 'Organizer', status: 'confirmed' }).map(&:person)
+    invites.where(invites: { invited_as: 'Organizer', status: 'confirmed' })
+           .map(&:person)
            .map(&:fullname).join(', ')
   end
 
   def supporting_organizers
-    invites.where(invited_as: 'Organizer').where(response: %w[yes maybe])
+    invites.where(invited_as: 'Organizer').where(status: :confirmed)
   end
 
   def participants
-    invites.where(invited_as: 'Participant').where(response: %w[yes maybe])
+    invites.where(invited_as: 'Participant').where(status: :confirmed)
   end
 
-  def confirmed_participants
-    invites.where(status: 1, invited_as: "Participant").map(&:person)
+  def get_confirmed_participant(proposal)
+    proposal.invites.where(status: :confirmed, invited_as: "Participant").map(&:person)
   end
 
   def self.supporting_organizer_fullnames(proposal)
@@ -343,6 +340,7 @@ class Proposal < ApplicationRecord
     return if code.present?
 
     tc = proposal_type.code || 'xx'
+
     self.code = year.to_s[-2..] + tc + next_number
   end
 
