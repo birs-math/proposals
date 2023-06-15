@@ -3,7 +3,7 @@ class SubmittedProposalsController < ApplicationController
   before_action :authorize_user
   before_action :set_proposals, only: %i[index]
   before_action :set_proposal, except: %i[index download_csv import_reviews
-                                          reviews_booklet reviews_excel_booklet booklet_log]
+                                          reviews_booklet reviews_excel_booklet]
   before_action :template_params, only: %i[approve_decline_proposals]
   before_action :check_reviews_permissions, only: %i[import_reviews
                                                      reviews_booklet
@@ -127,12 +127,9 @@ class SubmittedProposalsController < ApplicationController
   end
 
   def download_booklet
-    file = Rails.root.join('tmp', "booklet-proposals-#{current_user.id}.pdf")
-
-    return head(:not_found) unless file.exist?
-
+    f = File.open(Rails.root.join('tmp/booklet-proposals.pdf'))
     send_file(
-      file.open,
+      f,
       filename: "proposal_booklet.pdf",
       type: "application/pdf"
     )
@@ -204,26 +201,6 @@ class SubmittedProposalsController < ApplicationController
     proposals = Proposal.where(selected_proposal_ids)
     proposals.update_all(outcome_location_params.to_hash)
     head :ok
-  end
-
-  def booklet_log
-    @log = LatexToPdfLog.find(params[:log_id])
-  end
-
-  def download_log_file
-    log = LatexToPdfLog.find_by(id: params[:log_id])
-
-    return head(:not_found) if log.blank?
-
-    file = Rails.root.join('tmp', log.file_name)
-
-    return head(:not_found) unless file.exist?
-
-    send_file(
-      file.open,
-      filename: log.file_name,
-      type: log.mime_type
-    )
   end
 
   private
@@ -298,7 +275,7 @@ class SubmittedProposalsController < ApplicationController
         proposal_id: proposal.id,
         code: proposal.code,
         workshop_name: proposal.title,
-        participants: proposal.invites.where(status: "confirmed", invited_as: "Participant"),
+        participants: proposal.participant_invites,
         dates: proposal.assigned_date
       }
     end

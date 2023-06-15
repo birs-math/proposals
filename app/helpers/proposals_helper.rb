@@ -97,7 +97,7 @@ module ProposalsHelper
   end
 
   def existing_organizers(invite)
-    organizers = invite.proposal.list_of_organizers
+    organizers = invite.proposal.supporting_organizers
                        .remove(invite.person&.fullname)
     organizers.prepend(" and ") if organizers.present?
     organizers.strip.delete_suffix(",")

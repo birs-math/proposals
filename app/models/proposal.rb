@@ -137,6 +137,10 @@ class Proposal < ApplicationRecord
     joins(:proposal_type).where(proposal_type: { name: type })
   }
 
+  def to_param
+    code || id.to_s
+  end
+
   def self.find(param)
     return if param.blank?
 
@@ -169,42 +173,40 @@ class Proposal < ApplicationRecord
     proposal_roles.joins(:role).includes(:person).find_by(roles: { name: 'lead_organizer'})&.person
   end
 
-  def the_locations
+  def location_names
     locations.pluck(:name).join(', ')
   end
 
-  def list_of_organizers
-    invites.where(invites: { invited_as: 'Organizer', status: 'confirmed' })
-           .map(&:person)
-           .map(&:fullname).join(', ')
-  end
-
   def supporting_organizers
-    invites.where(invited_as: 'Organizer').where(status: :confirmed)
+    Person.where(id: supporting_organizer_invites.pluck(:person_id))
   end
 
   def participants
-    invites.where(invited_as: 'Participant').where(status: :confirmed)
+    Person.where(id: participant_invites.pluck(:person_id))
   end
 
-  def get_confirmed_participant(proposal)
-    proposal.invites.where(status: :confirmed, invited_as: "Participant").map(&:person)
+  def supporting_organizer_invites
+    invites.confirmed.organizer
+  end
+
+  def participant_invites
+    invites.confirmed.participant
   end
 
   def self.supporting_organizer_fullnames(proposal)
-    proposal&.supporting_organizers&.map { |org| "#{org.firstname} #{org.lastname}" }&.join(', ')
+    proposal&.supporting_organizer_invites&.map { |org| "#{org.firstname} #{org.lastname}" }&.join(', ')
   end
 
   def self.participants_fullnames(proposal)
-    proposal&.participants&.map { |org| "#{org.firstname} #{org.lastname}" }&.join(', ')
+    proposal&.participant_invites&.map { |org| "#{org.firstname} #{org.lastname}" }&.join(', ')
   end
 
   def self.participants_emails(proposal)
-    proposal&.participants&.map { |org| "#{org.email}" }&.join(', ')
+    proposal&.participant_invites&.map(&:email)&.join(', ')
   end
 
   def self.supporting_organizer_emails(proposal)
-    proposal&.supporting_organizers&.map { |org| "#{org.email}" }&.join(', ')
+    proposal&.supporting_organizer_invites&.map(&:email)&.join(', ')
   end
 
   def self.to_csv(proposals)
@@ -225,7 +227,7 @@ class Proposal < ApplicationRecord
 
   def self.each_row(proposal)
     [proposal&.code, proposal&.title, proposal&.proposal_type&.name,
-     proposal&.the_locations, proposal&.assigned_location&.name, proposal&.status, proposal&.outcome,
+     proposal&.location_names, proposal&.assigned_location&.name, proposal&.status, proposal&.outcome,
      proposal&.updated_at&.to_date, proposal&.edit_flow&.to_date,
      proposal&.subject&.title, proposal&.lead_organizer&.fullname,
      proposal&.lead_organizer&.email, supporting_organizer_fullnames(proposal),

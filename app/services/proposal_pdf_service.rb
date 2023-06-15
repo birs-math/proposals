@@ -171,7 +171,7 @@ class ProposalPdfService
     end
     @text << "\\begin{itemize}\n"
     proposal.supporting_organizers.each do |organizer|
-      @text << "\\item #{organizer&.person&.fullname}#{affil(organizer&.person)}\n"
+      @text << "\\item #{organizer.fullname}#{affil(organizer)}\n"
     end
     @text << "\\end{itemize}\n\n"
   end
@@ -273,7 +273,7 @@ class ProposalPdfService
   end
 
   def participant_list(career)
-    @participants = proposal.confirmed_participants
+    @participants = proposal.participants
     return '' if @participants.blank?
 
     text = "\\begin{enumerate}\n\n"
@@ -284,7 +284,7 @@ class ProposalPdfService
   end
 
   def participant_careers
-    careers = Person.where(id: @proposal.participants
+    careers = Person.where(id: @proposal.participant_invites
                     .pluck(:person_id)).pluck(:academic_status)
     return [] if careers.blank?
 
@@ -293,7 +293,7 @@ class ProposalPdfService
   end
 
   def proposal_participants
-    return if proposal.participants&.count&.zero?
+    return if proposal.participant_invites&.count&.zero?
 
     @careers = participant_careers
     @text << "\\section*{Participants}\n\n"

@@ -151,7 +151,7 @@ class ProposalsController < ApplicationController
   end
 
   def set_careers
-    @careers = Person.where(id: @proposal.participants.pluck(:person_id))
+    @careers = Person.where(id: @proposal.participant_invites.pluck(:person_id))
                      .pluck(:academic_status)
   end
 

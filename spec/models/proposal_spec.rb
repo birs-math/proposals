@@ -79,83 +79,84 @@ RSpec.describe Proposal, type: :model do
   end
 
 
-  describe '#the_locations' do
+  describe '#location_names' do
     let(:location) { create(:location) }
 
     before do
       proposal.locations << location
     end
 
-    it 'returns location' do
-      expect(proposal.the_locations).to eq(location.name)
+    it 'returns location names' do
+      expect(proposal.location_names).to eq(location.name)
     end
   end
 
   describe '#supporting organizer fullnames' do
     it 'returns supporting organizers fullnames' do
       expect(described_class.supporting_organizer_fullnames(proposal))
-        .to eq("#{proposal&.supporting_organizers&.first&.firstname}#{proposal&.supporting_organizers&.first&.lastname}" )
+        .to eq("#{proposal&.supporting_organizer_invites&.first&.firstname}#{proposal&.supporting_organizer_invites&.first&.lastname}" )
     end
   end
 
-  describe '#supporting organizer emails' do
+  describe '#supporting_organizer_emails' do
     it do
       expect(described_class.supporting_organizer_emails(proposal))
-        .to eq("#{proposal&.supporting_organizers&.first&.email}" )
+        .to eq("#{proposal&.supporting_organizer_invites&.first&.email}" )
     end
   end
 
   describe '#participants_fullnames' do
     it do
       expect(described_class.participants_fullnames(proposal))
-        .to eq("#{proposal&.participants&.first&.firstname}#{proposal&.participants&.first&.lastname}" )
+        .to eq("#{proposal&.participant_invites&.first&.firstname}#{proposal&.participant_invites&.first&.lastname}" )
     end
   end
 
-  describe '#participants emails' do
+  describe '#participants_emails' do
     it 'returns participants emails' do
-      expect(described_class.participants_emails(proposal)).to eq("#{proposal&.participants&.first&.email}" )
+      expect(described_class.participants_emails(proposal)).to eq("#{proposal&.participant_invites&.first&.email}" )
     end
   end
 
-  describe '#list_of_organizers' do
+  describe '#supporting_organizers' do
     let(:invited_as) { 'Organizer' }
 
     before { invite }
 
-    it 'returns list of orgainzers' do
-      expect(proposal.list_of_organizers).to eq(invite.person.fullname)
+    it 'returns list of supporting organizers' do
+      expect(proposal.supporting_organizers.to_a).to eq([invite.person])
     end
   end
 
 
-  describe '#supporting_organizer' do
+  describe '#supporting_organizer_invites' do
     let(:invited_as) { 'Organizer' }
 
     before { invite }
 
     it 'returns supporting organizers' do
-      expect(proposal.supporting_organizers.to_a).to eq([invite])
+      expect(proposal.supporting_organizer_invites.to_a).to eq([invite])
     end
   end
 
+
+  describe '#participant_invites' do
+    let(:invited_as) { 'Participant' }
+
+    before { invite }
+
+    it 'returns organizer invites' do
+      expect(proposal.participant_invites.to_a).to eq([invite])
+    end
+  end
 
   describe '#participants' do
-    let(:invite) { create(:invite, invited_as: 'Participant', response: :yes, status: :confirmed, proposal: proposal) }
-    let(:proposal) { create(:proposal) }
-
-    it 'returns supporting xorganizers' do
-      expect(proposal.participants).to eq([invite])
-    end
-  end
-
-  describe '#get_confirmed_participants' do
     let(:invited_as) { 'Participant' }
 
     before { invite }
 
     it do
-      expect(proposal.get_confirmed_participant(proposal)).to eq([invite.person])
+      expect(proposal.participants.to_a).to eq([invite.person])
     end
   end
 
@@ -187,11 +188,11 @@ RSpec.describe Proposal, type: :model do
     it { expect(proposal.max_participants).to eq(proposal_type.participant) }
   end
 
-  describe '#max virtual participants' do
+  describe '#max_virtual_participants' do
     it { expect(proposal.max_virtual_participants).to eq(300) }
   end
 
-  describe '#max total participants' do
+  describe '#max_total_participants' do
     it { expect(proposal.max_total_participants).to eq(302) }
   end
 

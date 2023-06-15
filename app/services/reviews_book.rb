@@ -113,7 +113,7 @@ class ReviewsBook
 
   def confirmed_organizers
     @proposal.supporting_organizers.each do |organizer|
-      @text << "\\noindent #{organizer&.person&.fullname}#{affil(organizer&.person)}\n\n\n"
+      @text << "\\noindent #{organizer.fullname}#{affil(organizer)}\n\n\n"
     end
   end
 
