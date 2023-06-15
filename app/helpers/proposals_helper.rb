@@ -96,13 +96,6 @@ module ProposalsHelper
     numbers_to_words[proposal.max_supporting_organizers]
   end
 
-  def existing_organizers(invite)
-    organizers = invite.proposal.supporting_organizers
-                       .remove(invite.person&.fullname)
-    organizers.prepend(" and ") if organizers.present?
-    organizers.strip.delete_suffix(",")
-  end
-
   def invite_status(response, status)
     return "Invite has been cancelled" if status == 'cancelled'
 
