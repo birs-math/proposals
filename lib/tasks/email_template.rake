@@ -1,8 +1,8 @@
 namespace :birs do
   task default: 'birs:new_email_templates'
 
-  desc "Add new BIRS Email Templates to database"
-  task new_email_templates: :environment do
+  desc "Add invitation BIRS Email Templates to database"
+  task invitation_email_template: :environment do
     organizer_invitation = { title: "Invitation email for organizer",
                              subject: "BIRS Proposal: Invite for Supporting Organizer",
                              body: '
@@ -33,9 +33,86 @@ namespace :birs do
                                   and the organizing committee.</p>',
                                email_type: "participant_invitation_type" }
 
-    organizer = EmailTemplate.create(title: organizer_invitation[:title], subject: organizer_invitation[:subject],
-                                     body: organizer_invitation[:body], email_type: organizer_invitation[:email_type])
-    participant = EmailTemplate.create(title: participant_invitation[:title],
-                                       subject: participant_invitation[:subject], body: participant_invitation[:body], email_type: participant_invitation[:email_type])
+    unless EmailTemplate.exists?(email_type: organizer_invitation[:email_type])
+      EmailTemplate.create(title: organizer_invitation[:title],
+                           subject: organizer_invitation[:subject],
+                           body: organizer_invitation[:body],
+                           email_type: organizer_invitation[:email_type])
+    end
+
+    unless EmailTemplate.exists?(email_type: participant_invitation[:email_type])
+      EmailTemplate.create(title: participant_invitation[:title],
+                           subject: participant_invitation[:subject],
+                           body: participant_invitation[:body],
+                           email_type: participant_invitation[:email_type])
+    end
+  end
+
+  desc "Add Liquid email templates"
+  task liquid_email_templates: :environment do
+    invite_reminder = {
+      title: 'Invite reminder',
+      email_type: :invite_reminder,
+      subject: 'Please Respond – BIRS Proposal Invitation for {{ invited_role }}',
+      body: <<~HTML
+        <p>Dear {{ person_name }}:</p>
+        <p>
+          This is a friendly reminder to indicate your interest in being {{ invited_as }} a proposed {{ proposal_type }} titled “{{ proposal_title }}”, which is currently being organized by {{ organizers }}.
+        </p>
+
+        <p>Please indicate your interest in this proposal by following this link by {{ deadline_date }}:</p>
+
+        <p><a href="{{ invite_url }}">{{ invite_url }}</a></p>
+
+        <p>Thank you for indicating your interest in this proposed workshop!</p>
+
+        <p>Banff International Research Station</p>
+        <p>And the organizing committee.</p>
+      HTML
+    }
+
+    confirmation_of_interest = {
+      title: 'Invite acceptance of interest',
+      email_type: :confirmation_of_interest,
+      subject: 'BIRS Proposal Confirmation of Interest',
+      body: <<~HTML
+        <p>Dear {{ person_name }}:</p>
+        <p>
+          Thank you for indicating your interest in becoming a {{ invited_role }} for the proposed workshop titled, "{{ proposal_title }}", which is currently being organized by {{ organizers }}.
+          The organizing committee will be in touch regarding future steps if the proposal is successful.
+        </p>
+        <p>Sincerely,</p>
+        <p>The Banff International Research Station<br>
+        and the Organizing Committee</p>
+      HTML
+    }
+
+    invite_uncertain = {
+      title: 'Invite uncertain',
+      email_type: :invite_uncertain,
+      subject: 'Invite Uncertain',
+      body: <<~HTML
+        <p>Dear {{ person_name }}:</p>
+        <p>
+          Thank you for letting us know that you will may be able to participate in the proposed workshop, "{{ proposal_title }}", currently being
+          organized by  {{ lead_organizer }}.
+          We will send you soft remainder regarding this and hope you will join us in future.
+        </p>
+        <p>Sincerely,</p>
+        <p>Banff International Research Station</p>
+      HTML
+    }
+
+    templates = [invite_reminder, confirmation_of_interest, invite_uncertain]
+
+    templates.each do |template_hash|
+      next if EmailTemplate.exists?(email_type: template_hash[:email_type])
+
+      EmailTemplate.create(title: template_hash[:title],
+                           subject: template_hash[:subject],
+                           body: template_hash[:body],
+                           email_type: template_hash[:email_type],
+                           liquid_template: true)
+    end
   end
 end

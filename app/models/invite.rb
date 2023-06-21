@@ -60,7 +60,7 @@ class Invite < ApplicationRecord
     add_person
   end
 
-  def invited_as?
+  def humanize_invited_as
     invited_as == 'Organizer' ? 'Supporting Organizer' : 'Participant'
   end
 

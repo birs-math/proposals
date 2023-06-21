@@ -1,21 +1,22 @@
 module EmailTemplatesHelper
   def types_of_email
-    EmailTemplate.email_types.map do |k, _v|
+    EmailTemplate.email_types.map do |k, _|
+      first_word = k&.split('_')&.first&.capitalize
       [
-        case k&.split('_')&.first&.capitalize
+        case first_word
         when 'Revision'
           arr = k.split("_")
           if arr.second == 'spc'
-            "#{k&.split('_')&.first&.capitalize} SPC"
+            "#{first_word} SPC"
           else
-            k&.split('_')&.first&.capitalize
+            first_word
           end
         when 'Decision'
-          "#{k&.split('_')&.first&.capitalize} Email"
-        when 'Organizer' || 'Participant'
-          "#{k&.split('_')&.first&.capitalize} Invitation"
+          "#{first_word} Email"
+        when 'Organizer', 'Participant'
+          "#{first_word} Invitation"
         else
-          k&.split('_')&.first&.capitalize
+          k.humanize
         end, k
       ]
     end

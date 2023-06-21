@@ -34,7 +34,7 @@ RSpec.describe InviteMailer, type: :mailer do
       let(:email) { InviteMailer.with(invite: invite, body: body, lead_organizer: lead_organizer).invite_email }
 
       it "sends an invite_email" do
-        expect(email.subject).to eq("BIRS Proposal Invitation for #{invite.invited_as?}")
+        expect(email.subject).to eq("BIRS Proposal Invitation for #{invite.humanize_invited_as}")
       end
     end
 
@@ -43,7 +43,7 @@ RSpec.describe InviteMailer, type: :mailer do
       let(:email) { InviteMailer.with(invite: invite, body: body).invite_email }
 
       it "sends an invite_email" do
-        expect(email.subject).to eq("BIRS Proposal Invitation for #{invite.invited_as?}")
+        expect(email.subject).to eq("BIRS Proposal Invitation for #{invite.humanize_invited_as}")
       end
     end
   end
@@ -90,12 +90,12 @@ RSpec.describe InviteMailer, type: :mailer do
       let(:organizers) { invites.map(&:person).map(&:fullname).join(', ') }
       let(:email) { InviteMailer.with(invite: invite, organizers: organizers).invite_reminder }
       it "sends an invite reminder email" do
-        expect(email.subject).to eq("Please Respond – BIRS Proposal Invitation for #{invite.invited_as?}")
+        expect(email.subject).to eq("Please Respond – BIRS Proposal Invitation for #{invite.humanize_invited_as}")
       end
     end
 
     it "sends an invite reminder email" do
-      expect(email.subject).to eq("Please Respond – BIRS Proposal Invitation for #{invite.invited_as?}")
+      expect(email.subject).to eq("Please Respond – BIRS Proposal Invitation for #{invite.humanize_invited_as}")
     end
   end
 end

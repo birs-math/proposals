@@ -1,6 +1,6 @@
 class InviteMailer < ApplicationMailer
   def invited_as_text(invite)
-    return "a Supporting Organizer for" if invite.invited_as?.downcase.match?('organizer')
+    return "a Supporting Organizer for" if invite.humanize_invited_as.downcase.match?('organizer')
 
     "a Participant in"
   end
@@ -12,25 +12,32 @@ class InviteMailer < ApplicationMailer
 
     if params[:lead_organizer].present?
       @lead_organizer = params[:lead_organizer]
-      mail(to: @lead_organizer.email, subject: "BIRS Proposal Invitation for #{@invite.invited_as?}")
+      mail(to: @lead_organizer.email, subject: "BIRS Proposal Invitation for #{@invite.humanize_invited_as}")
     else
-      mail(to: @person.email, subject: "BIRS Proposal Invitation for #{@invite.invited_as?}")
+      mail(to: @person.email, subject: "BIRS Proposal Invitation for #{@invite.humanize_invited_as}")
     end
   end
 
   def invite_acceptance
-    @invite = params[:invite]
-    @existing_organizers = params[:organizers]
+    template = EmailTemplate.find_by(email_type: :confirmation_of_interest)
 
-    if @existing_organizers.present?
-      @existing_organizers.prepend(", ")
-      @existing_organizers = @existing_organizers.strip.delete_suffix(",")
-      @existing_organizers = @existing_organizers.sub(/.*\K,/, ' and')
-    end
-    @proposal = @invite.proposal
-    @person = @invite.person
+    invite = params[:invite]
+    proposal = invite.proposal
+    supporting_organizers = params[:organizers]
 
-    mail(to: @person.email, subject: t('invite_mailer.invite_acceptance.subject'))
+    supporting_organizers = ", #{supporting_organizers.sub(/.*\K,/, ' and')}" if supporting_organizers.present?
+
+    @context = {
+      person_name: invite.person&.fullname,
+      invited_role: invite.humanize_invited_as,
+      proposal_title: proposal.title,
+      organizers: "#{proposal.lead_organizer&.fullname}#{supporting_organizers}",
+    }
+
+    subject = template.render(:subject, context: @context)
+    @body = template.render(:body, context: @context)
+
+    mail(to: invite.email, subject: subject)
   end
 
   def invite_decline
@@ -42,24 +49,47 @@ class InviteMailer < ApplicationMailer
   end
 
   def invite_uncertain
-    @invite = params[:invite]
-    @proposal = @invite.proposal
-    @person = @invite.person
+    template = EmailTemplate.find_by(email_type: :invite_uncertain)
 
-    mail(to: @person.email, subject: t('invite_mailer.invite_uncertain.subject'))
+    invite = params[:invite]
+    proposal = invite.proposal
+
+    @context = {
+      person_name: invite.person&.fullname,
+      proposal_title: proposal.title,
+      lead_organizer: proposal.lead_organizer&.fullname
+    }
+
+    subject = template.render(:subject, context: @context)
+    @body = template.render(:body, context: @context)
+
+    mail(to: invite.email, subject: subject)
   end
 
   def invite_reminder
-    @invite = params[:invite]
-    @invited_as = invited_as_text(@invite)
-    @existing_organizers = params[:organizers]
+    template = EmailTemplate.find_by(email_type: :invite_reminder)
 
-    @existing_organizers.prepend(", ") if @existing_organizers.present?
-    @existing_organizers = @existing_organizers.sub(/.*\K,/, ' and') if @existing_organizers.present?
-    @proposal = @invite.proposal
-    @person = @invite.person
+    invite = params[:invite]
+    proposal = invite.proposal
+    supporting_organizers = params[:organizers]
 
-    mail(to: @person.email, subject: "Please Respond – BIRS Proposal Invitation for #{@invite.invited_as?}")
+    supporting_organizers = ", #{supporting_organizers.sub(/.*\K,/, ' and')}" if supporting_organizers.present?
+
+    @context = {
+      person_name: invite.person&.fullname,
+      invited_as: invited_as_text(invite),
+      proposal_type: proposal.proposal_type.name,
+      proposal_title: proposal.title,
+      organizers: "#{proposal.lead_organizer&.fullname}#{supporting_organizers}",
+      deadline_date: invite.deadline_date&.to_date,
+      invite_url: invite_url(code: invite.code),
+      invited_role: invite.humanize_invited_as
+    }
+
+    subject = template.render(:subject, context: @context)
+    @body = template.render(:body, context: @context)
+
+    mail(to: invite.email, subject: subject)
   end
 
   private
