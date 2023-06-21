@@ -194,23 +194,7 @@
                         <div class="mb-3">
                           <p><%= @proposal.proposal_form.introduction2&.html_safe %></p>
                         </div>
-                        <div>
-                          <h3>LaTeX Preamble</h3>
-                          <p>If you have custom LaTeX macros, enter them here to add them to the document preamble.</p>
-                          <div class="form-group mb-2">
-                            <%= f.text_area(:preamble, size: '5x5', class:'form-control', value: @proposal.preamble, disabled: action)%>
-                          </div>
-                        </div>
-                        <div class="form-group mb-3">
-                          <h3>Bibliography</h3>
-                          <p>If you have a LaTeX bibliography, please enter it in this field. It will be included when you click the "Print Proposal" button.</p>
-                          <div class="form-group mb-2">
-                            <%= f.text_area(:bibliography, size: '5x5', class:'form-control', value: @proposal.bibliography, disabled: action)%>
-                          </div>
-                        </div>
-                        <!-- <h4 class="tab-title">Common Fields</h4> -->
-                        <%= render partial: 'proposal_forms/proposal_fields', locals: { proposal_fields: common_proposal_fields(@proposal) } %>
-
+                        <%= render partial: 'proposals/form/fields', locals: { proposal: @proposal, form: f, disabled: action, no_latex: false } %>
                         <div class="row mt-20">&nbsp;</div>
                         <div class="d-flex">
                           <%= link_to "Print Proposal", rendered_proposal_proposal_path(@proposal.id, :format => :pdf), target: '_blank', class: 'me-auto p-2 btn btn-primary',
