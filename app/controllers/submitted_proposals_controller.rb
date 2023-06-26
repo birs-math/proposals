@@ -9,17 +9,19 @@ class SubmittedProposalsController < ApplicationController
                                                      reviews_excel_booklet]
 
   def index
+    @selected_year = params[:workshop_year] || Time.zone.today.year
+
     respond_to do |format|
       # loads initial page, but without proposals
       format.html do
-        @current_year = params[:workshop_year] || Date.today.year
         @proposal_types = ProposalType.distinct(:name).pluck(:name)
       end
       # loads proposals by type using turbo lazy loading
       format.turbo_stream do
-        @page = params[:page]
         @type = params[:proposal_type]
-        @pagy, @proposals = pagy(ProposalFiltersQuery.new(Proposal.order(:code, :created_at)).find(query_params), items: 10)
+        @pagy, @proposals = pagy(
+          ProposalFiltersQuery.new(Proposal.order(:code, :created_at)).find(query_params), items: 20
+        )
       end
     end
   end

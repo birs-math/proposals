@@ -3,25 +3,12 @@
   <div class="row pt-4">
     <div class="col"><h3><%= type %></h3></div>
   </div>
-  <div class="row border-bottom pb-4">
-      <div class="col-sm"></div>
-      <div class="col-sm">Code</div>
-      <div class="col-sm">Proposal Title</div>
-      <div class="col-sm">Proposal Type</div>
-      <div class="col-sm">Lead Organizer</div>
-      <div class="col-sm">Preferred Location</div>
-      <div class="col-sm">Assigned Location</div>
-      <div class="col-sm">Status</div>
-      <div class="col-sm">Outcome</div>
-      <div class="col-sm">Updated</div>
-      <div class="col-sm">Submitted to EditFlow</div>
-      <div class="col-sm">Actions</div>
-  </div>
-  <%= turbo_frame_tag "proposals_by_type_#{type}", src: submitted_proposals_path(format: :turbo_stream, page: params[:page], proposal_type: type, workshop_year: @current_year), loading: :lazy do %>
-    <div id="proposal_placeholders_for_<%= type %>">
+  <%= turbo_frame_tag "#{type}_proposal_headers" %>
+  <%= turbo_frame_tag "#{type}_proposals", src: submitted_proposals_path(format: :turbo_stream, page: params[:page], proposal_type: type, workshop_year: @selected_year), loading: :lazy do %>
+    <div id="<%= type %>_placeholders">
       <%= render partial: 'submitted_proposals/index/proposal_row_placeholder' %>
     </div>
   <% end %>
-  <%= turbo_frame_tag "proposals_pagination_for_#{type}" %>
+  <%= turbo_frame_tag "#{type}_pagination" %>
 </div>
 

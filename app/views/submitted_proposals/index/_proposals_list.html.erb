@@ -1,4 +1,4 @@
-<div class="col">
+<div class="col mb-4">
   <% @proposal_types.each do |type| %>
     <%= render partial: 'submitted_proposals/index/proposals_by_type', locals: { type: type } %>
   <% end %>
