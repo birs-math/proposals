@@ -1,4 +1,6 @@
 module ApplicationHelper
+  include Pagy::Frontend
+
   def active_menu(target_path)
     return 'active' if request.path == target_path
 

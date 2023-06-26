@@ -1,7 +1,6 @@
 class SubmittedProposalsController < ApplicationController
   before_action :authenticate_user!
   before_action :authorize_user
-  before_action :set_proposals, only: %i[index]
   before_action :set_proposal, except: %i[index download_csv import_reviews
                                           reviews_booklet reviews_excel_booklet booklet_log]
   before_action :template_params, only: %i[approve_decline_proposals]
@@ -9,7 +8,28 @@ class SubmittedProposalsController < ApplicationController
                                                      reviews_booklet
                                                      reviews_excel_booklet]
 
-  def index; end
+  def index
+    respond_to do |format|
+      # loads initial page, but without proposals
+      format.html do
+        @current_year = params[:workshop_year] || Date.today.year
+        @proposal_types = ProposalType.distinct(:name).pluck(:name)
+      end
+      # loads proposals by type using turbo lazy loading
+      format.turbo_stream do
+        @page = params[:page]
+        @type = params[:proposal_type]
+        @pagy, @proposals = pagy(ProposalFiltersQuery.new(Proposal.order(:code, :created_at)).find(query_params), items: 10)
+      end
+    end
+  end
+
+  def proposals_by_type
+    @type = params[:proposal_type]
+    @pagy, @proposals = pagy(ProposalFiltersQuery.new(Proposal.order(:code, :created_at)).find(params), items: 10)
+
+    respond_to { |format| format.turbo_stream }
+  end
 
   def show
     @proposal.review! if @proposal.may_review?
@@ -228,13 +248,13 @@ class SubmittedProposalsController < ApplicationController
 
   private
 
+  def query_params
+    params.permit(:workshop_year, :keywords, :subject_area, :proposal_type, :status, :location, :outcome)
+  end
+
   def selected_proposal_ids
     params.require(:proposal).permit(id: [])
   end
-
-  # def query_params?
-  #   params.values.any?(&:present?)
-  # end
 
   def outcome_location_params
     params.require(:proposal).permit(:outcome, :assigned_location_id, :assigned_size)
@@ -242,11 +262,6 @@ class SubmittedProposalsController < ApplicationController
 
   def email_params
     params.permit(:subject, :body, :cc_email, :bcc_email)
-  end
-
-  def set_proposals
-    @proposals = Proposal.order(:code, :created_at)
-    @proposals = ProposalFiltersQuery.new(@proposals).find(params)
   end
 
   def change_status

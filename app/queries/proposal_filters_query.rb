@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class ProposalFiltersQuery
+  EMPTY_YEAR = 'empty_year'
+
   def initialize(relation)
     @result = relation
   end
@@ -26,7 +28,9 @@ class ProposalFiltersQuery
   def filter_by_workshop_year(workshop_year)
     return @result if workshop_year.blank?
 
-    @result.search_proposal_year(workshop_year)
+    return @result.where(year: ['', nil]) if workshop_year == EMPTY_YEAR
+
+    @result.where(year: workshop_year)
   end
 
   def filter_by_subject_area(subject_area)
@@ -38,7 +42,7 @@ class ProposalFiltersQuery
   def filter_by_proposal_type(proposal_type)
     return @result if proposal_type.blank?
 
-    @result.search_proposal_type(proposal_type)
+    @result.joins(:proposal_type).where(proposal_type: { name: proposal_type })
   end
 
   def filter_by_status(statuses)

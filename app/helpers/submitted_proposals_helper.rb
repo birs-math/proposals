@@ -1,4 +1,9 @@
 module SubmittedProposalsHelper
+
+  def proposal_years
+    @proposal_years ||= Proposal.distinct.pluck(:year).reject(&:blank?).append(ProposalFiltersQuery::EMPTY_YEAR)
+  end
+
   def all_proposal_types
     ProposalType.all.map { |pt| [pt.name, pt.id] }
   end
