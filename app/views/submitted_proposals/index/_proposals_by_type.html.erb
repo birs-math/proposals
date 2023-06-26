@@ -1,10 +1,10 @@
 
 <div class="container container-lg m-0 p-0">
-  <div class="row pt-4">
+  <div class="row py-4">
     <div class="col"><h3><%= type %></h3></div>
   </div>
   <%= turbo_frame_tag "#{type}_proposal_headers" %>
-  <%= turbo_frame_tag "#{type}_proposals", src: submitted_proposals_path(format: :turbo_stream, page: params[:page], proposal_type: type, workshop_year: @selected_year), loading: :lazy do %>
+  <%= turbo_frame_tag "#{type}_proposals", src: submitted_proposals_path(format: :turbo_stream, page: params[:page], **@search_params.merge(proposal_type: type)), loading: :lazy do %>
     <div id="<%= type %>_placeholders">
       <%= render partial: 'submitted_proposals/index/proposal_row_placeholder' %>
     </div>

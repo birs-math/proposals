@@ -10,6 +10,7 @@ class SubmittedProposalsController < ApplicationController
 
   def index
     @selected_year = params[:workshop_year] || Time.zone.today.year
+    @search_params = query_params.merge(workshop_year: @selected_year)
 
     respond_to do |format|
       # loads initial page, but without proposals
@@ -24,13 +25,6 @@ class SubmittedProposalsController < ApplicationController
         )
       end
     end
-  end
-
-  def proposals_by_type
-    @type = params[:proposal_type]
-    @pagy, @proposals = pagy(ProposalFiltersQuery.new(Proposal.order(:code, :created_at)).find(params), items: 10)
-
-    respond_to { |format| format.turbo_stream }
   end
 
   def show
@@ -251,7 +245,7 @@ class SubmittedProposalsController < ApplicationController
   private
 
   def query_params
-    params.permit(:workshop_year, :keywords, :subject_area, :proposal_type, :status, :location, :outcome)
+    params.permit(:workshop_year, :keywords, :proposal_type, :location, :outcome, status: [], subject_area: [])
   end
 
   def selected_proposal_ids

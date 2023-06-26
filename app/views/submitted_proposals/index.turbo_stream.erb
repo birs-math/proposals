@@ -70,7 +70,7 @@
     <div class="row mb-2">
       <% if @pagy.next.present? %>
         <div class="col">
-          <%= link_to "Next", submitted_proposals_path(page: @pagy.next, proposal_type: @type, workshop_year: @selected_year), data: { turbo_stream: true }, class: " w-100 btn btn-primary" %>
+          <%= link_to "Next", submitted_proposals_path(page: @pagy.next, **@search_params), data: { turbo_stream: true }, class: " w-100 btn btn-primary" %>
         </div>
       <% end %>
     </div>

@@ -48,22 +48,18 @@ class ProposalFiltersQuery
   def filter_by_status(statuses)
     return @result if statuses.blank?
 
-    r = []
-    statuses.each do |status|
-      r << @result.search_proposal_status(status).sort_by { |p| p.code || '' }
-    end
-    @result = r.flatten
+    @result.where(status: statuses)
   end
 
   def filter_by_location(location)
     return @result if location.blank?
 
-    @result.search_proposal_location(location)
+    @result.joins(:locations).where(locations: { id: location })
   end
 
   def filter_by_outcome(outcome)
     return @result if outcome.blank?
 
-    @result.search_proposal_outcome(outcome)
+    @result.where(outcome: outcome)
   end
 end
