@@ -90,7 +90,7 @@ RSpec.feature "Proposal edit", type: :feature do
 
       it 'has disabled add participants buttons' do
         expect(page).to have_button('Invite Participant(s)', disabled: true)
-        expect(page).to have_button('Queue More Participant Invitations', disabled: true)
+        expect(page).to have_button(I18n.t('proposals.form.new_participants_invite'), disabled: true)
       end
     end
 
@@ -104,7 +104,7 @@ RSpec.feature "Proposal edit", type: :feature do
 
       it 'has add participants buttons' do
         expect(page).to have_button('Invite Participant(s)', disabled: false)
-        expect(page).to have_button('Queue More Participant Invitations', disabled: false)
+        expect(page).to have_button(I18n.t('proposals.form.new_participants_invite'), disabled: false)
       end
     end
   end
