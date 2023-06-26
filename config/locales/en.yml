@@ -48,7 +48,7 @@ en:
     form:
       add_organizers: 'Add Supporting Organizers:'
       add_participants: 'Add Participants:'
-      new_participants_invite: Queue More Participant Invitations
+      new_participants_invite: Click here to send out additional participant invitation
       new_organizers_invite: Click here to send out additional organizer invitation
       invite_participants: Invite Participant(s)
       invite_organizers: Invite Organizer(s)
