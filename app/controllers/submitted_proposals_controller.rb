@@ -27,6 +27,10 @@ class SubmittedProposalsController < ApplicationController
     end
   end
 
+  def demographic_data
+    @proposals = ProposalFiltersQuery.new(Proposal.order(:code, :created_at)).find(query_params).find_each
+  end
+
   def show
     @proposal.review! if @proposal.may_review?
     log_activity(@proposal)
