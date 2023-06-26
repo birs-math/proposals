@@ -6,7 +6,7 @@
       </h1>
       <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><%= link_to "Dashboard", dashboards_path %> </a></li>
+          <li class="breadcrumb-item"><%= link_to "Dashboard", dashboards_path %></li>
           <li class="breadcrumb-item active" aria-current="page"><%= link_to "Email Templates", email_templates_path %></li>
           <li class="breadcrumb-item active" aria-current="page">Show</li>
         </ol>
@@ -19,6 +19,11 @@
             <h2>Template Title: <em><%= @email_template.title.capitalize %></em></h2>
           </div>
           <div class="card-body">
+            <% if @email_template.liquid_template? %>
+              <div class="mb-3">
+                <h4><i class="align-middle fas fa-check-square"></i>&nbsp;This template uses liquid</h4>
+              </div>
+            <% end %>
             <div class="mb-3">
               <h4>Email Type: </h4>
               <label class="form-control"> <%= @email_template.email_type.split('_').map(&:capitalize).join(' ') %> </label>

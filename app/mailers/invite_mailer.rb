@@ -19,25 +19,13 @@ class InviteMailer < ApplicationMailer
   end
 
   def invite_acceptance
-    template = EmailTemplate.find_by(email_type: :confirmation_of_interest)
+    template = EmailTemplate.confirmation_of_interest.first
 
     invite = params[:invite]
-    proposal = invite.proposal
-    supporting_organizers = params[:organizers]
 
-    supporting_organizers = ", #{supporting_organizers.sub(/.*\K,/, ' and')}" if supporting_organizers.present?
+    liquid_email(template)
 
-    @context = {
-      person_name: invite.person&.fullname,
-      invited_role: invite.humanize_invited_as,
-      proposal_title: proposal.title,
-      organizers: "#{proposal.lead_organizer&.fullname}#{supporting_organizers}",
-    }
-
-    subject = template.render(:subject, context: @context)
-    @body = template.render(:body, context: @context)
-
-    mail(to: invite.email, subject: subject)
+    mail(to: invite.email, subject: @subject)
   end
 
   def invite_decline
@@ -49,47 +37,23 @@ class InviteMailer < ApplicationMailer
   end
 
   def invite_uncertain
-    template = EmailTemplate.find_by(email_type: :invite_uncertain)
+    template = EmailTemplate.invite_uncertain.first
 
     invite = params[:invite]
-    proposal = invite.proposal
 
-    @context = {
-      person_name: invite.person&.fullname,
-      proposal_title: proposal.title,
-      lead_organizer: proposal.lead_organizer&.fullname
-    }
+    liquid_email(template)
 
-    subject = template.render(:subject, context: @context)
-    @body = template.render(:body, context: @context)
-
-    mail(to: invite.email, subject: subject)
+    mail(to: invite.email, subject: @subject)
   end
 
   def invite_reminder
-    template = EmailTemplate.find_by(email_type: :invite_reminder)
+    template = EmailTemplate.invite_reminder.first
 
     invite = params[:invite]
-    proposal = invite.proposal
-    supporting_organizers = params[:organizers]
 
-    supporting_organizers = ", #{supporting_organizers.sub(/.*\K,/, ' and')}" if supporting_organizers.present?
+    liquid_email(template)
 
-    @context = {
-      person_name: invite.person&.fullname,
-      invited_as: invited_as_text(invite),
-      proposal_type: proposal.proposal_type.name,
-      proposal_title: proposal.title,
-      organizers: "#{proposal.lead_organizer&.fullname}#{supporting_organizers}",
-      deadline_date: invite.deadline_date&.to_date,
-      invite_url: invite_url(code: invite.code),
-      invited_role: invite.humanize_invited_as
-    }
-
-    subject = template.render(:subject, context: @context)
-    @body = template.render(:body, context: @context)
-
-    mail(to: invite.email, subject: subject)
+    mail(to: invite.email, subject: @subject)
   end
 
   private
@@ -108,5 +72,11 @@ class InviteMailer < ApplicationMailer
     placeholders.each { |k, v| @email_body.gsub!(k, v) }
     @proposal = @invite.proposal
     @person = @invite.person
+  end
+
+  def liquid_email(template)
+    @context = InviteMailerContext.call(params)
+    @subject = template.render(:subject, context: @context)
+    @body = template.render(:body, context: @context)
   end
 end

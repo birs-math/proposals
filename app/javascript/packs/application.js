@@ -14,6 +14,8 @@ import "@yaireo/tagify"
 import "@hotwired/turbo-rails"
 import "@rails/request.js"
 
+Turbo.session.drive = false
+
 import "../../../vendor/assets/javascripts/spark"
 
 import "../stylesheets/application"
