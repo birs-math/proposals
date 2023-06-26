@@ -46,9 +46,13 @@ class InviteMailerContext
   attr_accessor :organizers
 
   def organizers_to_s
-    self.organizers = ", #{organizers.sub(/.*\K,/, ' and')}" if organizers.present?
+    if organizers.is_a?(Array)
+      organizers.unshift(proposal.lead_organizer&.fullname).compact.join(', ')
+    elsif organizers.is_a?(String)
+      self.organizers = ", #{organizers.sub(/.*\K,/, ' and')}" if organizers.present?
 
-    "#{proposal.lead_organizer&.fullname}#{organizers}"
+      "#{proposal.lead_organizer&.fullname}#{organizers}"
+    end
   end
 
   def invited_as_text(invite)
