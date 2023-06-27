@@ -1,5 +1,5 @@
 <div class="text-center lead">
   <% proposal_years.each do |year| %>
-    <%= link_to year.upcase.gsub('_', ' '), submitted_proposals_path(workshop_year: year), class: "#{@selected_year == year ? '' : 'text-muted'}" %>
+    <%= link_to year.upcase.gsub('_', ' '), submitted_proposals_path(workshop_year: year), class: "#{@selected_year.to_s == year.to_s ? '' : 'text-muted'}" %>
   <% end %>
 </div>

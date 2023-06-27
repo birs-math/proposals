@@ -1,7 +1,7 @@
 module SubmittedProposalsHelper
 
   def proposal_years
-    @proposal_years ||= Proposal.distinct.pluck(:year).compact_blank.append(ProposalFiltersQuery::EMPTY_YEAR)
+    @proposal_years ||= Proposal.distinct.pluck(:year).compact_blank.sort.append(ProposalFiltersQuery::EMPTY_YEAR)
   end
 
   def all_proposal_types
