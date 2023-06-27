@@ -64,7 +64,7 @@ namespace :birs do
 
         <p><a href="{{ invite_url }}">{{ invite_url }}</a></p>
 
-        <p>Thank you for indicating your interest in this proposed workshop!</p>
+        <p>Thank you for indicating your interest in this proposed workshop!</p><br>
 
         <p>Banff International Research Station</p>
         <p>And the organizing committee.</p>
