@@ -68,7 +68,7 @@ class InvitesController < ApplicationController
 
   def invite_reminder
     if @invite.pending?
-      @organizers = @invite.proposal.supporting_organizers.map(&:fullname).join(', ')
+      @organizers = @invite.proposal.list_of_organizers.map(&:fullname)
       InviteMailer.with(invite: @invite, organizers: @organizers).invite_reminder.deliver_later
       check_user
     else
@@ -96,11 +96,10 @@ class InvitesController < ApplicationController
   end
 
   def cancel_confirmed_invite
-    ActiveRecord::Base.transaction do
-      @invite.proposal.proposal_roles.delete_by(person_id: @invite.person.id)
-      @invite.update_attribute(:status, 'cancelled')
-    end
-
+    @proposal_role = @invite.proposal.proposal_roles.find_by(person_id: @invite.person.id)
+    @proposal_role.destroy
+    @invite.skip_deadline_validation = true if @invite.deadline_date < Date.current
+    @invite.update(status: 'cancelled')
     if current_user.staff_member?
       redirect_to edit_submitted_proposal_url(@invite.proposal), notice: t('invites.cancel_confirmed_invite.success')
     else

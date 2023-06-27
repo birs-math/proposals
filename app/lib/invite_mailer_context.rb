@@ -13,7 +13,8 @@ class InviteMailerContext
     proposal_type: '',
     proposal_title: '',
     lead_organizer: '',
-    organizers: "Lead organizer + supporting organizers",
+    supporting_organizers: 'Organizers except lead organizer',
+    all_organizers: "Lead organizer + supporting organizers",
     deadline_date: '',
     invite_url: ''
   }.freeze
@@ -34,7 +35,8 @@ class InviteMailerContext
       proposal_type: proposal.proposal_type.name,
       proposal_title: proposal.title,
       lead_organizer: proposal.lead_organizer&.fullname,
-      organizers: organizers_to_s,
+      supporting_organizers: organizers.join(', '),
+      all_organizers: organizers.unshift(proposal.lead_organizer&.fullname).compact.join(', '),
       deadline_date: invite.deadline_date&.to_date,
       invite_url: invite_url(code: invite.code)
     }
@@ -44,16 +46,6 @@ class InviteMailerContext
 
   attr_reader :invite, :proposal
   attr_accessor :organizers
-
-  def organizers_to_s
-    if organizers.is_a?(Array)
-      organizers.unshift(proposal.lead_organizer&.fullname).compact.join(', ')
-    elsif organizers.is_a?(String)
-      self.organizers = ", #{organizers.sub(/.*\K,/, ' and')}" if organizers.present?
-
-      "#{proposal.lead_organizer&.fullname}#{organizers}"
-    end
-  end
 
   def invited_as_text(invite)
     return "a Supporting Organizer for" if invite.humanize_invited_as.downcase.match?('organizer')

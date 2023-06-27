@@ -57,7 +57,7 @@ namespace :birs do
       body: <<~HTML
         <p>Dear {{ person_name }}:</p>
         <p>
-          This is a friendly reminder to indicate your interest in being {{ invited_as }} a proposed {{ proposal_type }} titled “{{ proposal_title }}”, which is currently being organized by {{ organizers }}.
+          This is a friendly reminder to indicate your interest in being {{ invited_as }} a proposed {{ proposal_type }} titled “{{ proposal_title }}”, which is currently being organized by {{ all_organizers }}.
         </p>
 
         <p>Please indicate your interest in this proposal by following this link by {{ deadline_date }}:</p>
@@ -78,7 +78,7 @@ namespace :birs do
       body: <<~HTML
         <p>Dear {{ person_name }}:</p>
         <p>
-          Thank you for indicating your interest in becoming a {{ invited_role }} for the proposed workshop titled, "{{ proposal_title }}", which is currently being organized by {{ organizers }}.
+          Thank you for indicating your interest in becoming a {{ invited_role }} for the proposed workshop titled, "{{ proposal_title }}", which is currently being organized by {{ all_organizers }}.
           The organizing committee will be in touch regarding future steps if the proposal is successful.
         </p>
         <p>Sincerely,</p>
