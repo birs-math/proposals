@@ -149,6 +149,14 @@ ActiveRecord::Schema.define(version: 2023_05_30_113342) do
     t.index ["proposal_id"], name: "index_invites_on_proposal_id"
   end
 
+  create_table "latex_to_pdf_logs", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.text "log"
+    t.string "file_name"
+    t.string "mime_type"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
   create_table "locations", force: :cascade do |t|
     t.string "name"
     t.datetime "created_at", precision: 6, null: false
