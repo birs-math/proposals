@@ -25,20 +25,6 @@ class BookletPdfService
     multiple_proposals_fields(year) if @input == 'all'
   end
 
-  def self.format_errors(error)
-    @error_object = error.cause # RailsLatex::ProcessingError
-    @error_summary = @error_object.log.lines.last(20).join("\n")
-
-    save_error_messages
-
-    line_num = 1
-    @error_object.src.each_line do |line|
-      @error_output << (line_num.to_s + " #{line}")
-      line_num += 1
-    end
-    @error_output << "\n</pre>\n\n"
-  end
-
   private
 
   def save_error_messages
