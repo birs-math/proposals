@@ -48,33 +48,6 @@ class ProposalPdfService
     "#{@proposal.macros}\n\n\\begin{document}\n\n#{latex_infile}\n"
   end
 
-  def self.format_errors(error)
-    error_object = error.cause # RailsLatex::ProcessingError
-    error_summary = error_object.log.lines.last(20).join("\n")
-
-    error_output = "<h2 class=\"text-danger\">LaTeX Error Log:</h2>\n\n"
-    error_output << "<h4>Last 20 lines:</h4>\n\n"
-    error_output << "<pre>\n#{error_summary}\n</pre>\n\n"
-    error_output << %q(
-      <button class="btn btn-primary mb-4 latex-show-more" type="button"
-                     data-bs-toggle="collapse" data-bs-target="#latex-error"
-                     aria-expanded="false" aria-controls="latex-error">
-              Show full error log
-      </button>')
-    error_output << "<pre class=\"collapse\" id=\"latex-error\">\n"
-    error_output << "#{error_object.log}\n</pre>\n\n"
-
-    error_output << "<h2 class=\"text-danger p-4\">LaTeX Source File:</h2>\n\n"
-    error_output << "<pre id=\"latex-source\">\n"
-
-    line_num = 1
-    error_object.src.each_line do |line|
-      error_output << (line_num.to_s + " #{line}")
-      line_num += 1
-    end
-    error_output << "\n</pre>\n\n"
-  end
-
   private
 
   def all_proposal_fields

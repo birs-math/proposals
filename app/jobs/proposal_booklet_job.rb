@@ -15,7 +15,8 @@ class ProposalBookletJob < ApplicationJob
     )
   rescue ActionView::Template::Error => e
     Rails.logger.info { "\n\nLaTeX error:\n #{e.message}\n\n" }
-    log = create_log_record(e.cause)
+
+    log = CreatePdfToLatexLog.call(temp_file, error: e.cause)
     ProposalBookletChannel.broadcast_to(current_user, { alert: e.message, log_id: log.id })
   end
 
@@ -84,9 +85,5 @@ class ProposalBookletJob < ApplicationJob
 
   def read_temp_file
     File.read("#{Rails.root}/tmp/#{temp_file}")
-  end
-
-  def create_log_record(error)
-    LatexToPdfLog.create(log: error.log.lines.last(20).join("\n"), file_name: temp_file)
   end
 end
