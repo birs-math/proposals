@@ -23,7 +23,7 @@ Rails.application.routes.draw do
       post :send_to_workshop
       post :proposals_booklet
       get :download_booklet
-      get :download_file
+      get :download_log_file
       post :edit_flow
       post :revise_proposal_editflow
       post :approve_decline_proposals

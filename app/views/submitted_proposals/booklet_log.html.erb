@@ -9,7 +9,7 @@
           <%= simple_format(@log.log) %>
         </div>
         <div class="row">
-        <%= link_to "Source file", download_file_submitted_proposals_path(log_id: @log) %>
+        <%= link_to "Source file", download_log_file_submitted_proposals_path(log_id: @log) %>
         </div>
       </div>
     </div>
