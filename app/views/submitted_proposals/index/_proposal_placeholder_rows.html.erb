@@ -1,5 +1,6 @@
+<% count = local_assigns.has_key?(:rows) ? local_assigns.fetch(:rows) : 5 %>
 <div id="<%= type %>_placeholders">
-  <% 5.times do %>
+  <% count.times do %>
     <%= render partial: 'submitted_proposals/index/proposal_placeholder' %>
   <% end %>
 </div>

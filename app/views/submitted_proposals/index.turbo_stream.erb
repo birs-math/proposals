@@ -41,13 +41,13 @@
           <%= link_to '<i class="align-middle fas fa-fw fa-pen"></i>Edit<br>'.html_safe, edit_submitted_proposal_url(proposal), class: 'text-muted', data: { turbo: false } %>
           <%= link_to '<i class="align-middle fas fa-fw fa-eye"></i>Show<br>'.html_safe, submitted_proposal_url(proposal), class: 'text-muted', data: { turbo: false } %>
           <%= link_to '<i class="align-middle mr-2 fas fa-fw fa-clone"></i>Versions<br>'.html_safe, versions_proposal_url(proposal), class: 'text-muted', data: { turbo: false } %>
-          <%= link_to '<i class="align-middle fas fa-fw fa-trash" data-toggle="tooltip" title="Delete<br>" ></i>Delete<br>'.html_safe, submitted_proposal_url(proposal), method: :delete , data: {confirm: "Are you sure you want to delete this proposal?"}, class: 'text-muted' %>
+          <%= link_to '<i class="align-middle fas fa-fw fa-trash" data-toggle="tooltip" title="Delete"></i>Delete<br>'.html_safe, submitted_proposal_url(proposal), method: :delete , data: {confirm: "Are you sure you want to delete this proposal?"}, class: 'text-muted' %>
           <%= link_to '<i class="align-middle mr-2 fas fa-fw fa-file"></i>Reviews<br>'.html_safe, reviews_submitted_proposal_path(proposal), class: 'text-muted', data: { turbo: false } %>
         </div>
       </div>
     <% end %>
     <% if @pagy.next.present? %>
-      <%= render partial: 'submitted_proposals/index/proposal_placeholder_rows', locals: { type: @type } %>
+      <%= render partial: 'submitted_proposals/index/proposal_placeholder_rows', locals: { type: @type, rows: 1 } %>
     <% end %>
   <% end %>
 
