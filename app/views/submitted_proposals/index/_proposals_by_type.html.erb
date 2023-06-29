@@ -20,11 +20,7 @@
   <% end %>
 
   <%= turbo_frame_tag "#{type}_proposals", src: submitted_proposals_path(format: :turbo_stream, page: params[:page], **@search_params.merge(proposal_type: type)), loading: :lazy do %>
-    <div id="<%= type %>_placeholders">
-      <% 5.times do %>
-        <%= render partial: 'submitted_proposals/index/proposal_placeholder' %>
-      <% end %>
-    </div>
+    <%= render partial: 'submitted_proposals/index/proposal_placeholder_rows', locals: { type: type } %>
   <% end %>
 
   <%= turbo_frame_tag "#{type}_pagination" %>

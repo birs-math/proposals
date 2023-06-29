@@ -47,4 +47,8 @@ module ApplicationHelper
       6 => 'six', 7 => 'seven', 8 => 'eight', 9 => 'nine', 10 => 'ten'
     }
   end
+
+  def turbo_stream_flash
+    turbo_stream.prepend "flash", partial: "layouts/toastr"
+  end
 end

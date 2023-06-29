@@ -1,15 +1,17 @@
-<% if flash.any? %>
-  <!-- flash messages -->
-  <script type="text/javascript">
-    <% flash.each do |key, value| %>
+<div id="flash">
+  <% if flash.any? %>
+    <!-- flash messages -->
+    <script type="text/javascript">
+      <% flash.each do |key, value| %>
       <% type = key.to_s.gsub('alert', 'error').gsub('notice', 'success') %>
-        <% if value.respond_to?(:each) %>
-          <% value&.each do |msg| %>
-            toastr.<%= type %>('<%= msg %>')
-          <% end %>
-        <% else %>
-          toastr.<%= type %>('<%= value %>')
-        <% end %>
-    <% end %>
-  </script>
-<% end %>
+      <% if value.respond_to?(:each) %>
+      <% value&.each do |msg| %>
+      toastr.<%= type %>('<%= msg %>')
+      <% end %>
+      <% else %>
+      toastr.<%= type %>('<%= value %>')
+      <% end %>
+      <% end %>
+    </script>
+  <% end %>
+</div>

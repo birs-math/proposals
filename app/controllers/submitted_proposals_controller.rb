@@ -120,6 +120,7 @@ class SubmittedProposalsController < ApplicationController
                     notice: t('submitted_proposals.destroy.success')
       end
       format.json { head :no_content }
+      format.turbo_stream { flash.now[:notice] = t('submitted_proposals.destroy.success') }
     end
   end
 

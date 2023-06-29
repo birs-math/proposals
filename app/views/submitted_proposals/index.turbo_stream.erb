@@ -3,7 +3,7 @@
 <% if @proposals.present? %>
   <%= turbo_stream.append "#{@type}_proposals" do %>
     <% @proposals&.each do |proposal| %>
-      <div class="row border-bottom mb-3 align-items-center small">
+      <div class="row border-bottom mb-3 align-items-center small" id="proposal-row-<%= proposal.id %>">
         <div class="col-xl col-sm-12">
           <input type="checkbox" name="reviewed" data-action="click->submitted-proposals#storeID" id="<%= proposal.id %>_checkbox" class="proposals-checkboxes" data-value="<%= proposal.id %>">
         </div>
@@ -37,27 +37,28 @@
         <div class="col-xl col-sm-12 py-sm-1"><%= proposal.updated_at.to_date %></div>
         <div class="col-xl col-sm-12 py-sm-1"><%= proposal&.edit_flow&.to_date %></div>
         <div class="col-xl col-sm-12 py-sm-1">
-          <%= link_to '<i class="align-middle fas fa-fw fa-print"></i>PDF<br>'.html_safe, rendered_proposal_proposal_path(proposal.id, :format => :pdf), target: '_blank', class: 'text-muted' %>
-          <%= link_to '<i class="align-middle fas fa-fw fa-pen"></i>Edit<br>'.html_safe, edit_submitted_proposal_url(proposal), class: 'text-muted' %>
-          <%= link_to '<i class="align-middle fas fa-fw fa-eye"></i>Show<br>'.html_safe, submitted_proposal_url(proposal), class: 'text-muted' %>
-          <%= link_to '<i class="align-middle mr-2 fas fa-fw fa-clone"></i>Versions<br>'.html_safe, versions_proposal_url(proposal), class: 'text-muted' %>
-          <%= link_to '<i class="align-middle fas fa-fw fa-trash" data-toggle="tooltip" title="Delete<br>" ></i>Delete<br>'.html_safe,submitted_proposal_url(proposal), method: :delete , data: {confirm: "Are you sure you want to delete this proposal?"}, class: 'text-muted' %>
-          <%= link_to '<i class="align-middle mr-2 fas fa-fw fa-file"></i>Reviews<br>'.html_safe, reviews_submitted_proposal_path(proposal), class: 'text-muted' %>
+          <%= link_to '<i class="align-middle fas fa-fw fa-print"></i>PDF<br>'.html_safe, rendered_proposal_proposal_path(proposal.id, :format => :pdf), target: '_blank', class: 'text-muted', data: { turbo: false } %>
+          <%= link_to '<i class="align-middle fas fa-fw fa-pen"></i>Edit<br>'.html_safe, edit_submitted_proposal_url(proposal), class: 'text-muted', data: { turbo: false } %>
+          <%= link_to '<i class="align-middle fas fa-fw fa-eye"></i>Show<br>'.html_safe, submitted_proposal_url(proposal), class: 'text-muted', data: { turbo: false } %>
+          <%= link_to '<i class="align-middle mr-2 fas fa-fw fa-clone"></i>Versions<br>'.html_safe, versions_proposal_url(proposal), class: 'text-muted', data: { turbo: false } %>
+          <%= link_to '<i class="align-middle fas fa-fw fa-trash" data-toggle="tooltip" title="Delete<br>" ></i>Delete<br>'.html_safe, submitted_proposal_url(proposal), method: :delete , data: {confirm: "Are you sure you want to delete this proposal?"}, class: 'text-muted' %>
+          <%= link_to '<i class="align-middle mr-2 fas fa-fw fa-file"></i>Reviews<br>'.html_safe, reviews_submitted_proposal_path(proposal), class: 'text-muted', data: { turbo: false } %>
         </div>
       </div>
+    <% end %>
+    <% if @pagy.next.present? %>
+      <%= render partial: 'submitted_proposals/index/proposal_placeholder_rows', locals: { type: @type } %>
     <% end %>
   <% end %>
 
   <%= turbo_stream.update "#{@type}_pagination" do %>
-    <div class="row mb-2">
-      <% if @pagy.next.present? %>
-        <%= turbo_stream.replace "#{@type}_pagination" do %>
-          <%= turbo_frame_tag "#{@type}_pagination", src: submitted_proposals_path(page: @pagy.next, format: "turbo_stream", **@search_params), loading: "lazy" %>
-        <% end %>
+    <% if @pagy.next.present? %>
+      <%= turbo_stream.replace "#{@type}_pagination" do %>
+        <%= turbo_frame_tag "#{@type}_pagination", src: submitted_proposals_path(page: @pagy.next, format: :turbo_stream, **@search_params), loading: :lazy %>
       <% end %>
-    </div>
+    <% end %>
     <div class="row">
-      <p class="text-center"><%= pagy_info @pagy %></p>
+      <p class="text-center"><%== pagy_info @pagy %></p>
     </div>
   <% end %>
 <% else %>
