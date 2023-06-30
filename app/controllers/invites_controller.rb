@@ -68,7 +68,7 @@ class InvitesController < ApplicationController
 
   def invite_reminder
     if @invite.pending?
-      @organizers = @invite.proposal.supporting_organizers
+      @organizers = @invite.proposal.supporting_organizers.map(&:fullname).join(', ')
       InviteMailer.with(invite: @invite, organizers: @organizers.to_a).invite_reminder.deliver_later
       check_user
     else
