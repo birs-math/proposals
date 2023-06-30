@@ -92,7 +92,7 @@
                   </div>
 
                   <div class="tab-pane" id="tab-2" role="tabpanel">
-                    <%= turbo_frame_tag "proposals_demographic_data", src: demographic_data_submitted_proposals_path(format: :turbo_stream, **@search_params.except(:proposal_type)), loading: :lazy %>
+                    <%= turbo_frame_tag "proposals_demographic_data", src: demographic_data_submitted_proposals_path(format: :turbo_stream, **@search_params.slice(:workshop_year)), loading: :lazy %>
                   </div>
                 </div>
               </div>
