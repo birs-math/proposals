@@ -192,21 +192,21 @@ RSpec.describe ProposalsHelper, type: :helper do
     context "when status is yes or may be" do
       let(:invite) { create(:invite, response: 'yes') }
       it "changes the color of response" do
-        invite_response_color(invite.response)
+        invite_response_color(invite.response, invite.status)
         expect(response).to have_http_status(:ok)
       end
     end
     context "when status is no" do
       let(:invite) { create(:invite, response: 'no') }
       it "changes the color of response" do
-        invite_response_color(invite.response)
+        invite_response_color(invite.response, invite.status)
         expect(response).to have_http_status(:ok)
       end
     end
     context "when status is nil" do
       let(:invite) { create(:invite, response: nil) }
       it "changes the color of response" do
-        invite_response_color(invite.response)
+        invite_response_color(invite.response, invite.status)
         expect(response).to have_http_status(:ok)
       end
     end

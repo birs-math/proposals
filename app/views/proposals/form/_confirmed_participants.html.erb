@@ -1,8 +1,8 @@
 <div class="mt-4">
   <div class="mb-3">
-    <% unless @proposal.confirmed_participants.blank? %>
+    <% unless @proposal.participants.blank? %>
       <h3 class="form-section">Confirmed Participants:</h3>
-      <%= render partial: 'proposals/confirm_participant', locals: { confirmed_participants: @proposal.confirmed_participants } %>
+      <%= render partial: 'proposals/confirm_participant', locals: { confirmed_participants: @proposal.participants } %>
     <% end %>
   </div>
 </div>

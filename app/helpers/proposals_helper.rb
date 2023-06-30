@@ -96,13 +96,6 @@ module ProposalsHelper
     numbers_to_words[proposal.max_supporting_organizers]
   end
 
-  def existing_organizers(invite)
-    organizers = invite.proposal.list_of_organizers
-                       .remove(invite.person&.fullname)
-    organizers.prepend(" and ") if organizers.present?
-    organizers.strip.delete_suffix(",")
-  end
-
   def invite_status(response, status)
     return "Invite has been cancelled" if status == 'cancelled'
 
@@ -141,8 +134,10 @@ module ProposalsHelper
     proposals[status]
   end
 
-  def invite_response_color(status)
-    case status
+  def invite_response_color(response, status)
+    return 'text-danger' if status == 'cancelled'
+
+    case response
     when "yes"
       "text-success"
     when "maybe"

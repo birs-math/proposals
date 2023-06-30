@@ -124,11 +124,11 @@ class ProposalPdfService
   end
 
   def confirmed_organizers
-    proposal.invites.where(status: "confirmed", invited_as: "Organizer")
+    @confirmed_organizers ||= proposal.supporting_organizer_invites
   end
 
   def confirmed_participants
-    proposal.invites.where(status: "confirmed", invited_as: "Participant")
+    @confirmed_participants ||= proposal.participant_invites
   end
 
   def remove_organizers_from_participants
@@ -171,7 +171,7 @@ class ProposalPdfService
     end
     @text << "\\begin{itemize}\n"
     proposal.supporting_organizers.each do |organizer|
-      @text << "\\item #{organizer&.person&.fullname}#{affil(organizer&.person)}\n"
+      @text << "\\item #{organizer.fullname}#{affil(organizer)}\n"
     end
     @text << "\\end{itemize}\n\n"
   end
@@ -273,7 +273,7 @@ class ProposalPdfService
   end
 
   def participant_list(career)
-    @participants = proposal.confirmed_participants
+    @participants = proposal.participants
     return '' if @participants.blank?
 
     text = "\\begin{enumerate}\n\n"
@@ -284,16 +284,15 @@ class ProposalPdfService
   end
 
   def participant_careers
-    careers = Person.where(id: @proposal.participants
-                    .pluck(:person_id)).pluck(:academic_status)
+    careers = @proposal.participants.pluck(:academic_status)
+
     return [] if careers.blank?
 
-    careers.delete(nil)
     careers.uniq.sort
   end
 
   def proposal_participants
-    return if proposal.participants&.count&.zero?
+    return if proposal.participant_invites&.count&.zero?
 
     @careers = participant_careers
     @text << "\\section*{Participants}\n\n"
@@ -335,7 +334,6 @@ class ProposalPdfService
 
   def proposal_organizing_committee
     @text << "\\section*{\\centering Organizing Committee}\n\n"
-    confirmed_organizer
     @text << "\\subsection*{A) Early-Career Researcher}\n\n"
     organizer_early_career
     @text << "\\subsection*{B) Under represented in STEM}"
@@ -343,13 +341,8 @@ class ProposalPdfService
     @text
   end
 
-  def confirmed_organizer
-    @confirmed_organizers = proposal.invites.where(status: "confirmed",
-                                                   invited_as: "Organizer")
-  end
-
   def organizer_early_career
-    @confirmed_organizers&.each do |organizer|
+    confirmed_organizers&.each do |organizer|
       @person = organizer&.person
       next unless @person.academic_status.present? || @person.academic_status == "Post Doctoral"
 
@@ -367,7 +360,7 @@ class ProposalPdfService
   end
 
   def organizer_represented_stem
-    @confirmed_organizers&.each do |organizer|
+    confirmed_organizers&.each do |organizer|
       result = organizer.person&.demographic_data&.result
       next if result.nil? || result["stem"] == "Prefer not to answer"
 
@@ -404,11 +397,10 @@ class ProposalPdfService
   def set_confirmed_invitations
     # due to earlier bugs, there can be more than one confirmed invitation for
     # the same person in a proposal, so use the newest one for each person
-    @confirmed_invitations = proposal.invites.where(status: "confirmed")
-                                     .order(:id).uniq(&:person_id)
+    @confirmed_invitations = proposal.invites.where(status: "confirmed").order(:id).uniq(&:person_id)
 
     # add the Lead Organizer, who has no invitation
-    @confirmed_invitations << Invite.new(person: @proposal.lead_organizer)
+    @confirmed_invitations << Invite.new(person: proposal.lead_organizer)
   end
 
   def number_of_indigenous

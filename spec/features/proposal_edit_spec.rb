@@ -55,11 +55,11 @@ RSpec.feature "Proposal edit", type: :feature do
     create(:invite, proposal: proposal, status: 'confirmed', invited_as: 'Organizer')
     proposal.reload
 
-    expect(proposal.supporting_organizers).not_to be_empty
+    expect(proposal.supporting_organizer_invites).not_to be_empty
 
     visit edit_proposal_path(proposal)
 
-    proposal.supporting_organizers.each do |invite|
+    proposal.supporting_organizer_invites.each do |invite|
       shows_person_info(invite.person)
     end
   end

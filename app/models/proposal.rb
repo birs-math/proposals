@@ -152,17 +152,7 @@ class Proposal < ApplicationRecord
   end
 
   def demographics_data
-    @demographic_data ||= DemographicData
-      .where(person_id: invites.where(invited_as: 'Participant')
-      .pluck(:person_id))
-  end
-
-  def invites_demographic_data
-    # persons can have multiple confirmed invites
-    # for persons with more than one demo data record, use the latest one
-    DemographicData.where(person_id: invites.where(status: 'confirmed')
-                   .pluck(:person_id).uniq).order(:id)
-                   .index_by(&:person_id).values
+    @demographics_data ||= DemographicData.where(person_id: participant_invites.pluck(:person_id))
   end
 
   def create_organizer_role(person, organizer)
@@ -173,41 +163,40 @@ class Proposal < ApplicationRecord
     proposal_roles.joins(:role).includes(:person).find_by(roles: { name: 'lead_organizer'})&.person
   end
 
-  def the_locations
+  def location_names
     locations.pluck(:name).join(', ')
   end
 
-  def list_of_organizers
-    invites.where(invites: { invited_as: 'Organizer', status: 'confirmed' }).map(&:person)
-           .map(&:fullname).join(', ')
-  end
-
   def supporting_organizers
-    invites.where(invited_as: 'Organizer').where(response: %w[yes maybe])
+    Person.where(id: supporting_organizer_invites.pluck(:person_id))
   end
 
   def participants
-    invites.where(invited_as: 'Participant').where(response: %w[yes maybe])
+    Person.where(id: participant_invites.pluck(:person_id))
   end
 
-  def confirmed_participants
-    invites.where(status: 1, invited_as: "Participant").map(&:person)
+  def supporting_organizer_invites
+    invites.confirmed.organizer
+  end
+
+  def participant_invites
+    invites.confirmed.participant
   end
 
   def self.supporting_organizer_fullnames(proposal)
-    proposal&.supporting_organizers&.map { |org| "#{org.firstname} #{org.lastname}" }&.join(', ')
+    proposal&.supporting_organizer_invites&.map { |org| "#{org.firstname} #{org.lastname}" }&.join(', ')
   end
 
   def self.participants_fullnames(proposal)
-    proposal&.participants&.map { |org| "#{org.firstname} #{org.lastname}" }&.join(', ')
+    proposal&.participant_invites&.map { |org| "#{org.firstname} #{org.lastname}" }&.join(', ')
   end
 
   def self.participants_emails(proposal)
-    proposal&.participants&.map { |org| "#{org.email}" }&.join(', ')
+    proposal&.participant_invites&.map(&:email)&.join(', ')
   end
 
   def self.supporting_organizer_emails(proposal)
-    proposal&.supporting_organizers&.map { |org| "#{org.email}" }&.join(', ')
+    proposal&.supporting_organizer_invites&.map(&:email)&.join(', ')
   end
 
   def self.to_csv(proposals)
@@ -228,7 +217,7 @@ class Proposal < ApplicationRecord
 
   def self.each_row(proposal)
     [proposal&.code, proposal&.title, proposal&.proposal_type&.name,
-     proposal&.the_locations, proposal&.assigned_location&.name, proposal&.status, proposal&.outcome,
+     proposal&.location_names, proposal&.assigned_location&.name, proposal&.status, proposal&.outcome,
      proposal&.updated_at&.to_date, proposal&.edit_flow&.to_date,
      proposal&.subject&.title, proposal&.lead_organizer&.fullname,
      proposal&.lead_organizer&.email, supporting_organizer_fullnames(proposal),
@@ -343,6 +332,7 @@ class Proposal < ApplicationRecord
     return if code.present?
 
     tc = proposal_type.code || 'xx'
+
     self.code = year.to_s[-2..] + tc + next_number
   end
 
