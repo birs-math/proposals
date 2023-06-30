@@ -21,7 +21,6 @@ class InviteMailerContext
 
   def initialize(params)
     @invite = params[:invite]
-    @organizers = params[:organizers].dup
     @proposal = invite.proposal
   end
 
@@ -35,8 +34,8 @@ class InviteMailerContext
       proposal_type: proposal.proposal_type.name,
       proposal_title: proposal.title,
       lead_organizer: proposal.lead_organizer&.fullname,
-      supporting_organizers: organizers.join(', '),
-      all_organizers: organizers.unshift(proposal.lead_organizer&.fullname).compact.join(', '),
+      supporting_organizers: supporting_organizers.join(', '),
+      all_organizers: supporting_organizers.unshift(proposal.lead_organizer&.fullname).compact.join(', '),
       deadline_date: invite.deadline_date&.to_date,
       invite_url: invite_url(code: invite.code)
     }
@@ -45,7 +44,10 @@ class InviteMailerContext
   private
 
   attr_reader :invite, :proposal
-  attr_accessor :organizers
+
+  def supporting_organizers
+    @supporting_organizers ||= invite.proposal.supporting_organizers.map(&:fullname)
+  end
 
   def invited_as_text(invite)
     return "a Supporting Organizer for" if invite.humanize_invited_as.downcase.match?('organizer')
