@@ -20,15 +20,13 @@ class SubmittedProposalsController < ApplicationController
       # loads proposals by type using turbo lazy loading
       format.turbo_stream do
         @type = params[:proposal_type]
-        @pagy, @proposals = pagy(
-          ProposalFiltersQuery.new(Proposal.order(:code, :created_at)).find(query_params), items: 20
-        )
+        @pagy, @proposals = pagy(proposals_query_with_filters, items: 20)
       end
     end
   end
 
   def demographic_data
-    @proposals = ProposalFiltersQuery.new(Proposal.order(:code, :created_at)).find(query_params).find_each
+    @proposals = proposals_query_with_filters.find_each
   end
 
   def show
@@ -248,6 +246,10 @@ class SubmittedProposalsController < ApplicationController
   end
 
   private
+
+  def proposals_query_with_filters
+    ProposalFiltersQuery.new(Proposal.order(:code, :created_at)).find(query_params)
+  end
 
   def query_params
     params.permit(:workshop_year, :keywords, :proposal_type, :location, :outcome, status: [], subject_area: [])
