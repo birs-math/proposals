@@ -160,14 +160,6 @@ RSpec.describe Proposal, type: :model do
     end
   end
 
-  describe '#invites_demographic_data' do
-    let(:invite) { create(:invite, status: 'confirmed') }
-
-    it 'returns demographicData' do
-      expect(proposal.invites_demographic_data).to eq([])
-    end
-  end
-
   describe '#birs_email' do
     it do
       expect(proposal.birs_emails).to eq(%w[birs-director@birs.ca birs@birs.ca])
