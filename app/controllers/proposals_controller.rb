@@ -144,8 +144,10 @@ class ProposalsController < ApplicationController
     flash[:alert] = "There are errors in your LaTeX code. Please see the
                         output from the compiler, and the LaTeX document,
                         below".squish
-    error_output = ProposalPdfService.format_errors(e)
-    render layout: "latex_errors", inline: error_output.to_s, formats: [:html]
+
+    log = CreatePdfToLatexLog.call(latex_temp_file, error: e.cause)
+
+    redirect_to booklet_log_submitted_proposals_path(log_id: log.id)
   end
 
   def set_careers
