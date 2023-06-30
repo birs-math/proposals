@@ -284,7 +284,7 @@ class ProposalPdfService
   end
 
   def participant_careers
-    careers = @proposal.participants.pluck(:academic_status)
+    careers = @proposal.participants.pluck(:academic_status).compact
 
     return [] if careers.blank?
 
