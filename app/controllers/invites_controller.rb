@@ -33,13 +33,16 @@ class InvitesController < ApplicationController
   end
 
   def invite_email
-    @inviters = if params[:id].eql?("0")
-                  Invite.where(proposal_id: @proposal.id, invited_as: params[:invited_as])
+    inviters = if params[:id].eql?("0")
+                 Invite.where(proposal_id: @proposal.id, invited_as: params[:invited_as])
                 else
                   Invite.where(proposal_id: @proposal.id, invited_as: params[:invited_as]).where('id > ?', params[:id])
                 end
 
-    send_invite_emails
+    inviters.each do |invite|
+      InviteMailer.with(invite: invite, lead_organizer_copy: false, invited_as: params[:invited_as]).invite_email.deliver_later
+      InviteMailer.with(invite: invite, lead_organizer_copy: true, invited_as: params[:invited_as]).invite_email.deliver_later
+    end
 
     head :ok
   end
@@ -162,15 +165,6 @@ class InvitesController < ApplicationController
   def invite_params
     params.require(:invite).permit(:firstname, :lastname, :email, :invited_as,
                                    :deadline_date)
-  end
-
-  def send_invite_emails
-    @email_body = params[:body]
-    @inviters.each do |invite|
-      InviteMailer.with(invite: invite, body: @email_body).invite_email.deliver_later
-      InviteMailer.with(invite: invite, lead_organizer: @proposal.lead_organizer,
-                        body: @email_body).invite_email.deliver_later
-    end
   end
 
   def send_email_on_response

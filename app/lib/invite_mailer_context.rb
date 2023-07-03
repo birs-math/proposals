@@ -4,24 +4,29 @@ class InviteMailerContext
   include Callable
   include Rails.application.routes.url_helpers
 
-  CONTEXT_VARS = {
-    person_name: 'Firstname + Lastname',
-    person_firstname: '',
-    person_lastname: '',
-    invited_as: '"a Supporting Organizer for" or "a Participant in"',
-    invited_role: '"Participant" or "Supporting organizer"',
-    proposal_type: '',
-    proposal_title: '',
-    lead_organizer: '',
-    supporting_organizers: 'Organizers except lead organizer',
-    all_organizers: "Lead organizer + supporting organizers",
-    deadline_date: '',
-    invite_url: ''
-  }.freeze
+  class << self
+    def placeholders
+      {
+        person_name: '[Firstname Lastname]',
+        person_firstname: '[Firstname]',
+        person_lastname: '[Lastname]',
+        invited_as: '[a Supporting Organizer for/a Participant in]',
+        invited_role: '[Participant/Supporting Organizer]',
+        proposal_type: '[Proposal type]',
+        proposal_title: '[Proposal title]',
+        lead_organizer: '[Lead organizer]',
+        supporting_organizers: '[Supporting organizers]',
+        all_organizers: "[Lead organizer and Supporting organizers]",
+        deadline_date: '[Invitation deadline]',
+        invite_url: '[Invite URL]'
+      }.freeze
+    end
+  end
 
   def initialize(params)
     @invite = params[:invite]
     @proposal = invite.proposal
+    @params = params
   end
 
   def call
@@ -37,13 +42,13 @@ class InviteMailerContext
       supporting_organizers: supporting_organizers.join(', '),
       all_organizers: supporting_organizers.unshift(proposal.lead_organizer&.fullname).compact.join(', '),
       deadline_date: invite.deadline_date&.to_date,
-      invite_url: invite_url(code: invite.code)
+      invite_url: safe_invite_url
     }
   end
 
   private
 
-  attr_reader :invite, :proposal
+  attr_reader :invite, :proposal, :params
 
   def supporting_organizers
     @supporting_organizers ||= invite.proposal.supporting_organizers.map(&:fullname)
@@ -53,5 +58,12 @@ class InviteMailerContext
     return "a Supporting Organizer for" if invite.humanize_invited_as.downcase.match?('organizer')
 
     "a Participant in"
+  end
+
+  def safe_invite_url
+    # Omit invite code if email is copied to lead organizer
+    code = params[:lead_organizer_copy].present? ? '123...' : invite.code
+
+    invite_url(code: code)
   end
 end

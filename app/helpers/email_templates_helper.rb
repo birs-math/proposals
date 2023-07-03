@@ -47,7 +47,7 @@ module EmailTemplatesHelper
 
   def show_context
     text = ''
-    InviteMailerContext::CONTEXT_VARS.each do |k, v|
+    InviteMailerContext.placeholders.each do |k, v|
       wrapped_key = "{{ #{k} }}"
       entry = v.present? ? "#{wrapped_key} - #{v}" : "#{wrapped_key}"
       text << "<span class=\"fw-bold\">#{entry}</span><br>"
