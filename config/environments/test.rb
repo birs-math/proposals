@@ -60,4 +60,8 @@ Rails.application.configure do
   config.action_mailer.raise_delivery_errors = false
   # Annotate rendered view with file names.
   # config.action_view.annotate_rendered_view_with_filenames = true
+
+  Rails.application.routes.default_url_options[:host] = ENV['APPLICATION_HOST']
+
+  config.hosts << ENV['APPLICATION_HOST']
 end

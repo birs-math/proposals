@@ -6,7 +6,7 @@ namespace :birs do
     organizer_invitation = {
       title: "Invitation email for organizer",
       email_type: "organizer_invitation_type",
-      subject: "BIRS Proposal: Invite for Supporting Organizer",
+      subject: "BIRS Proposal: Invitation for Supporting Organizer",
       body: <<~HTML
         <p>Dear {{ person_name }},</p>
         <p>{{ lead_organizer }} is putting together a proposal for a {{ proposal_type }} titled "{{ proposal_title }}" for submission to the Banff International Research Station.</p>
@@ -24,7 +24,7 @@ namespace :birs do
     participant_invitation = {
       title: "Invitation email for participant",
       email_type: "participant_invitation_type",
-      subject: "BIRS Proposal: Invite for Participant",
+      subject: "BIRS Proposal: Invitation for Participant",
       body: <<~HTML
         <p>Dear {{ person_name }},</p>
         <p>{{ lead_organizer }} is putting together a proposal for a {{ proposal_type }} titled "{{ proposal_title }}" for submission to the Banff International Research Station.</p>

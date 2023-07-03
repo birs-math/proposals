@@ -1,6 +1,9 @@
-require "rails_helper"
+require 'rails_helper'
 
 RSpec.describe InviteMailer, type: :mailer do
+  Proposals::Application.load_tasks
+  Rake::Task['birs:liquid_email_templates'].invoke
+
   describe '#invited_as_text' do
     context 'when invite is organizer' do
       let(:invite) { create(:invite, invited_as: 'Organizer') }
@@ -23,27 +26,24 @@ RSpec.describe InviteMailer, type: :mailer do
     let(:proposal) { create(:proposal, :with_organizers) }
     let(:invite) { create(:invite, proposal: proposal) }
     let(:person) { create(:person, invite: invite) }
+    let(:email) { InviteMailer.with(invite: invite, body: body).invite_email }
+    let(:body) { "Invitation email body for {{ proposal_title }}" }
 
     context 'when lead organizer is present' do
-      let(:proposal_role) { create(:proposal_role, proposal: proposal) }
-      let(:body) { "Invitation email body" }
-      before do
-        proposal_role.role.update(name: 'lead_organizer')
-      end
-      let(:lead_organizer) { proposal_role.person }
-      let(:email) { InviteMailer.with(invite: invite, body: body, lead_organizer: lead_organizer).invite_email }
+      let(:email) { InviteMailer.with(invite: invite, body: body, lead_organizer_copy: true).invite_email }
 
-      it "sends an invite_email" do
-        expect(email.subject).to eq("BIRS Proposal Invitation for #{invite.humanize_invited_as}")
+      it { expect(email.subject).to eq("BIRS Proposal: Invitation for #{invite.humanize_invited_as}") }
+
+      it 'sends to lead organizer' do
+        expect(email.to).to eq([proposal.lead_organizer.email])
       end
     end
 
     context 'when lead organizer is not present' do
-      let(:body) { "Invitation email body" }
-      let(:email) { InviteMailer.with(invite: invite, body: body).invite_email }
+      it { expect(email.subject).to eq("BIRS Proposal: Invitation for #{invite.humanize_invited_as}") }
 
-      it "sends an invite_email" do
-        expect(email.subject).to eq("BIRS Proposal Invitation for #{invite.humanize_invited_as}")
+      it 'sends to participant' do
+        expect(email.to).to eq([invite.email])
       end
     end
   end

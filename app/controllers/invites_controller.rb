@@ -40,8 +40,8 @@ class InvitesController < ApplicationController
                 end
 
     inviters.each do |invite|
-      InviteMailer.with(invite: invite, lead_organizer_copy: false, invited_as: params[:invited_as]).invite_email.deliver_later
-      InviteMailer.with(invite: invite, lead_organizer_copy: true, invited_as: params[:invited_as]).invite_email.deliver_later
+      InviteMailer.with(invite: invite, lead_organizer_copy: false).invite_email.deliver_later
+      InviteMailer.with(invite: invite, lead_organizer_copy: true).invite_email.deliver_later
     end
 
     head :ok

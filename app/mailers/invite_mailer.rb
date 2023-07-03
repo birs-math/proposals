@@ -6,7 +6,9 @@ class InviteMailer < ApplicationMailer
   end
 
   def invite_email
-    template = case params[:invited_as].downcase
+    invite = params[:invite]
+
+    template = case invite.invited_as&.downcase
                when 'organizer'
                  EmailTemplate.organizer_invitation_type.first
                when 'participant'
@@ -14,8 +16,6 @@ class InviteMailer < ApplicationMailer
                else
                  raise ActiveRecord::RecordNotFound
                end
-
-    invite = params[:invite]
 
     liquid_email(template)
 
