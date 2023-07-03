@@ -14,13 +14,11 @@ class SubmittedProposalsController < ApplicationController
 
     respond_to do |format|
       # loads initial page, but without proposals
-      format.html do
-        @proposal_types = ProposalType.distinct(:name).pluck(:name)
-      end
+      format.html
       # loads proposals by type using turbo lazy loading
       format.turbo_stream do
         @type = params[:proposal_type]
-        @pagy, @proposals = pagy(proposals_query_with_filters, items: 20)
+        @pagy, @proposals = pagy(proposals_query_with_filters, items: 100)
       end
     end
   end

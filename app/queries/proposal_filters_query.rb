@@ -42,6 +42,12 @@ class ProposalFiltersQuery
   def filter_by_proposal_type(proposal_type)
     return @result if proposal_type.blank?
 
+    if proposal_type == ProposalType::FIVE_DAY_WORKSHOP_AND_SUMMER_SCHOOL
+      return @result
+             .joins(:proposal_type)
+             .where(proposal_type: { name: [ProposalType::FIVE_DAY_WORKSHOP, ProposalType::SUMMER_SCHOOL] })
+    end
+
     @result.joins(:proposal_type).where(proposal_type: { name: proposal_type })
   end
 

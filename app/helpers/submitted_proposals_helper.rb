@@ -4,6 +4,15 @@ module SubmittedProposalsHelper
     @proposal_years ||= Proposal.distinct.pluck(:year).compact_blank.sort.append(ProposalFiltersQuery::EMPTY_YEAR)
   end
 
+  def proposal_type_groups
+    @proposal_type_groups ||=
+      ProposalType
+      .distinct(:name)
+      .where.not(name: [ProposalType::FIVE_DAY_WORKSHOP, ProposalType::SUMMER_SCHOOL])
+      .pluck(:name)
+      .unshift(ProposalType::FIVE_DAY_WORKSHOP_AND_SUMMER_SCHOOL)
+  end
+
   def all_proposal_types
     ProposalType.all.map { |pt| [pt.name, pt.id] }
   end
