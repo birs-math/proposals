@@ -2,7 +2,10 @@ require 'rails_helper'
 
 RSpec.describe InviteMailer, type: :mailer do
   Proposals::Application.load_tasks
-  Rake::Task['birs:liquid_email_templates'].invoke
+
+  before(:all) do
+    Rake::Task['birs:liquid_email_templates'].invoke
+  end
 
   describe '#invited_as_text' do
     context 'when invite is organizer' do
