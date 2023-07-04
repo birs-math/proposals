@@ -66,6 +66,10 @@ RSpec.describe DemographicDataPresenter do
   end
 
   before do
+    person_with_two_invites = create_person
+    create_invite(person_with_two_invites, first_proposal)
+    create_invite(person_with_two_invites, second_proposal)
+
     create_invite(create_person, first_proposal)
     create_invite(create_person(demographic_result_two), first_proposal)
 
@@ -84,26 +88,26 @@ RSpec.describe DemographicDataPresenter do
     describe 'stem' do
       let(:keys) { %w[stem] }
 
-      it { expect(demographic_responses).to eq({ 'No' => 2, 'Yes' => 2 }) }
+      it { expect(demographic_responses).to eq({ 'No' => 2, 'Yes' => 3 }) }
     end
 
     describe 'gender, gender_other' do
       let(:keys) { %w[gender gender_other] }
 
-      it { expect(demographic_responses).to eq({ 'Male' => 2, 'Female' => 2, 'Undefined' => 4 }) }
+      it { expect(demographic_responses).to eq({ 'Male' => 3, 'Female' => 2, 'Undefined' => 5 }) }
     end
 
     describe 'academic_status, other_academic_status' do
       let(:keys) { %w[academic_status other_academic_status] }
       let(:source) { :person }
 
-      it { expect(demographic_responses).to eq({ 'Phd' => 4, 'Bachelor' => 4 }) }
+      it { expect(demographic_responses).to eq({ 'Phd' => 5, 'Bachelor' => 5 }) }
     end
 
     describe 'indigenous_person, indigenous_person_yes' do
       let(:keys) { %w[indigenous_person indigenous_person_yes] }
 
-      it { expect(demographic_responses).to eq({ 'No' => 2, 'Yes' => 2, 'Metis' => 2, 'Native' => 2 }) }
+      it { expect(demographic_responses).to eq({ 'No' => 2, 'Yes' => 3, 'Metis' => 3, 'Native' => 3 }) }
     end
 
     context 'when empty result' do
