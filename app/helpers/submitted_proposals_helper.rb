@@ -41,16 +41,16 @@ module SubmittedProposalsHelper
     gender_data.values
   end
 
-  def career_data
-    @career_data ||= demographic_data.responses('academic_status', 'other_academic_status', source: :person)
+  def people_career_data
+    @people_career_data ||= demographic_data.responses('academic_status' 'other_academic_status', source: :person)
   end
 
   def submitted_career_labels
-    career_data.keys
+    people_career_data.keys
   end
 
   def submitted_career_values
-    career_data.values
+    people_career_data.values
   end
 
   def stem_data
