@@ -24,6 +24,7 @@ jobs:
           PG_USER: $DB_USER
           RAILS_ENV: test
           RACK_ENV: test
+          APPLICATION_HOST: 'localhost'
           CODACY_PROJECT_TOKEN: $CODACY_PROJECT_TOKEN
       - image: 'circleci/postgres:12.1-alpine-ram'
         environment:
