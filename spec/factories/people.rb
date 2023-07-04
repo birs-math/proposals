@@ -20,11 +20,12 @@ FactoryBot.define do
     f.deceased { false }
     f.country { set_valid_country }
     f.academic_status { Faker::Educator.degree }
+    f.other_academic_status { Faker::Educator.degree }
     f.first_phd_year { Date.current.year - 5 }
   end
 
   after(:create) do |person|
-    if person.instance_of?(Person) # person is sometimes not a Person object(!?)
+    if person.instance_of?(Person) && person.demographic_data.nil? # person is sometimes not a Person object(!?)
       person.demographic_data = create(:demographic_data, person: person)
     end
   end

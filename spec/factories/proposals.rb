@@ -29,6 +29,18 @@ FactoryBot.define do
     end
   end
 
+  trait :with_participants do
+    after(:create) do |proposal|
+      3.times do
+        person = create(:person)
+        create(:invite, proposal: proposal, status: :confirmed,
+               invited_as: 'Participant', response: :yes,
+               firstname: person.firstname, lastname: person.lastname,
+               email: person.email, person: person)
+      end
+    end
+  end
+
   trait :submission do
     after(:create) do |proposal|
       proposal.ams_subjects << create_list(:ams_subject, 2)

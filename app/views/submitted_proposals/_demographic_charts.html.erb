@@ -1,10 +1,10 @@
 <div data-controller="demographic-charts"
-     data-demographic-charts-career-labels-value="<%= submitted_career_labels(@proposals) %>"
-     data-demographic-charts-career-value="<%= submitted_career_values(@proposals) %>"
-     data-demographic-charts-gender-labels-value="<%= submitted_gender_labels(@proposals) %>"
-     data-demographic-charts-gender-value="<%= submitted_gender_values(@proposals) %>"
-     data-demographic-charts-stem-labels-value="<%= submitted_stem_labels(@proposals) %>"
-     data-demographic-charts-stem-value="<%= submitted_stem_values(@proposals) %>"
+     data-demographic-charts-career-labels-value="<%= submitted_career_labels %>"
+     data-demographic-charts-career-value="<%= submitted_career_values %>"
+     data-demographic-charts-gender-labels-value="<%= submitted_gender_labels %>"
+     data-demographic-charts-gender-value="<%= submitted_gender_values %>"
+     data-demographic-charts-stem-labels-value="<%= submitted_stem_labels %>"
+     data-demographic-charts-stem-value="<%= submitted_stem_values %>"
 >
   <div class="mb-3">Charts</div>
   <div class="row">
@@ -22,7 +22,7 @@
               </tr>
             </thead>
             <tbody>
-              <% submitted_nationality_data(@proposals).each do |key, value| %>
+              <% submitted_nationality_data.each do |key, value| %>
               <tr>
                 <td><%= key %></td>
                 <td><%=  value %></td>
@@ -47,7 +47,7 @@
               </tr>
             </thead>
             <tbody>
-              <% submitted_ethnicity_data(@proposals).each do |key, value| %>
+              <% submitted_ethnicity_data.each do |key, value| %>
               <tr>
                 <td><%= key %></td>
                 <td><%=  value %></td>

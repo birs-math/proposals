@@ -24,7 +24,7 @@ class SubmittedProposalsController < ApplicationController
   end
 
   def demographic_data
-    @proposals = proposals_query_with_filters.find_each
+    @proposal_ids = proposals_query_with_filters.pluck(:id)
   end
 
   def show

@@ -17,88 +17,52 @@ module SubmittedProposalsHelper
     ProposalType.all.map { |pt| [pt.name, pt.id] }
   end
 
-  def submitted_graph_data(param, param2, proposals)
-    data = Hash.new(0)
-    proposals&.each do |proposal|
-      citizenships = proposal.demographics_data.pluck(:result)
-                             .pluck(param, param2).flatten.reject do |s|
-        s.blank? || s.eql?("Other")
-      end
-
-      citizenships.each { |c| data[c] += 1 }
-    end
-    data
+  def demographic_data
+    @demographic_data ||= DemographicDataPresenter.new(@proposal_ids)
   end
 
-  def submitted_nationality_data(proposals)
-    submitted_graph_data("citizenships", "citizenships_other", proposals)
+  def submitted_nationality_data
+    demographic_data.responses('citizenships', 'citizenships_other')
   end
 
-  def submitted_ethnicity_data(proposals)
-    submitted_graph_data("ethnicity", "ethnicity_other", proposals)
+  def submitted_ethnicity_data
+    demographic_data.responses('ethnicity', 'ethnicity_other')
   end
 
-  def submitted_gender_labels(proposals)
-    data = submitted_graph_data("gender", "gender_other", proposals)
-    data.keys
+  def gender_data
+    @gender_data ||= demographic_data.responses('gender', 'gender_other')
   end
 
-  def submitted_gender_values(proposals)
-    data = submitted_graph_data("gender", "gender_other", proposals)
-    data.values
+  def submitted_gender_labels
+    gender_data.keys
   end
 
-  def submitted_career_data(param, param2, proposals)
-    data = Hash.new(0)
-    proposals&.each do |proposal|
-      career_stage = proposal_career_stage(param, param2, proposal)
-
-      career_stage.each { |s| data[s] += 1 }
-    end
-    data
+  def submitted_gender_values
+    gender_data.values
   end
 
-  def proposal_career_stage(param, param2, proposal)
-    person = Person.where.not(id: proposal.lead_organizer&.id)
-    person.where(id: proposal.person_ids).pluck(param, param2)
-          .flatten.reject do |s|
-      s.blank? || s.eql?("Other")
-    end
+  def career_data
+    @career_data ||= demographic_data.responses('academic_status', 'other_academic_status', source: :person)
   end
 
-  def submitted_career_labels(proposals)
-    data = submitted_career_data("academic_status", "other_academic_status",
-                                 proposals)
-    data.keys
+  def submitted_career_labels
+    career_data.keys
   end
 
-  def submitted_career_values(proposals)
-    data = submitted_career_data("academic_status", "other_academic_status",
-                                 proposals)
-    data.values
+  def submitted_career_values
+    career_data.values
   end
 
-  def submitted_stem_graph_data(proposals)
-    data = Hash.new(0)
-    proposals&.each do |proposal|
-      citizenships = proposal.demographics_data.pluck(:result).pluck("stem")
-                             .flatten.reject do |s|
-        s.blank? || s.eql?("Other")
-      end
-
-      citizenships.each { |c| data[c] += 1 }
-    end
-    data
+  def stem_data
+    @stem_data ||= demographic_data.responses('stem')
   end
 
-  def submitted_stem_labels(proposals)
-    data = submitted_stem_graph_data(proposals)
-    data.keys
+  def submitted_stem_labels
+    stem_data.keys
   end
 
-  def submitted_stem_values(proposals)
-    data = submitted_stem_graph_data(proposals)
-    data.values
+  def submitted_stem_values
+    stem_data.values
   end
 
   def organizers_email(proposal)
