@@ -29,11 +29,10 @@ RSpec.describe InviteMailer, type: :mailer do
     let(:proposal) { create(:proposal, :with_organizers) }
     let(:invite) { create(:invite, proposal: proposal) }
     let(:person) { create(:person, invite: invite) }
-    let(:email) { InviteMailer.with(invite: invite, body: body).invite_email }
-    let(:body) { "Invitation email body for {{ proposal_title }}" }
+    let(:email) { InviteMailer.with(invite: invite).invite_email }
 
     context 'when lead organizer is present' do
-      let(:email) { InviteMailer.with(invite: invite, body: body, lead_organizer_copy: true).invite_email }
+      let(:email) { InviteMailer.with(invite: invite, lead_organizer_copy: true).invite_email }
 
       it { expect(email.subject).to eq("BIRS Proposal: Invitation for #{invite.humanize_invited_as}") }
 
@@ -49,12 +48,21 @@ RSpec.describe InviteMailer, type: :mailer do
         expect(email.to).to eq([invite.email])
       end
     end
+
+    context 'rendering liquid' do
+      before do
+        email.deliver_now
+      end
+
+      let(:delivery) { ActionMailer::Base.deliveries.last }
+
+      it { expect(delivery.html_part.body.to_s).to include(proposal.title) }
+    end
   end
 
   describe 'invite_acceptance' do
     let(:proposal) { create(:proposal, :with_organizers) }
     let(:invite) { create(:invite, proposal: proposal) }
-    let(:person) { create(:person, invite: invite) }
     let(:email) { InviteMailer.with(invite: invite, organizers: nil).invite_acceptance }
 
     context 'when organizers are present' do
@@ -68,6 +76,16 @@ RSpec.describe InviteMailer, type: :mailer do
 
     it "sends an invite acceptance email" do
       expect(email.subject).to eq("BIRS Proposal Confirmation of Interest")
+    end
+
+    context 'rendering liquid' do
+      before do
+        email.deliver_now
+      end
+
+      let(:delivery) { ActionMailer::Base.deliveries.last }
+
+      it { expect(delivery.html_part.body.to_s).to include(invite.person.fullname) }
     end
   end
 
@@ -99,6 +117,16 @@ RSpec.describe InviteMailer, type: :mailer do
 
     it "sends an invite reminder email" do
       expect(email.subject).to eq("Please Respond – BIRS Proposal Invitation for #{invite.humanize_invited_as}")
+    end
+
+    context 'rendering liquid' do
+      before do
+        email.deliver_now
+      end
+
+      let(:delivery) { ActionMailer::Base.deliveries.last }
+
+      it { expect(delivery.html_part.body.to_s).to include(invite.deadline_date.to_date.to_s) }
     end
   end
 end
