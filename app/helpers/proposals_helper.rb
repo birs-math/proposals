@@ -155,10 +155,10 @@ module ProposalsHelper
   end
 
   def graph_data(param, param2, proposal)
-    citizenships = proposal.demographics_data.pluck(:result)
-                           .pluck(param, param2).flatten.reject do |s|
+    citizenships = proposal.demographics_data.pluck(:result).pluck(param, param2).flatten.reject do |s|
       s.blank? || s.eql?("Other")
     end
+
     data = Hash.new(0)
 
     citizenships.each do |c|
@@ -189,8 +189,7 @@ module ProposalsHelper
 
   def career_data(param, param2, proposal)
     person = Person.where.not(id: proposal.lead_organizer.id)
-    career_stage = person.where(id: proposal.invites.where(invited_as: 'Participant')
-                         .pluck(:person_id)).pluck(param, param2)
+    career_stage = person.where(id: proposal.participant_invites.pluck(:person_id)).pluck(param, param2)
                          .flatten.reject do |s|
                            s.blank? || s.eql?("Other")
                          end

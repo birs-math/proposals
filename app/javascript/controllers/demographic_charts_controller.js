@@ -14,12 +14,12 @@ export default class extends Controller {
   }
 
   connect() {
-    this.plotGenderGraph()
+    this.plotGenderChart()
     this.plotStemChart()
     this.plotCareerChart()
   }
 
-  plotGenderGraph() {
+  plotGenderChart() {
     this.plotGraph(this.genderChartTarget, this.genderLabelsValue, this.genderValue)
   }
 
