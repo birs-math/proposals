@@ -10,7 +10,7 @@ class SubmitProposalsController < ApplicationController
     @submission = result.submission
     @proposal = result.proposal
 
-    return redirect_to :back, **result.flash_message if result.errors?
+    return redirect_back fallback_location: edit_proposal_path(@proposal), **result.flash_message if result.errors?
 
     session[:is_submission] = @proposal.is_submission = @submission.final?
 
@@ -19,7 +19,7 @@ class SubmitProposalsController < ApplicationController
       @attachment = generate_proposal_pdf || return
       confirm_submission
     else
-      redirect_to :back, notice: t('submit_proposals.create.alert')
+      redirect_back fallback_location: edit_proposal_path(@proposal), notice: t('submit_proposals.create.alert')
     end
   end
 

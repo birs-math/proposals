@@ -54,13 +54,15 @@ RSpec.describe "/submit_proposals", type: :request do
         location_ids: location.id, no_latex: false }
     end
 
+    let(:http_referer) { nil }
+
     before do
       role_privilege
       proposal_role
       user_role
       sign_in user
 
-      post submit_proposals_url, params: params
+      post submit_proposals_url, params: params, headers: { 'HTTP_REFERER' => http_referer }
     end
 
     describe 'POST #create' do
@@ -87,16 +89,17 @@ RSpec.describe "/submit_proposals", type: :request do
     describe 'redirects' do
       let(:user_role) { create(:user_role, role: create(:role, name: role_name), user: user) }
 
-      context 'when staff' do
-        let(:role_name) { 'Staff' }
-
-        it { expect(response).to redirect_to(submitted_proposals_path) }
-      end
-
-      context 'when lead organizer' do
+      context 'when referrer is not present' do
         let(:role_name) { 'lead_organizer' }
 
-        it { expect(response).to redirect_to(edit_proposal_path(proposal)) }
+        it('uses fallback location') { expect(response).to redirect_to(edit_proposal_path(proposal)) }
+      end
+
+      context 'when referrer is set' do
+        let(:role_name) { 'Staff' }
+        let(:http_referer) { edit_submitted_proposal_path(proposal) }
+
+        it('redirects to referer') { expect(response).to redirect_to(http_referer) }
       end
     end
 
