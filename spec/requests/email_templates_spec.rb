@@ -96,9 +96,8 @@ RSpec.describe "/email_templates", type: :request do
   end
 
   describe "DELETE /destroy" do
-    before do
-      delete email_template_url(email_template.id)
-    end
-    it { expect(EmailTemplate.all.count).to eq(0) }
+    before { email_template }
+
+    it { expect { delete(email_template_url(email_template.id)) }.to change(EmailTemplate, :count).by(-1) }
   end
 end
