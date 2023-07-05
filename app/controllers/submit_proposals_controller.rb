@@ -12,8 +12,6 @@ class SubmitProposalsController < ApplicationController
 
     return redirect_to edit_proposal_path(@proposal), **result.flash_message if result.errors?
 
-    return staff_redirect if current_user.staff_member?
-
     session[:is_submission] = @proposal.is_submission = @submission.final?
 
     if @proposal.is_submission
@@ -187,15 +185,6 @@ class SubmitProposalsController < ApplicationController
                      "proposal_type" => @proposal.proposal_type&.name.to_s,
                      "proposal_title" => @proposal&.title.to_s }
     placeholders.each { |k, v| @template_body&.gsub!(k, v) }
-  end
-
-  def staff_redirect
-    if @submission.errors?
-      redirect_to edit_submitted_proposal_path(@proposal), alert: "Your submission has
-          errors: #{@submission.error_messages}.".squish
-    else
-      redirect_to submitted_proposals_path, notice: t('submit_proposals.staff_redirect.alert')
-    end
   end
 
   def change_proposal_status
