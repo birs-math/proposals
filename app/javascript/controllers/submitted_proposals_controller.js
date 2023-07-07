@@ -315,7 +315,7 @@ export default class extends Controller {
 
   importReviews() {
     var proposalIds = [];
-    $("input:checked").each(function() {
+    this.proposalsByTypeCheckboxChecked().each(function() {
       proposalIds.push(this.dataset.value);
     });
     if(typeof proposalIds[0] === "undefined")
@@ -323,9 +323,10 @@ export default class extends Controller {
       toastr.error("Please select any checkbox!")
     }
     else {
+      let selectedProposals = proposalIds.filter((x) => typeof x !== "undefined")
       $('.import-reviews-btn').html("Importing...")
       $('.import-reviews-btn').addClass('disabled');
-      $.post(`/submitted_proposals/import_reviews?proposals=${proposalIds}`, function() {
+      $.post(`/submitted_proposals/import_reviews?proposals=${selectedProposals}`, function() {
         toastr.success("Import reviews In progress. You will be notified once its done.")
       })
     }
@@ -337,7 +338,7 @@ export default class extends Controller {
       this.reviewTocTarget.checked = true;
     }
     var proposalIds = [];
-    $("input:checked").each(function() {
+    this.proposalsByTypeCheckboxChecked().each(function() {
       proposalIds.push(this.dataset.value);
     });
     if(typeof proposalIds[0] === "undefined")
@@ -345,15 +346,14 @@ export default class extends Controller {
       toastr.error("Please select any checkbox!")
     }
     else {
+      let selectedProposals = proposalIds.filter((x) => typeof x !== "undefined")
+      $("span#review-window-proposals").text(selectedProposals)
       $("#review-window").modal('show')
     }
   }
 
   reviewsBooklet() {
-    var proposalIds = [];
-    $("input:checked").each(function() {
-      proposalIds.push(this.dataset.value);
-    });
+    let proposalIds = $("span#review-window-proposals").text()
     this.checkReviewType(proposalIds)
   }
 
@@ -436,7 +436,7 @@ export default class extends Controller {
 
   reviewsExcelBooklet() {
     var proposalIds = [];
-    $("input:checked").each(function() {
+    this.proposalsByTypeCheckboxChecked().each(function() {
       proposalIds.push(this.dataset.value);
     });
     if(typeof proposalIds[0] === "undefined")
