@@ -43,7 +43,20 @@ class SubmittedProposalsController < ApplicationController
 
   def send_to_workshop
     proposals = Proposal.where(id: params[:ids].split(','))
-    post_to_workshop(proposals)
+
+    proposals = proposals.map do |proposal|
+      {
+        proposal_type: proposal.proposal_type.name,
+        proposal_year: proposal.year,
+        proposal_id: proposal.id,
+        code: proposal.code,
+        workshop_name: proposal.title,
+        participants: proposal.participant_invites,
+        dates: proposal.assigned_date
+      }
+    end
+
+    RestClient.post "#{ENV['WORKSHOPS_API_URL']}/events/proposals", {proposals: proposals}.to_json, content_type: 'application/json'
   end
 
   def download_csv
@@ -312,23 +325,6 @@ class SubmittedProposalsController < ApplicationController
     Rails.logger.info { "\n\nError creating #{@proposal&.code} PDF: #{e.message}\n\n" }
     flash[:alert] = "Error creating #{@proposal&.code} PDF: #{e.message}"
     false
-  end
-
-
-  def post_to_workshop(proposals)
-    proposals = proposals.map do |proposal|
-      {
-        proposal_type: proposal.proposal_type.name,
-        proposal_year: proposal.year,
-        proposal_id: proposal.id,
-        code: proposal.code,
-        workshop_name: proposal.title,
-        participants: proposal.participant_invites,
-        dates: proposal.assigned_date
-      }
-    end
-
-    RestClient.post "#{ENV['WORKSHOPS_API_URL']}/events/proposals", {proposals: proposals}.to_json, content_type: 'application/json'
   end
 
   def post_to_editflow

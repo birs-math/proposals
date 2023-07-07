@@ -19,6 +19,7 @@
             <label class="form-label">Workshop Size</label>
             <%= select_tag :size, options_for_select([['Half', 'Half'], ['Full', 'Full']]), include_blank: '', class: 'form-select w-25', data: { 'submitted-proposals-target': 'assignedSize' } %>
           </div>
+          <span id="outcome-location-size" hidden="true"></span>
         </div>
       </div>
       <div class="modal-footer">
