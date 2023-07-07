@@ -24,7 +24,7 @@ class SubmittedProposalsController < ApplicationController
   end
 
   def demographic_data
-    @proposal_ids = proposals_query_with_filters.pluck(:id)
+    @proposal_ids = proposals_query_with_filters(demographic_data_params).pluck(:id)
   end
 
   def show
@@ -245,12 +245,16 @@ class SubmittedProposalsController < ApplicationController
 
   private
 
-  def proposals_query_with_filters
-    ProposalFiltersQuery.new(Proposal.order(:code, :created_at)).find(query_params)
+  def proposals_query_with_filters(params = query_params)
+    ProposalFiltersQuery.new(Proposal.order(:code, :created_at)).find(params)
   end
 
   def query_params
     params.permit(:workshop_year, :keywords, :proposal_type, :location, :outcome, status: [], subject_area: [])
+  end
+
+  def demographic_data_params
+    query_params.slice(:workshop_year).merge(status: :not_draft)
   end
 
   def selected_proposal_ids

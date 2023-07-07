@@ -54,6 +54,8 @@ class ProposalFiltersQuery
   def filter_by_status(statuses)
     return @result if statuses.blank?
 
+    return @result.not_draft if statuses == :not_draft
+
     @result.where(status: statuses)
   end
 
