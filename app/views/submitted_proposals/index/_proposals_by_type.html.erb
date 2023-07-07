@@ -26,24 +26,22 @@
   <% end %>
 
   <%= turbo_frame_tag "#{type}_actionbar" do %>
+    <div class="mb-4">
+      <span data-action="click->submitted-proposals#selectAllProposals" class="btn btn-sm btn-primary" data-type="<%= type %>">Select All</span>
+      <span data-action="click->submitted-proposals#unselectAllProposals" class="btn btn-sm btn-primary" data-type="<%= type %>">Select None</span>
+      <span data-action="click->submitted-proposals#invertSelectedProposals" class="btn btn-sm btn-primary" data-type="<%= type %>">Invert Selection</span>
+    </div>
     <div>
-      <span data-action="click->submitted-proposals#selectAllProposals" data-submitted-proposals-target="allProposals" class="btn btn-primary" data-type="<%= type %>">Select All</span>
-      <span data-action="click->submitted-proposals#unselectAllProposals" data-submitted-proposals-target="noProposals" class="btn btn-primary" data-type="<%= type %>">Select None</span>
-      <span data-action="click->submitted-proposals#invertSelectedProposals" data-submitted-proposals-target="invertProposals" class="btn btn-primary" data-type="<%= type %>">Invert Selection</span>
-    </div>
-    <div class="text-end m-3">
-      <span data-action="click->submitted-proposals#tableOfContent" class="btn btn-primary proposal-booklet-btn" data-type="<%= type %>">Create Booklet</span>
-      <span data-action="click->submitted-proposals#editFlow" class="btn btn-primary" data-type="<%= type %>">Send to EditFlow</span>
-      <span data-action="click->submitted-proposals#workshop" class="btn btn-primary" data-type="<%= type %>">Send to Workshop</span>
-      <button data-action="click->submitted-proposals#downloadCSV" class="btn btn-primary" data-type="<%= type %>">Download CSV</button>
-      <span data-action="click->submitted-proposals#emailModal" class="btn btn-primary" data-type="<%= type %>">Send Decision Email</span>
-      <span data-action="click->submitted-proposals#outcomeLocationModal" id="decline" class="btn btn-primary" data-type="<%= type %>">Set Outcome/Location</span>
-    </div>
-    <div class="text-end m-3">
+      <span data-action="click->submitted-proposals#tableOfContent" class="btn btn-sm btn-primary proposal-booklet-btn mb-2" data-type="<%= type %>">Create Booklet</span>
+      <span data-action="click->submitted-proposals#editFlow" class="btn btn-sm btn-primary mb-2" data-type="<%= type %>">Send to EditFlow</span>
+      <span data-action="click->submitted-proposals#workshop" class="btn btn-sm btn-primary mb-2" data-type="<%= type %>">Send to Workshop</span>
+      <button data-action="click->submitted-proposals#downloadCSV" class="btn btn-sm btn-primary mb-2" data-type="<%= type %>">Download CSV</button>
+      <span data-action="click->submitted-proposals#emailModal" class="btn btn-sm btn-primary mb-2" data-type="<%= type %>">Send Decision Email</span>
+      <span data-action="click->submitted-proposals#outcomeLocationModal" id="decline" class="btn btn-sm btn-primary mb-2" data-type="<%= type %>">Set Outcome/Location</span>
       <% if check_review_privilege %>
-        <span data-action="click->submitted-proposals#reviewsExcelBooklet" class="btn btn-primary" data-type="<%= type %>">Create Reviews Excel Booklet</span>
-        <span data-action="click->submitted-proposals#reviewsContent" class="btn btn-primary reviews-booklet-btn" data-type="<%= type %>">Create Reviews Booklet</span>
-        <span data-action="click->submitted-proposals#importReviews" class="btn btn-primary import-reviews-btn" data-type="<%= type %>">Import Reviews</span>
+        <span data-action="click->submitted-proposals#reviewsExcelBooklet" class="btn btn-sm btn-primary mb-2" data-type="<%= type %>">Create Reviews Excel Booklet</span>
+        <span data-action="click->submitted-proposals#reviewsContent" class="btn btn-sm btn-primary reviews-booklet-btn mb-2" data-type="<%= type %>">Create Reviews Booklet</span>
+        <span data-action="click->submitted-proposals#importReviews" class="btn btn-sm btn-primary import-reviews-btn mb-2" data-type="<%= type %>">Import Reviews</span>
       <% end %>
     </div>
   <% end %>
