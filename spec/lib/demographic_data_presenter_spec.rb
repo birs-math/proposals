@@ -47,10 +47,17 @@ RSpec.describe DemographicDataPresenter do
   end
 
   def create_person(demographic_result = demographic_result_one)
-    create(:person,
-           demographic_data: create(:demographic_data, result: demographic_result),
-           academic_status: 'Phd',
-           other_academic_status: 'Bachelor')
+    person = create(:person,
+                    demographic_data: create(:demographic_data, result: demographic_result),
+                    academic_status: 'Phd',
+                    other_academic_status: 'Bachelor')
+
+    old_result = demographic_result == demographic_result_one ? demographic_result_two : demographic_result_one
+
+    # Old demographic data with other survey results that should NOT be used in calculations
+    create(:demographic_data, person: person, result: old_result, created_at: 1.month.ago, updated_at: 1.month.ago)
+
+    person
   end
 
   def create_invite(person, proposal)
@@ -66,6 +73,7 @@ RSpec.describe DemographicDataPresenter do
   end
 
   before do
+    # Demographic results are pulled for each confirmed invite, meaning 2 invites - twice the answer count
     person_with_two_invites = create_person
     create_invite(person_with_two_invites, first_proposal)
     create_invite(person_with_two_invites, second_proposal)
@@ -88,26 +96,26 @@ RSpec.describe DemographicDataPresenter do
     describe 'stem' do
       let(:keys) { %w[stem] }
 
-      it { expect(demographic_responses).to eq({ 'No' => 2, 'Yes' => 3 }) }
+      it { expect(demographic_responses).to eq({ 'No' => 2, 'Yes' => 4 }) }
     end
 
     describe 'gender, gender_other' do
       let(:keys) { %w[gender gender_other] }
 
-      it { expect(demographic_responses).to eq({ 'Male' => 3, 'Female' => 2, 'Undefined' => 5 }) }
+      it { expect(demographic_responses).to eq({ 'Male' => 4, 'Female' => 2, 'Undefined' => 6 }) }
     end
 
     describe 'academic_status, other_academic_status' do
       let(:keys) { %w[academic_status other_academic_status] }
       let(:source) { :person }
 
-      it { expect(demographic_responses).to eq({ 'Phd' => 5, 'Bachelor' => 5 }) }
+      it { expect(demographic_responses).to eq({ 'Phd' => 6, 'Bachelor' => 6 }) }
     end
 
     describe 'indigenous_person, indigenous_person_yes' do
       let(:keys) { %w[indigenous_person indigenous_person_yes] }
 
-      it { expect(demographic_responses).to eq({ 'No' => 2, 'Yes' => 3, 'Metis' => 3, 'Native' => 3 }) }
+      it { expect(demographic_responses).to eq({ 'No' => 2, 'Yes' => 4, 'Metis' => 4, 'Native' => 4 }) }
     end
 
     context 'when empty result' do

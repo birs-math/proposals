@@ -20,5 +20,7 @@ FactoryBot.define do
                                     %w[Métis Métis], %w[Inuit Inuit]].sample
       }
     end
+    created_at { }
+    updated_at { }
   end
 end
