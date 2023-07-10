@@ -32,7 +32,7 @@ class DemographicDataPresenter
 
   # Map survey results for each confirmed proposal a person is attending
   def demographic_data_map
-    @demographic_data_map ||= invited_people_ids.map { |person_id| unique_survey_results_hash[person_id] }
+    @demographic_data_map ||= invited_people_ids.map { |person_id| unique_survey_results_hash[person_id] }.uniq
   end
 
   # Get last demographic survey result and make a hash with person_id as key
@@ -46,7 +46,7 @@ class DemographicDataPresenter
 
   # The same for career status
   def person_career_status_map
-    @person_career_status_map ||= invited_people_ids.map { |person_id| unique_career_status_hash[person_id] }
+    @person_career_status_map ||= invited_people_ids.map { |person_id| unique_career_status_hash[person_id] }.uniq
   end
 
   # The same for career status, but transform to_h by grouping last two values into array
