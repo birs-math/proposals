@@ -29,11 +29,14 @@ class SubmittedProposalsController < ApplicationController
 
   def show
     @proposal.review! if @proposal.may_review?
+    @proposal_ids = [@proposal.id]
+
     log_activity(@proposal)
   end
 
   def edit
     @proposal.invites.build
+    @proposal_ids = [@proposal.id]
   end
 
   def send_to_workshop
@@ -492,8 +495,6 @@ class SubmittedProposalsController < ApplicationController
 
   def set_proposal
     @proposal = Proposal.find(params[:id])
-    # params[:id] could be a code
-    @proposal_ids = [@proposal.id]
   end
 
   def template_params
