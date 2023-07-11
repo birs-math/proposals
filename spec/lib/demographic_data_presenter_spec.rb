@@ -22,7 +22,6 @@ RSpec.describe DemographicDataPresenter do
       'citizenships_other' => '',
       'underRepresented' => 'No',
       'indigenous_person' => 'Yes',
-      'academic_status' => 'Software Developer',
       'indigenous_person_yes' => %w[Metis Native]
     }
   end
@@ -41,7 +40,6 @@ RSpec.describe DemographicDataPresenter do
       'citizenships_other' => '',
       'underRepresented' => 'Yes',
       'indigenous_person' => 'No',
-      'academic_status' => 'Software Engineer',
       'indigenous_person_yes' => []
     }
   end
@@ -86,8 +84,7 @@ RSpec.describe DemographicDataPresenter do
   end
 
   describe '#responses' do
-    subject(:demographic_responses) { described_class.new(proposal_ids).responses(*keys, source: source) }
-    let(:source) { :demographic_data }
+    subject(:demographic_responses) { described_class.new(proposal_ids).fetch(*keys) }
 
     before do
       create_list(:proposal, 2, :with_participants, :with_organizers)
@@ -107,7 +104,6 @@ RSpec.describe DemographicDataPresenter do
 
     describe 'academic_status, other_academic_status' do
       let(:keys) { %w[academic_status other_academic_status] }
-      let(:source) { :person }
 
       it { expect(demographic_responses).to eq({ 'Phd' => 6, 'Bachelor' => 6 }) }
     end

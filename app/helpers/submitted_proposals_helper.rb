@@ -22,47 +22,35 @@ module SubmittedProposalsHelper
   end
 
   def submitted_nationality_data
-    demographic_data.responses('citizenships', 'citizenships_other')
+    demographic_data.fetch('citizenships', 'citizenships_other')
   end
 
   def submitted_ethnicity_data
-    demographic_data.responses('ethnicity', 'ethnicity_other')
-  end
-
-  def gender_data
-    @gender_data ||= demographic_data.responses('gender', 'gender_other')
+    demographic_data.fetch('ethnicity', 'ethnicity_other')
   end
 
   def submitted_gender_labels
-    gender_data.keys
+    demographic_data.fetch('gender', 'gender_other').keys
   end
 
   def submitted_gender_values
-    gender_data.values
-  end
-
-  def people_career_data
-    @people_career_data ||= demographic_data.responses('academic_status' 'other_academic_status', source: :person)
+    demographic_data.fetch('gender', 'gender_other').values
   end
 
   def submitted_career_labels
-    people_career_data.keys
+    demographic_data.fetch('academic_status' 'other_academic_status').keys
   end
 
   def submitted_career_values
-    people_career_data.values
-  end
-
-  def stem_data
-    @stem_data ||= demographic_data.responses('stem')
+    demographic_data.fetch('academic_status' 'other_academic_status').values
   end
 
   def submitted_stem_labels
-    stem_data.keys
+    demographic_data.fetch('stem').keys
   end
 
   def submitted_stem_values
-    stem_data.values
+    demographic_data.fetch('stem').values
   end
 
   def organizers_email(proposal)

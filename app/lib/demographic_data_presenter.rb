@@ -1,60 +1,77 @@
 # frozen_string_literal: true
 
-# TODO: memo each key pluck'ed
-
 class DemographicDataPresenter
   def initialize(proposal_ids)
     @proposal_ids = proposal_ids
   end
 
-  def responses(*keys, source: :demographic_data)
-    hash = Hash.new(0)
-
-    pluck(*keys, source: source).each do |response|
-      hash[response] += 1
-    end
-
-    hash
+  def fetch(*keys)
+    memo.values_at(*keys.uniq).compact_blank.reduce({}, :merge)
   end
 
   private
 
   attr_reader :proposal_ids
 
-  def pluck(*keys, source: :demographic_data)
-    case source
-    when :demographic_data
-      demographic_data_map.pluck(*keys)
-    when :person
-      person_career_status_map
-    end.flatten.reject { |response| response.blank? || response.downcase.eql?('other') }
+  def memo
+    return @memo if defined?(@memo)
+
+    @memo = {}
+    populate_survey_results
+    populate_career_results
+
+    @memo
   end
 
-  # Map survey results for each confirmed proposal a person is attending
-  def demographic_data_map
-    @demographic_data_map ||= invited_people_ids.map { |person_id| unique_survey_results_hash[person_id] }.uniq
+  def populate_survey_results
+    unique_survey_results_array.each do |id_and_result|
+      person_id, result = id_and_result
+      answers_count = person_answer_count(person_id)
+
+      result.each do |survey_key, answer|
+        store_answers(survey_key, Array(answer), answers_count)
+      end
+    end
   end
 
-  # Get last demographic survey result and make a hash with person_id as key
-  def unique_survey_results_hash
-    @unique_survey_results_hash ||= DemographicData
-                                    .select("DISTINCT ON (person_id) person_id, *")
-                                    .order(:person_id, created_at: :desc)
-                                    .where(demographic_data: { person_id: invited_people_ids })
-                                    .to_a.pluck(:person_id, :result).to_h
+  def populate_career_results
+    unique_career_status_array.each do |id_and_career|
+      person_id, academic_status, other_academic_status = id_and_career
+      career_entries = person_answer_count(person_id)
+
+      store_answers('academic_status', Array(academic_status), career_entries)
+      store_answers('other_academic_status', Array(other_academic_status), career_entries)
+    end
   end
 
-  # The same for career status
-  def person_career_status_map
-    @person_career_status_map ||= invited_people_ids.map { |person_id| unique_career_status_hash[person_id] }.uniq
+  def store_answers(top_key, answers, answer_count)
+    memo[top_key] ||= Hash.new(0)
+
+    answers.reject { |val| empty_answer?(val) }.map { |answer| memo[top_key][answer] += answer_count }
   end
 
-  # The same for career status, but transform to_h by grouping last two values into array
-  def unique_career_status_hash
-    @unique_career_status_hash ||= Person
-                                   .where(id: invited_people_ids)
-                                   .pluck(:id, :academic_status, :other_academic_status)
-                                   .to_h { |array| [array[0], [array[1], array[2]]] }
+  def empty_answer?(answer)
+    answer.blank? || answer.downcase.eql?('other')
+  end
+
+  # Survey answer count = confirmed invites count
+  def person_answer_count(person_id)
+    invited_people_ids.count { |val| val == person_id }
+  end
+
+  # Get last demographic survey result
+  def unique_survey_results_array
+    @unique_survey_results_array ||= DemographicData
+                                     .select("DISTINCT ON (person_id) person_id, *")
+                                     .order(:person_id, created_at: :desc)
+                                     .where(demographic_data: { person_id: invited_people_ids })
+                                     .to_a.pluck(:person_id, :result)
+  end
+
+  def unique_career_status_array
+    @unique_career_status_array ||= Person
+                                    .where(id: invited_people_ids)
+                                    .pluck(:id, :academic_status, :other_academic_status)
   end
 
   # Get invited people with duplicates (those who have more than 1 confirmed invite)
