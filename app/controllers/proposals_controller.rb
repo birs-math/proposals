@@ -121,7 +121,8 @@ class ProposalsController < ApplicationController
 
   def set_proposal
     @proposal = Proposal.find(params[:id])
-    @proposal_ids = [params[:id]]
+    # params[:id] could be a code
+    @proposal_ids = [@proposal.id]
     @submission = session[:is_submission]
   end
 
