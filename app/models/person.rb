@@ -61,10 +61,6 @@ class Person < ApplicationRecord
     proposals.where(status: :draft).present?
   end
 
-  def demographic_survey_submitted?
-    !DemographicData.exists?({ person_id: 24, result: "{}" })
-  end
-
   private
 
   def strip_whitespace

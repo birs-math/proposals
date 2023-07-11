@@ -12,7 +12,7 @@ class PeopleController < ApplicationController
 
   def update
     if @person.update(person_params)
-      if @person.demographic_survey_submitted?
+      if @person.demographic_data.present?
         redirect_to root_path
       else
         redirect_to new_survey_path(code: params[:code], response: params[:response]),
