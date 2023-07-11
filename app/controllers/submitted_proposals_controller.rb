@@ -492,6 +492,7 @@ class SubmittedProposalsController < ApplicationController
 
   def set_proposal
     @proposal = Proposal.find(params[:id])
+    @proposal_ids = [params[:id]]
   end
 
   def template_params

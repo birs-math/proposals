@@ -1,3 +1,4 @@
+<% section_title = local_assigns.has_key?(:title) ? local_assigns.fetch(:title) : 'Charts' %>
 <div data-controller="demographic-charts"
      data-demographic-charts-career-labels-value="<%= submitted_career_labels %>"
      data-demographic-charts-career-value="<%= submitted_career_values %>"
@@ -6,7 +7,7 @@
      data-demographic-charts-stem-labels-value="<%= submitted_stem_labels %>"
      data-demographic-charts-stem-value="<%= submitted_stem_values %>"
 >
-  <div class="mb-3">Charts</div>
+  <div class="mb-3"><%= section_title %></div>
   <div class="row">
     <div class="col-12 col-lg-6">
       <div class="card flex-fill w-100">
