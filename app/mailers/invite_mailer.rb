@@ -1,36 +1,40 @@
 class InviteMailer < ApplicationMailer
   def invited_as_text(invite)
-    return "a Supporting Organizer for" if invite.invited_as?.downcase.match?('organizer')
+    return "a Supporting Organizer for" if invite.humanize_invited_as.downcase.match?('organizer')
 
     "a Participant in"
   end
 
   def invite_email
-    @invite = params[:invite]
-    @body = params[:body]
-    replace_email_placeholders
+    invite = params[:invite]
 
-    if params[:lead_organizer].present?
-      @lead_organizer = params[:lead_organizer]
-      mail(to: @lead_organizer.email, subject: "BIRS Proposal Invitation for #{@invite.invited_as?}")
+    template = case invite.invited_as&.downcase
+               when 'organizer'
+                 EmailTemplate.organizer_invitation_type.first
+               when 'participant'
+                 EmailTemplate.participant_invitation_type.first
+               else
+                 raise ActiveRecord::RecordNotFound
+               end
+
+    liquid_email(template)
+
+    if params[:lead_organizer_copy].present?
+      lead_organizer = invite.proposal.lead_organizer
+      mail(to: lead_organizer.email, subject: @subject)
     else
-      mail(to: @person.email, subject: "BIRS Proposal Invitation for #{@invite.invited_as?}")
+      mail(to: invite.email, subject: @subject)
     end
   end
 
   def invite_acceptance
-    @invite = params[:invite]
-    @existing_organizers = params[:organizers]
+    template = EmailTemplate.confirmation_of_interest.first
 
-    if @existing_organizers.present?
-      @existing_organizers.prepend(", ")
-      @existing_organizers = @existing_organizers.strip.delete_suffix(",")
-      @existing_organizers = @existing_organizers.sub(/.*\K,/, ' and')
-    end
-    @proposal = @invite.proposal
-    @person = @invite.person
+    invite = params[:invite]
 
-    mail(to: @person.email, subject: t('invite_mailer.invite_acceptance.subject'))
+    liquid_email(template)
+
+    mail(to: invite.email, subject: @subject)
   end
 
   def invite_decline
@@ -42,41 +46,30 @@ class InviteMailer < ApplicationMailer
   end
 
   def invite_uncertain
-    @invite = params[:invite]
-    @proposal = @invite.proposal
-    @person = @invite.person
+    template = EmailTemplate.invite_uncertain.first
 
-    mail(to: @person.email, subject: t('invite_mailer.invite_uncertain.subject'))
+    invite = params[:invite]
+
+    liquid_email(template)
+
+    mail(to: invite.email, subject: @subject)
   end
 
   def invite_reminder
-    @invite = params[:invite]
-    @invited_as = invited_as_text(@invite)
-    @existing_organizers = params[:organizers]
+    template = EmailTemplate.invite_reminder.first
 
-    @existing_organizers.prepend(", ") if @existing_organizers.present?
-    @existing_organizers = @existing_organizers.sub(/.*\K,/, ' and') if @existing_organizers.present?
-    @proposal = @invite.proposal
-    @person = @invite.person
+    invite = params[:invite]
 
-    mail(to: @person.email, subject: "Please Respond – BIRS Proposal Invitation for #{@invite.invited_as?}")
+    liquid_email(template)
+
+    mail(to: invite.email, subject: @subject)
   end
 
   private
 
-  def invite_link(invite)
-    code = params[:lead_organizer].present? ? '123...' : invite&.code
-    url = invite_url(code: code)
-    "<a href='#{url}'>#{url}</a>"
-  end
-
-  def replace_email_placeholders
-    @email_body = String.new(@body)
-    placeholders = { "invite_deadline_date" => @invite&.deadline_date&.to_date.to_s,
-                     "invite_url" => invite_link(@invite),
-                     "invited_as" => invited_as_text(@invite) }
-    placeholders.each { |k, v| @email_body.gsub!(k, v) }
-    @proposal = @invite.proposal
-    @person = @invite.person
+  def liquid_email(template)
+    @context = InviteMailerContext.call(params)
+    @subject = template.render(:subject, context: @context)
+    @body = template.render(:body, context: @context)
   end
 end

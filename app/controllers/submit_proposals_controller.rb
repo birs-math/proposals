@@ -29,16 +29,21 @@ class SubmitProposalsController < ApplicationController
 
   def invitation_template
     invited_as = params[:invited_as]
-    case invited_as
-    when 'organizer'
-      @email_template = EmailTemplate.find_by(email_type: "organizer_invitation_type")
-    when 'participant'
-      @email_template = EmailTemplate.find_by(email_type: "participant_invitation_type")
+    template = case invited_as
+               when 'organizer'
+                 EmailTemplate.organizer_invitation_type.first
+               when 'participant'
+                 EmailTemplate.participant_invitation_type.first
+               end
+
+    if template&.body.blank?
+      return redirect_to new_email_template_path, alert: t('submit_proposals.preview_placeholders.failure')
     end
 
-    preview_placeholders
-    render json: { subject: @email_template.subject, body: @template_body },
-           status: :ok
+    @body = template.render(:body, context: InviteMailerContext.placeholders)
+    @subject = template.render(:subject, context: InviteMailerContext.placeholders)
+
+    render json: { subject: @subject, body: @body }, status: :ok
   end
 
   def create_invite
@@ -173,17 +178,8 @@ class SubmitProposalsController < ApplicationController
     raise CanCan::AccessDenied unless current_user&.lead_organizer?(@proposal)
   end
 
-  def preview_placeholders
-    @template_body = @email_template&.body
-    if @template_body.blank?
-      return redirect_to new_email_template_path, alert: t('submit_proposals.preview_placeholders.failure')
-    end
-
-    placing_holders
-  end
-
   def placing_holders
-    placeholders = { "Proposal_lead_organizer_name" => @proposal&.lead_organizer&.fullname.to_s,
+    placeholders = { 'lead_organizer' => @proposal&.lead_organizer&.fullname.to_s,
                      "proposal_type" => @proposal.proposal_type&.name.to_s,
                      "proposal_title" => @proposal&.title.to_s }
     placeholders.each { |k, v| @template_body&.gsub!(k, v) }

@@ -19,6 +19,7 @@ gem 'ed25519'
 gem 'email_verifier'
 gem 'hotwire-rails'
 gem 'jbuilder', '~> 2.7'
+gem 'liquid', '~> 3.0'
 gem 'pdf-reader', '~> 1.0', '>= 1.0.2'
 gem 'pg'
 gem 'pg_search'
@@ -43,6 +44,7 @@ group :test do
   gem 'capybara', '>= 3.26'
   gem 'factory_bot_rails', require: false
   gem 'faker'
+  gem 'rails-controller-testing'
   gem 'rspec-rails', '~> 4.1.0'
   gem 'selenium-webdriver'
   gem 'shoulda-matchers', '~> 4.0'
@@ -50,7 +52,6 @@ group :test do
   gem 'simplecov-lcov'
   gem 'webdrivers'
   gem 'webmock'
-  gem 'rails-controller-testing'
 end
 
 group :development do

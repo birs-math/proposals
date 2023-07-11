@@ -1,8 +1,1 @@
-Dear <%= @person&.fullname %>:
-
-Thank you for letting us know that you will may be able to participate in the proposed workshop, "<%= @proposal.title %>"", currently being 
-organized by  <%= @proposal.lead_organizer&.fullname %>.
-We will send you soft remainder regarding this and hope you will join us in future.
-
-Sincerely,
-Banff International Research Station
+<%= strip_tags(@body) %>

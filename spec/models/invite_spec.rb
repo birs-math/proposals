@@ -54,7 +54,7 @@ RSpec.describe Invite, type: :model do
     let(:invite) { create(:invite, invited_as: "Organizer") }
 
     it "returns a Supporting Organizer" do
-      expect(invite.invited_as?).to eq('Supporting Organizer')
+      expect(invite.humanize_invited_as).to eq('Supporting Organizer')
     end
   end
 

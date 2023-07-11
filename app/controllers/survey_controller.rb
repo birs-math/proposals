@@ -87,9 +87,7 @@ class SurveyController < ApplicationController
   def send_email_on_response
     return if @invite.no?
 
-    @organizers = @invite.proposal.supporting_organizers.where.not(id: @invite.person.id).map(&:fullname).join(', ')
-    InviteMailer.with(invite: @invite, organizers: @organizers)
-                .invite_acceptance.deliver_later
+    InviteMailer.with(invite: @invite).invite_acceptance.deliver_later
   end
 
   def proposal_role

@@ -1,8 +1,1 @@
-<p>Dear <%= @person&.fullname %>:</p>
-<p>
-  Thank you for indicating your interest in becoming a <%= @invite.invited_as?.downcase %> for the proposed workshop titled, "<%= @proposal.title %>", which is currently being organized by <%= @proposal.lead_organizer&.fullname %><%= @existing_organizers %>.
-  The organizing committee will be in touch regarding future steps if the proposal is successful.
-</p>
-<p>Sincerely,</p>
-<p>The Banff International Research Station<br>
-and the Organizing Committee</p>
+<%= simple_format(@body) %>

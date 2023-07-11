@@ -33,13 +33,16 @@ class InvitesController < ApplicationController
   end
 
   def invite_email
-    @inviters = if params[:id].eql?("0")
-                  Invite.where(proposal_id: @proposal.id, invited_as: params[:invited_as])
+    inviters = if params[:id].eql?("0")
+                 Invite.where(proposal_id: @proposal.id, invited_as: params[:invited_as])
                 else
                   Invite.where(proposal_id: @proposal.id, invited_as: params[:invited_as]).where('id > ?', params[:id])
                 end
 
-    send_invite_emails
+    inviters.each do |invite|
+      InviteMailer.with(invite: invite, lead_organizer_copy: false).invite_email.deliver_later
+      InviteMailer.with(invite: invite, lead_organizer_copy: true).invite_email.deliver_later
+    end
 
     head :ok
   end
@@ -68,8 +71,7 @@ class InvitesController < ApplicationController
 
   def invite_reminder
     if @invite.pending?
-      @organizers = @invite.proposal.supporting_organizers.map(&:fullname).join(', ')
-      InviteMailer.with(invite: @invite, organizers: @organizers).invite_reminder.deliver_later
+      InviteMailer.with(invite: @invite).invite_reminder.deliver_later
       check_user
     else
       redirect_to edit_proposal_path(@proposal), notice: t('invites.invite_reminder.success')
@@ -97,7 +99,7 @@ class InvitesController < ApplicationController
 
   def cancel_confirmed_invite
     ActiveRecord::Base.transaction do
-      @invite.proposal.proposal_roles.delete_by(person_id: @invite.person.id)
+      @invite.proposal.proposal_roles.delete_by(person_id: @invite.person_id)
       @invite.update_attribute(:status, 'cancelled')
     end
 
@@ -164,15 +166,6 @@ class InvitesController < ApplicationController
   def invite_params
     params.require(:invite).permit(:firstname, :lastname, :email, :invited_as,
                                    :deadline_date)
-  end
-
-  def send_invite_emails
-    @email_body = params[:body]
-    @inviters.each do |invite|
-      InviteMailer.with(invite: invite, body: @email_body).invite_email.deliver_later
-      InviteMailer.with(invite: invite, lead_organizer: @proposal.lead_organizer,
-                        body: @email_body).invite_email.deliver_later
-    end
   end
 
   def send_email_on_response
