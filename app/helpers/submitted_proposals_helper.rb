@@ -38,11 +38,11 @@ module SubmittedProposalsHelper
   end
 
   def submitted_career_labels
-    demographic_data.fetch('academic_status' 'other_academic_status').keys
+    demographic_data.fetch('academic_status', 'other_academic_status').keys
   end
 
   def submitted_career_values
-    demographic_data.fetch('academic_status' 'other_academic_status').values
+    demographic_data.fetch('academic_status', 'other_academic_status').values
   end
 
   def submitted_stem_labels
