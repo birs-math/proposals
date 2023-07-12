@@ -9,12 +9,14 @@ class SubmittedProposalsController < ApplicationController
                                                      reviews_excel_booklet]
 
   def index
-    @selected_year = params[:workshop_year] || Time.zone.today.year
+    @current_year = Time.zone.today.year
+    @selected_year = params[:workshop_year] || @current_year
+    @selected_year = ProposalFiltersQuery::EMPTY_YEAR if @selected_year.to_i.zero?
     @search_params = query_params.merge(workshop_year: @selected_year)
 
     respond_to do |format|
       # loads initial page, but without proposals
-      format.html
+      format.html { selected_year_pagination }
       # loads proposals by type using turbo lazy loading
       format.turbo_stream do
         @type = params[:proposal_type]
@@ -618,5 +620,13 @@ class SubmittedProposalsController < ApplicationController
 
   def check_reviews_permissions
     raise CanCan::AccessDenied unless @ability.can?(:manage, Review)
+  end
+
+  def selected_year_pagination
+    return if @selected_year.to_i.zero?
+
+    @selected_year_object = DateTime.strptime(@selected_year.to_s, "%Y")
+    @prev_year = 1.year.ago(@selected_year_object).year
+    @next_year = 1.year.from_now(@selected_year_object).year
   end
 end
