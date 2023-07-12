@@ -135,6 +135,7 @@ Rails.application.configure do
     protocol: 'https',
     host: ENV['APPLICATION_HOST']
   }
+  
   ## SMTP Settings
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.raise_delivery_errors = true
