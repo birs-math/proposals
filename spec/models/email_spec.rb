@@ -127,10 +127,8 @@ RSpec.describe Email, type: :model do
       end
     end
 
-
     it { expect(birs_email.update_status(proposal, 'Draft')).to be_falsey }
   end
-
 
   describe '#unwrap_cc_emails' do
     let(:email) { build(:birs_email) }

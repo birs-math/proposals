@@ -84,6 +84,7 @@ class SubmittedProposalsController < ApplicationController
     add_files
     if @email.save
       @email.send_email
+      log_activity(@proposal)
       page_redirect
     else
       @message = @email.errors.full_messages
