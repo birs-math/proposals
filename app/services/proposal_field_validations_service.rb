@@ -46,10 +46,8 @@ class ProposalFieldValidationsService
 
   def preferred_impossible_dates_validation
     if @answer.nil?
-      @errors << "You have to choose atleast #{proposal.proposal_type.min_no_of_preferred_dates}
-      preferred dates"
-      @errors << "You have to choose atleast #{proposal.proposal_type.min_no_of_impossible_dates}
-      impossible dates"
+      @errors << "You have to choose atleast #{proposal.proposal_type.min_no_of_preferred_dates} preferred dates"
+      @errors << "You have to choose atleast #{proposal.proposal_type.min_no_of_impossible_dates} impossible dates"
       return
     end
     preferred = JSON.parse(@answer)&.first(5)
@@ -59,20 +57,16 @@ class ProposalFieldValidationsService
     uniq_dates = JSON.parse(@answer).reject { |date| date == '' }
     @errors << "You can't select the same date twice" unless uniq_dates.uniq.count == uniq_dates.count
     if preferred_dates.count > proposal.proposal_type.max_no_of_preferred_dates
-      @errors << "You can choose maximum #{proposal.proposal_type.max_no_of_preferred_dates}
-      preferred dates"
+      @errors << "You can choose maximum #{proposal.proposal_type.max_no_of_preferred_dates} preferred dates"
     end
     if preferred_dates.count < proposal.proposal_type.min_no_of_preferred_dates
-      @errors << "You have to choose atleast #{proposal.proposal_type.min_no_of_preferred_dates}
-      preferred dates"
+      @errors << "You have to choose atleast #{proposal.proposal_type.min_no_of_preferred_dates} preferred dates"
    	end
     if impossible_dates.count > proposal.proposal_type.max_no_of_impossible_dates
-    	@errors << "You can choose maximum #{proposal.proposal_type.max_no_of_impossible_dates}
-      impossible dates"
+    	@errors << "You can choose maximum #{proposal.proposal_type.max_no_of_impossible_dates} impossible dates"
    	end
     if impossible_dates.count < proposal.proposal_type.min_no_of_impossible_dates
-      @errors << "You have to choose atleast #{proposal.proposal_type.min_no_of_impossible_dates}
-      impossible dates"
+      @errors << "You have to choose atleast #{proposal.proposal_type.min_no_of_impossible_dates} impossible dates"
     end
   end
   def attached_file

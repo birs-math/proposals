@@ -10,9 +10,7 @@ class SubmitProposalsController < ApplicationController
     @submission = result.submission
     @proposal = result.proposal
 
-    return redirect_to edit_proposal_path(@proposal), **result.flash_message if result.errors?
-
-    return staff_redirect if current_user.staff_member?
+    return redirect_back fallback_location: edit_proposal_path(@proposal), **result.flash_message if result.errors?
 
     session[:is_submission] = @proposal.is_submission = @submission.final?
 
@@ -21,7 +19,7 @@ class SubmitProposalsController < ApplicationController
       @attachment = generate_proposal_pdf || return
       confirm_submission
     else
-      redirect_to edit_proposal_path(@proposal), notice: t('submit_proposals.create.alert')
+      redirect_back fallback_location: edit_proposal_path(@proposal), notice: t('submit_proposals.create.alert')
     end
   end
 
@@ -183,15 +181,6 @@ class SubmitProposalsController < ApplicationController
                      "proposal_type" => @proposal.proposal_type&.name.to_s,
                      "proposal_title" => @proposal&.title.to_s }
     placeholders.each { |k, v| @template_body&.gsub!(k, v) }
-  end
-
-  def staff_redirect
-    if @submission.errors?
-      redirect_to edit_submitted_proposal_path(@proposal), alert: "Your submission has
-          errors: #{@submission.error_messages}.".squish
-    else
-      redirect_to submitted_proposals_path, notice: t('submit_proposals.staff_redirect.alert')
-    end
   end
 
   def change_proposal_status
