@@ -130,4 +130,31 @@ RSpec.describe Email, type: :model do
 
     it { expect(birs_email.update_status(proposal, 'Draft')).to be_falsey }
   end
+
+
+  describe '#unwrap_cc_emails' do
+    let(:email) { build(:birs_email) }
+    let(:wrapped_cc_email) { [{ value: 'somemail@example.com' }, { value: 'othermail@example.com' }].to_json }
+    let(:unwrapped_cc_email) { 'somemail@example.com, othermail@example.com' }
+
+    it 'parses JSON' do
+      email.cc_email = wrapped_cc_email
+      expect(email.send(:unwrap_cc_emails)).to eq(unwrapped_cc_email)
+    end
+
+    it 'does not touch strings' do
+      email.cc_email = unwrapped_cc_email
+      expect(email.send(:unwrap_cc_emails)).to eq(unwrapped_cc_email)
+    end
+
+    it 'does not error on empty strings' do
+      email.cc_email = ''
+      expect(email.send(:unwrap_cc_emails)).to eq('')
+    end
+
+    it 'does not error on nil' do
+      email.cc_email = nil
+      expect(email.send(:unwrap_cc_emails)).to eq('')
+    end
+  end
 end
