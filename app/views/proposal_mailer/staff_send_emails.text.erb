@@ -1,3 +1,2 @@
-Dear <%= @organizer %>,
-
-<%= @email.body %>
+Dear <%= @recipient_name %>,
+<%= raw(@email.body) %>

@@ -2,6 +2,8 @@ class Email < ApplicationRecord
   validates :subject, :body, presence: true
   belongs_to :proposal
 
+  before_create :unwrap_cc_emails
+
   has_many_attached :files
 
   def update_status(proposal, status)
@@ -39,52 +41,54 @@ class Email < ApplicationRecord
     false
   end
 
-  def email_organizers(organizers_email)
-    proposal_mailer(proposal.lead_organizer.email,
-                    proposal.lead_organizer.fullname)
+  def send_email
+    ProposalMailer.with(email_data: self).staff_send_emails.deliver_now
+  end
+
+  def email_organizers(organizers_email = nil)
+    proposal_mailer(proposal.lead_organizer.email, proposal.lead_organizer.fullname)
 
     @organizers_email = organizers_email
     send_organizers_email if @organizers_email.present?
   end
 
-  def new_email_organizers(organizers_email)
-    new_proposal_mailer(proposal.lead_organizer.email,
-                        proposal.lead_organizer.fullname)
-
-    @organizers_email = organizers_email
-    new_send_organizers_email if @organizers_email.present?
+  def to_action_mailer_hash
+    {
+      to: to_email,
+      subject: subject,
+      cc: string_to_a(cc_email),
+      bcc: string_to_a(bcc_email)
+    }
   end
 
-  def all_emails(email)
-    email&.split(', ')&.map { |val| val }
+  def to_email
+    recipient || proposal.lead_organizer.email
   end
 
-  def all_cc_emails(email)
-    JSON.parse(email).map(&:values).flatten
+  def recipient_fullname_or_email
+    Person.find_by(email: to_email)&.fullname || to_email
   end
 
   private
 
-  def proposal_mailer(email_address, organizer_name)
-    ProposalMailer.with(email_data: self, email: email_address,
-                        organizer: organizer_name)
-                  .staff_send_emails.deliver_now
+  def unwrap_cc_emails
+    self.cc_email = json_to_a(cc_email).join(', ')
   end
 
-  def new_proposal_mailer(email_address, organizer_name)
+  def proposal_mailer(email_address, organizer_name)
     ProposalMailer.with(email_data: self, email: email_address,
                         organizer: organizer_name)
                   .new_staff_send_emails.deliver_now
   end
 
-  def new_send_organizers_email
+  def send_organizers_email
     @organizers_email&.each do |email|
       next if email.nil?
 
       organizer = Invite.find_by(email: email)
       next if organizer.nil?
 
-      new_proposal_mailer(organizer.email, organizer.person.fullname)
+      proposal_mailer(organizer.email, organizer.person.fullname)
     end
   end
 
@@ -97,5 +101,19 @@ class Email < ApplicationRecord
       version = answer.version + 1
       answer.update(version: version)
     end
+  end
+
+  # SubmittedProposalsController#approve_decline_proposals and SubmittedProposalsController#send_emails
+  # return email#cc_email in form of json and just string, so we try unwrap it before cc_email hits db
+  def json_to_a(emails_string)
+    return [] if emails_string.blank?
+
+    JSON.parse(emails_string).map(&:values).flatten
+  rescue JSON::ParserError, TypeError
+    string_to_a(emails_string)
+  end
+
+  def string_to_a(emails_string)
+    emails_string.split(',').map(&:squish)
   end
 end

@@ -1,2 +1,2 @@
-<p>Dear <%= @organizer %>,</p>
-<p><%= raw @email.body %></p>
+<p>Dear <%= @recipient_name %>,</p>
+<%= simple_format(@email.body) %>

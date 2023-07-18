@@ -127,16 +127,7 @@ RSpec.describe Email, type: :model do
       end
     end
 
-    
-    it { expect(birs_email.update_status(proposal, 'Draft')).to be_falsey }
-  end
 
-  describe '#all_emails' do
-    let(:proposal) { create(:proposal) }
-    let(:birs_email) { create(:birs_email, proposal: proposal) }
-    let(:email) { ['test1@test.com', 'test2@test.com', 'test3@test.com'] }
-    it 'fetching all emails' do
-      expect(birs_email.all_emails(email)).to eq([email])
-    end
+    it { expect(birs_email.update_status(proposal, 'Draft')).to be_falsey }
   end
 end

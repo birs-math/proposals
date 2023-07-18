@@ -82,9 +82,8 @@ class SubmittedProposalsController < ApplicationController
       return
     end
     add_files
-    organizers_email_addresses
     if @email.save
-      @email.email_organizers(@organizers_email)
+      @email.send_email
       page_redirect
     else
       @message = @email.errors.full_messages
@@ -241,7 +240,7 @@ class SubmittedProposalsController < ApplicationController
   end
 
   def email_params
-    params.permit(:subject, :body, :cc_email, :bcc_email)
+    params.permit(:subject, :body, :recipient, :cc_email, :bcc_email)
   end
 
   def set_proposals
@@ -489,7 +488,7 @@ class SubmittedProposalsController < ApplicationController
   def send_email_proposals
     add_attachments
     organizers_email = @proposal.invites.where(invited_as: 'Organizer', status: :confirmed)&.pluck(:email)
-    @email.new_email_organizers(organizers_email) if @email.save
+    @email.email_organizers(organizers_email) if @email.save
     @errors << @email.errors.full_messages unless @email.errors.empty?
   end
 
