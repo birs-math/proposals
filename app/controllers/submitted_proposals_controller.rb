@@ -42,6 +42,8 @@ class SubmittedProposalsController < ApplicationController
   end
 
   def send_to_workshop
+    return head :unprocessable_entity if params[:ids].blank?
+
     proposal_codes = Proposal.where(id: params[:ids].split(',')).pluck(:code)
 
     ExportProposalsJob.perform_later(proposal_codes)
