@@ -1,4 +1,5 @@
-class ScheduledProposalService
+# TODO: Move code to serializer
+class WorkshopsApiProposal
   attr_reader :proposal, :errors
 
   def initialize(proposal)
@@ -32,9 +33,9 @@ class ScheduledProposalService
   end
 
   def event_end_date
-    return (@proposal.applied_date + 5.days) if @proposal.proposal_type.length.blank?
+    return (@proposal.safe_applied_date + 5.days) if @proposal.proposal_type.length.blank?
 
-    @proposal.applied_date + @proposal.proposal_type.length.days
+    @proposal.safe_applied_date + @proposal.proposal_type.length.days
   end
 
   def proposal_press_release
@@ -95,7 +96,7 @@ class ScheduledProposalService
       person: person_data(@proposal.lead_organizer)
     }]
 
-    @proposal.invites.find_each do |invite|
+    @proposal.invites.confirmed.find_each do |invite|
       next if invite.person.blank?
 
       members << {
