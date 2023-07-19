@@ -9,6 +9,8 @@ class Location < ApplicationRecord
   has_many :schedule_runs
   validate :date_rules
 
+  scope :birs, -> { find_by(code: 'BIRS') }
+
   def date_rules
     return if start_date.nil? || end_date.nil?
 

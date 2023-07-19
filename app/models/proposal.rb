@@ -294,6 +294,12 @@ class Proposal < ApplicationRecord
       end
   end
 
+  def safe_assigned_location
+    return assigned_location if assigned_location.exists?
+
+    Location.birs
+  end
+
   private
 
   def preferred_impossible_field
