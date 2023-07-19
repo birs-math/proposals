@@ -86,8 +86,7 @@ class ProposalMailer < ApplicationMailer
                                                                      .map do |p|
                                                                  "#{p.firstname} #{p.lastname}"
                                                                end.join(', '),
-                     "[WORKSHOP SUPPORTING_ORGANIZER_EMAIL]" => "#{JSON.parse(@email.cc_email).map(&:values).flatten
-                     .join(', ')}, #{@email.bcc_email}",
+                     "[WORKSHOP SUPPORTING_ORGANIZER_EMAIL]" => @email.cc_email,
                      "[INSERT ASSIGNED DATES]" => workshop_date_range(@email.proposal&.assigned_date),
                      "[INSERT APPLIED DATES]" => workshop_date_range(@email.proposal&.applied_date) }
     placeholders.each { |k, v| @template_body.gsub!(k, v) }

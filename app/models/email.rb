@@ -69,6 +69,10 @@ class Email < ApplicationRecord
     Person.find_by(email: to_email)&.fullname || to_email
   end
 
+  def string_to_a(emails_string)
+    emails_string&.split(',')&.map(&:squish) || []
+  end
+
   private
 
   def unwrap_cc_emails
@@ -111,9 +115,5 @@ class Email < ApplicationRecord
     JSON.parse(emails_string).map(&:values).flatten
   rescue JSON::ParserError, TypeError
     string_to_a(emails_string)
-  end
-
-  def string_to_a(emails_string)
-    emails_string.split(',').map(&:squish)
   end
 end
