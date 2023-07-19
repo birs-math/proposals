@@ -6,7 +6,7 @@
       </h1>
       <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><%= link_to "Dashboard", dashboards_path %> </a></li>
+          <li class="breadcrumb-item"><%= link_to "Dashboard", dashboards_path %></li>
           <li class="breadcrumb-item" aria-current="page"><%= link_to "Submitted Proposals", submitted_proposals_path %></li>
           <li class="breadcrumb-item active">Reviews</li>
         </ol>
@@ -53,7 +53,7 @@
                           <% review.files&.each do |file| %>
                             <div>
                               <%= link_to file.filename, rails_blob_path(file), target: "_blank" %>
-                              <span data-review-id="<%= review.id %>" data-attachment-id="<%= file.id %>" 
+                              <span data-review-id="<%= review.id %>" data-attachment-id="<%= file.id %>"
                                 data-action="click->submitted-proposals#removeFile" class="btn btn-sm btn-light">
                                   Remove file
                               </span>

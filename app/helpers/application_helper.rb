@@ -1,4 +1,6 @@
 module ApplicationHelper
+  include Pagy::Frontend
+
   def active_menu(target_path)
     return 'active' if request.path == target_path
 
@@ -44,5 +46,9 @@ module ApplicationHelper
       1 => 'one', 2 => 'two', 3 => 'three', 4 => 'four', 5 => 'five',
       6 => 'six', 7 => 'seven', 8 => 'eight', 9 => 'nine', 10 => 'ten'
     }
+  end
+
+  def turbo_stream_flash
+    turbo_stream.prepend "flash", partial: "layouts/toastr"
   end
 end

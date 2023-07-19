@@ -22,14 +22,14 @@ class ProposalsController < ApplicationController
     @proposal = Proposal.new
   end
 
+  def show
+    log_activity(@proposal)
+  end
+
   def create
     create_result = Proposals::Initialize.call(current_user: current_user, proposal_params: proposal_params)
 
     redirect_to create_result.redirect_url, create_result.flash_message
-  end
-
-  def show
-    log_activity(@proposal)
   end
 
   def edit
@@ -121,6 +121,8 @@ class ProposalsController < ApplicationController
 
   def set_proposal
     @proposal = Proposal.find(params[:id])
+    # params[:id] could be a code
+    @proposal_ids = [@proposal.id]
     @submission = session[:is_submission]
   end
 

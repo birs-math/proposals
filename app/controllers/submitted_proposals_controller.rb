@@ -1,7 +1,6 @@
 class SubmittedProposalsController < ApplicationController
   before_action :authenticate_user!
   before_action :authorize_user
-  before_action :set_proposals, only: %i[index]
   before_action :set_proposal, except: %i[index download_csv import_reviews
                                           reviews_booklet reviews_excel_booklet booklet_log]
   before_action :template_params, only: %i[approve_decline_proposals]
@@ -9,15 +8,37 @@ class SubmittedProposalsController < ApplicationController
                                                      reviews_booklet
                                                      reviews_excel_booklet]
 
-  def index; end
+  def index
+    @current_year = Time.zone.today.year
+    @selected_year = params[:workshop_year] || @current_year
+    @selected_year = ProposalFiltersQuery::EMPTY_YEAR if @selected_year.to_i.zero?
+    @search_params = query_params.merge(workshop_year: @selected_year)
+
+    respond_to do |format|
+      # loads initial page, but without proposals
+      format.html { selected_year_pagination }
+      # loads proposals by type using turbo lazy loading
+      format.turbo_stream do
+        @type = params[:proposal_type]
+        @pagy, @proposals = pagy(proposals_query_with_filters, items: 100)
+      end
+    end
+  end
+
+  def demographic_data
+    @proposal_ids = proposals_query_with_filters(demographic_data_params).pluck(:id)
+  end
 
   def show
     @proposal.review! if @proposal.may_review?
+    @proposal_ids = [@proposal.id]
+
     log_activity(@proposal)
   end
 
   def edit
     @proposal.invites.build
+    @proposal_ids = [@proposal.id]
   end
 
   def send_to_workshop
@@ -100,6 +121,7 @@ class SubmittedProposalsController < ApplicationController
                     notice: t('submitted_proposals.destroy.success')
       end
       format.json { head :no_content }
+      format.turbo_stream { flash.now[:notice] = t('submitted_proposals.destroy.success') }
     end
   end
 
@@ -228,13 +250,21 @@ class SubmittedProposalsController < ApplicationController
 
   private
 
+  def proposals_query_with_filters(params = query_params)
+    ProposalFiltersQuery.new(Proposal.order(:code, :created_at)).find(params)
+  end
+
+  def query_params
+    params.permit(:workshop_year, :keywords, :proposal_type, :location, :outcome, status: [], subject_area: [])
+  end
+
+  def demographic_data_params
+    query_params.slice(:workshop_year).merge(status: :not_draft)
+  end
+
   def selected_proposal_ids
     params.require(:proposal).permit(id: [])
   end
-
-  # def query_params?
-  #   params.values.any?(&:present?)
-  # end
 
   def outcome_location_params
     params.require(:proposal).permit(:outcome, :assigned_location_id, :assigned_size)
@@ -242,11 +272,6 @@ class SubmittedProposalsController < ApplicationController
 
   def email_params
     params.permit(:subject, :body, :cc_email, :bcc_email)
-  end
-
-  def set_proposals
-    @proposals = Proposal.order(:code, :created_at)
-    @proposals = ProposalFiltersQuery.new(@proposals).find(params)
   end
 
   def change_status
@@ -595,5 +620,13 @@ class SubmittedProposalsController < ApplicationController
 
   def check_reviews_permissions
     raise CanCan::AccessDenied unless @ability.can?(:manage, Review)
+  end
+
+  def selected_year_pagination
+    return if @selected_year.to_i.zero?
+
+    @selected_year_object = DateTime.strptime(@selected_year.to_s, "%Y")
+    @prev_year = 1.year.ago(@selected_year_object).year
+    @next_year = 1.year.from_now(@selected_year_object).year
   end
 end

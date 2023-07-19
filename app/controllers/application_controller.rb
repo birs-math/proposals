@@ -1,4 +1,6 @@
 class ApplicationController < ActionController::Base
+  include Pagy::Backend
+
   before_action :assign_ability, :set_current_user
 
   rescue_from ActiveRecord::RecordNotFound, with: :record_not_found

@@ -9,7 +9,7 @@
       </h1>
       <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><%= link_to "Dashboard", dashboards_path %> </a></li>
+          <li class="breadcrumb-item"><%= link_to "Dashboard", dashboards_path %></li>
           <li class="breadcrumb-item active" aria-current="page"><%= link_to "Submitted Proposals", submitted_proposals_path %></li>
         </ol>
       </nav>
@@ -19,47 +19,39 @@
         <div class="card" data-controller="submitted-proposals">
           <div class="card-header">
             <form class="form-inline">
-              
-              <div class="row mb-3">
-                <div class="col-xs-6 col-md-3">
+              <div class="row">
+                <div class="col-xs-6 col-lg-4">
                   <label class="form-label">Keywords</label><br>
                   <input type="search" class="form-control" name="keywords" placeholder="Enter Keywords" value="<%= params[:keywords] %>">
                 </div>
-                <div class="col-xs-6 col-md-3">
-                  <label class="form-label">Proposal Type</label><br>
-                  <%= select_tag "proposal_type", options_for_select(all_proposal_types, params[:proposal_type]), { include_blank: '', class: 'form-select p-1' }%>
-                </div>
-                <div class="col-xs-6 col-md-2">
-                  <label class="form-label">Workshop Year</label><br>
-                  <%= select_tag "workshop_year", options_for_select([[2021, 2021], [2022, 2022], [2023,2023], [2024, 2024], [2025, 2025], [2026, 2026], [2027, 2027], [2028, 2028], [2029, 2029]], params[:workshop_year]), { include_blank: '', class: 'form-select mb-3 p-1', style: 'width: 116px;'}%>
-                </div>
-                <div class="col-xs-6 col-md-3">
-                  <label class="form-label">Status</label><br>
-                  <%= select_tag :status, options_for_select(all_statuses, params[:status]), { include_blank: '', class: 'form-select p-1', multiple: true } %>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-xs-6 col-md-6">
+                <div class="col-xs-6 col-lg-3">
                   <label class="form-label">Subject Area</label><br>
                   <%= select_tag "subject_area", options_for_select(subjects_area, params[:subject_area]), { include_blank: '', class: 'form-select p-1', multiple: true }%>
                 </div>
-                <div class="col-xs-6 col-md-2">
+                <div class="col-xs-6 col-lg-3">
+                  <label class="form-label">Status</label><br>
+                  <%= select_tag :status, options_for_select(all_statuses, params[:status]), { include_blank: '', class: 'form-select p-1', multiple: true } %>
+                </div>
+                <div class="text-center col-xs-6 col-md-2 align-self-center">
+                  <%= hidden_field_tag :workshop_year, @selected_year %>
+                  <button class="btn btn-primary">Search</button>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-xs-6 col-lg-2">
                   <label class="form-label">Location</label><br>
                   <%= select_tag "location", options_for_select(locations, params[:location]), { include_blank: '', class: 'form-select p-1' }%>
                 </div>
-                <div class="col-xs-6 col-md-2">
+                <div class="col-xs-6 col-lg-2">
                   <label class="form-label">Outcome</label><br>
                   <%= select_tag "outcome", options_for_select(proposal_outcome, params[:outcome]), { include_blank: '', class: 'form-select p-1' }%>
-                </div>
-                <div class="text-end col-xs-6 col-md-2">
-                  <button class="btn btn-primary">Search</button>
                 </div>
               </div>
             </form>
           </div>
           <div class="card-body"  style="background: #f4f7fc">
             <div class="col-12 col-lg-12">
-              
+
               <div class="tab">
                 <ul class="nav nav-tabs" role="tablist">
                   <li class="nav-item col-6"><a class="nav-link active" href="#tab-1" data-bs-toggle="tab" role="tab">Submitted Proposals</a></li>
@@ -72,7 +64,8 @@
                     <div class="text-end m-3">
                       <%= render 'table_window' %>
                     </div>
-                    <%= render partial: "proposals" %>
+                    <%= render partial: 'submitted_proposals/index/years_pagination' %>
+                    <%= render partial: "submitted_proposals/index/proposals_list" %>
                     <div>
                       <span data-action="click->submitted-proposals#selectAllProposals" data-submitted-proposals-target="allProposals" class="btn btn-primary">Select All</span>
                       <span data-action="click->submitted-proposals#unselectAllProposals" data-submitted-proposals-target="noProposals" class="btn btn-primary">Select None</span>
@@ -97,12 +90,11 @@
                       <% end %>
                     </div>
                   </div>
-                  
+
                   <div class="tab-pane" id="tab-2" role="tabpanel">
-                    <%= render partial: "demographic_charts" %>
+                    <%= turbo_frame_tag "proposals_demographic_data", src: demographic_data_submitted_proposals_path(format: :turbo_stream, **@search_params.slice(:workshop_year)), loading: :lazy %>
                   </div>
                 </div>
-
               </div>
             </div>
           </div>

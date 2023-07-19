@@ -45,6 +45,10 @@ en:
   proposals:
     initialize: 'Started a new %{proposal_type} proposal!'
     limit_per_type_per_year: 'There is a limit of one %{proposal_type} proposal per year.'
+    ui:
+      no_proposals: No proposals found
+      current_year: 'Current year (%{year})'
+      no_year_set: 'Empty year'
     form:
       add_organizers: 'Add Supporting Organizers:'
       add_participants: 'Add Participants:'

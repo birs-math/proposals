@@ -33,6 +33,7 @@ Rails.application.routes.draw do
       get :download_review_booklet
       get :reviews_excel_booklet
       post :proposal_outcome_location
+      get :demographic_data
     end
     member do
       post :update_status

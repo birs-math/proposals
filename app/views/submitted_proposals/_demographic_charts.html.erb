@@ -1,6 +1,13 @@
-<div>
-  <div class="mb-3">Charts</div>
-
+<% section_title = local_assigns.has_key?(:title) ? local_assigns.fetch(:title) : 'Charts' %>
+<div data-controller="demographic-charts"
+     data-demographic-charts-career-labels-value="<%= submitted_career_labels %>"
+     data-demographic-charts-career-value="<%= submitted_career_values %>"
+     data-demographic-charts-gender-labels-value="<%= submitted_gender_labels %>"
+     data-demographic-charts-gender-value="<%= submitted_gender_values %>"
+     data-demographic-charts-stem-labels-value="<%= submitted_stem_labels %>"
+     data-demographic-charts-stem-value="<%= submitted_stem_values %>"
+>
+  <div class="mb-3"><%= section_title %></div>
   <div class="row">
     <div class="col-12 col-lg-6">
       <div class="card flex-fill w-100">
@@ -16,7 +23,7 @@
               </tr>
             </thead>
             <tbody>
-              <% submitted_nationality_data(@proposals).each do |key, value| %>
+              <% submitted_nationality_data.each do |key, value| %>
               <tr>
                 <td><%= key %></td>
                 <td><%=  value %></td>
@@ -41,7 +48,7 @@
               </tr>
             </thead>
             <tbody>
-              <% submitted_ethnicity_data(@proposals).each do |key, value| %>
+              <% submitted_ethnicity_data.each do |key, value| %>
               <tr>
                 <td><%= key %></td>
                 <td><%=  value %></td>
@@ -54,195 +61,43 @@
     </div>
   </div>
   <div class="row">
-    <div class="col-12 col-lg-6">
+    <div class="col-12">
       <div class="card flex-fill w-100">
         <div class="card-header">
           <h5 class="card-title">Gender</h5>
-          <!-- <h6 class="card-subtitle text-muted">A line chart is a way of plotting data points on a line.</h6> -->
         </div>
         <div class="card-body">
           <div class="chart">
-            <canvas id="chartjs-gender"></canvas>
+            <canvas data-demographic-charts-target="genderChart" id="chartjs-gender"></canvas>
           </div>
         </div>
       </div>
     </div>
-    <div class="col-12 col-lg-6">
+    <div class="col-12">
       <div class="card flex-fill w-100">
         <div class="card-header">
           <h5 class="card-title">Under-represented minority in STEM</h5>
-          <!-- <h6 class="card-subtitle text-muted">A line chart is a way of plotting data points on a line.</h6> -->
         </div>
         <div class="card-body">
           <div class="chart">
-            <canvas id="chartjs-stem"></canvas>
+            <canvas data-demographic-charts-target="stemChart" id="chartjs-stem"></canvas>
           </div>
         </div>
       </div>
     </div>
   </div>
   <div class="row">
-    <div class="col-12 col-lg-6">
+    <div class="col-12">
       <div class="card flex-fill w-100">
         <div class="card-header">
           <h5 class="card-title">Career Stage</h5>
         </div>
         <div class="card-body">
           <div class="chart">
-            <canvas id="chartjs-career"></canvas>
+            <canvas data-demographic-charts-target="careerChart" id="chartjs-career"></canvas>
           </div>
         </div>
       </div>
     </div>
   </div>
 </div>
-  <script>
-  document.addEventListener("DOMContentLoaded", function() {
-    new Chart(document.getElementById("chartjs-gender"), {
-      type: "bar",
-      data: {
-        labels: <%= submitted_gender_labels(@proposals).to_json.html_safe %>,
-        datasets: [{
-          fill: true,
-          backgroundColor: "rgba(50, 83, 168)",
-          borderColor: window.theme.primary,
-          data: <%= submitted_gender_values(@proposals) %>
-        }]
-      },
-      options: {
-        maintainAspectRatio: false,
-        legend: {
-          display: false
-        },
-        tooltips: {
-          intersect: false
-        },
-        hover: {
-          intersect: true
-        },
-        plugins: {
-          filler: {
-            propagate: false
-          }
-        },
-        scales: {
-          xAxes: [{
-            reverse: true,
-            gridLines: {
-              color: "rgba(0,0,0,0.05)"
-            }
-          }],
-          yAxes: [{
-            ticks: {
-              stepSize: 500
-            },
-            display: true,
-            borderDash: [5, 5],
-            gridLines: {
-              color: "rgba(0,0,0,0)",
-              fontColor: "#fff"
-            }
-          }]
-        }
-      }
-    });
-
-    new Chart(document.getElementById("chartjs-stem"), {
-      type: "bar",
-      data: {
-        labels: <%= submitted_stem_labels(@proposals).to_json.html_safe %>,
-        datasets: [{
-          fill: true,
-          backgroundColor: "rgba(50, 83, 168)",
-          borderColor: window.theme.primary,
-          data: <%= submitted_stem_values(@proposals) %>
-        }]
-      },
-      options: {
-        maintainAspectRatio: false,
-        legend: {
-          display: false
-        },
-        tooltips: {
-          intersect: false
-        },
-        hover: {
-          intersect: true
-        },
-        plugins: {
-          filler: {
-            propagate: false
-          }
-        },
-        scales: {
-          xAxes: [{
-            reverse: true,
-            gridLines: {
-              color: "rgba(0,0,0,0.05)"
-            }
-          }],
-          yAxes: [{
-            ticks: {
-              stepSize: 500
-            },
-            display: true,
-            borderDash: [5, 5],
-            gridLines: {
-              color: "rgba(0,0,0,0)",
-              fontColor: "#fff"
-            }
-          }]
-        }
-      }
-    });
-
-    new Chart(document.getElementById("chartjs-career"), {
-      type: "bar",
-      data: {
-        labels: <%= submitted_career_labels(@proposals).to_json.html_safe %>,
-        datasets: [{
-          fill: true,
-          backgroundColor: "rgba(50, 83, 168)",
-          borderColor: window.theme.primary,
-          data: <%= submitted_career_values(@proposals) %>
-        }]
-      },
-      options: {
-        maintainAspectRatio: false,
-        legend: {
-          display: false
-        },
-        tooltips: {
-          intersect: false
-        },
-        hover: {
-          intersect: true
-        },
-        plugins: {
-          filler: {
-            propagate: false
-          }
-        },
-        scales: {
-          xAxes: [{
-            reverse: true,
-            gridLines: {
-              color: "rgba(0,0,0,0.05)"
-            }
-          }],
-          yAxes: [{
-            ticks: {
-              stepSize: 500
-            },
-            display: true,
-            borderDash: [5, 5],
-            gridLines: {
-              color: "rgba(0,0,0,0)",
-              fontColor: "#fff"
-            }
-          }]
-        }
-      }
-    });
-  });
-</script>
