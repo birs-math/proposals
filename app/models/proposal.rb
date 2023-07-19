@@ -295,7 +295,7 @@ class Proposal < ApplicationRecord
   end
 
   def safe_assigned_location
-    return assigned_location if assigned_location.exists?
+    return assigned_location if assigned_location.present?
 
     Location.birs
   end
