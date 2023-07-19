@@ -22,7 +22,7 @@ class WorkshopsApiProposal
     {
       code: @proposal.code,
       name: @proposal.title,
-      start_date: @proposal.applied_date,
+      start_date: @proposal.safe_applied_date,
       end_date: event_end_date,
       event_type: @proposal.proposal_type.name,
       location: @proposal.assigned_location.code,
