@@ -147,8 +147,6 @@ export default class extends Controller {
 
   sendInviteEmails(id, invitedAs, inviteId, data) {
     var url = ''
-    let formData = new FormData()
-    let emailBody = $('#email_body').text()
     if(data.errors.length > 0 && data.counter === 0) {
        $.each(data.errors, function(index, error) {
         toastr.error(error)
@@ -161,12 +159,10 @@ export default class extends Controller {
       $.each(data.errors, function(index, error) {
         toastr.error(error)
       })
-      formData.append("body", emailBody)
       url = `/proposals/${id}/invites/${inviteId}/invite_email?invited_as=${invitedAs}`
       Rails.ajax({
         url,
         type: "POST",
-        data: formData,
         success: () => {
           setTimeout(function() {
             window.location.reload();
@@ -175,12 +171,10 @@ export default class extends Controller {
       })
     }
     else {
-      formData.append("body", emailBody)
       url = `/proposals/${id}/invites/${inviteId}/invite_email?invited_as=${invitedAs}`
       Rails.ajax({
         url,
         type: "POST",
-        data: formData,
         success: () => {
           toastr.success('Invitation has been sent!')
           setTimeout(function() {
