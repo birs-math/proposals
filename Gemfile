@@ -34,6 +34,7 @@ gem 'sass-rails', '>= 6'
 gem 'tinymce-rails', '5.10.2'
 gem 'turbo-rails', '~> 1.4'
 gem 'webpacker', '~> 5.0'
+gem 'sucker_punch', '~> 3.0'
 
 group :development, :test do
   gem 'byebug'

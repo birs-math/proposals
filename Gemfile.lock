@@ -367,6 +367,8 @@ GEM
       net-ssh (>= 2.8.0)
     stimulus-rails (1.2.1)
       railties (>= 6.0.0)
+    sucker_punch (3.1.0)
+      concurrent-ruby (~> 1.0)
     thor (1.2.2)
     tilt (2.2.0)
     timeout (0.3.2)
@@ -463,6 +465,7 @@ DEPENDENCIES
   simplecov
   simplecov-lcov
   spring
+  sucker_punch (~> 3.0)
   tinymce-rails (= 5.10.2)
   turbo-rails (~> 1.4)
   web-console (>= 4.1.0)
