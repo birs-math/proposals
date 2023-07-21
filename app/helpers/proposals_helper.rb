@@ -7,10 +7,6 @@ module ProposalsHelper
     proposal_type.map { |pt| [pt.name, pt.id] }
   end
 
-  def no_of_participants(id, invited_as)
-    Invite.where('invited_as = ? AND proposal_id = ?', invited_as, id)
-  end
-
   def confirmed_participants(id, invited_as)
     Invite.where('invited_as = ? AND proposal_id = ?', invited_as, id)
           .where.not(status: 'cancelled')

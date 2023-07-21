@@ -97,7 +97,6 @@ export default class extends Controller {
   editPreview ()  {
     event.preventDefault()
     let id = event.currentTarget.dataset.id;
-    let invitedAs = event.currentTarget.id;
     $.get(`/invites/show_invite_modal/${id}`, function(data) {
         $('#invite-modal-body').html(data)
         $('#invite-modal').modal('show')
@@ -108,7 +107,6 @@ export default class extends Controller {
   editLeadPreview () {
     event.preventDefault()
     let id = event.currentTarget.dataset.id;
-    let invitedAs = event.currentTarget.id;
     $.get(`/person/show_person_modal/${id}`, function(data) {
         $('#invite-person-body').html(data)
         $('#person-modal').modal('show')
@@ -116,72 +114,22 @@ export default class extends Controller {
     )
   }
 
+  // TODO: do not send whole form when inviting
   sendInvite () {
     let id = event.currentTarget.dataset.id;
-    let invitedAs = ''
-    let inviteId = 0
-    let _this = this
-    let inviteParticipant = event.currentTarget.dataset.participant || 0
-    let inviteOrganizer = event.currentTarget.dataset.organizer || 0
-    var body = $('#email_body').text()
     $.post(`/submit_proposals/create_invite?proposal=${id}`,
-      $('form#submit_proposal').serialize(), function(data) {
-        if (body.toLowerCase().includes("supporting organizer")) {
-          invitedAs = 'Organizer'
-          inviteId = inviteOrganizer
-        }
-        else if (body.toLowerCase().includes("participant")) {
-          invitedAs = 'Participant'
-          inviteId = inviteParticipant
-        }
-        _this.sendInviteEmails(id, invitedAs, inviteId, data)
-      }
-    )
-    .fail(function(response) {
-      let errors = response.responseJSON
-      $.each(errors, function(index, error) {
-        toastr.error(error)
-      })
-    });
-  }
-
-  sendInviteEmails(id, invitedAs, inviteId, data) {
-    var url = ''
-    if(data.errors.length > 0 && data.counter === 0) {
-       $.each(data.errors, function(index, error) {
-        toastr.error(error)
+      $('form#submit_proposal').serialize()
+    ).done(function(response) {
+      if (response.errors.length > 0) {
+        $.each(response.errors, function(index, error) {
+          toastr.error(error)
+        })
+      } else {
+        toastr.success('Invitation has been sent!')
         setTimeout(function() {
-          window.location.reload();
+          $('#email-preview').modal('hide')
         }, 2000)
-      })
-    }
-    else if(data.errors.length > 0 && data.counter > 0) {
-      $.each(data.errors, function(index, error) {
-        toastr.error(error)
-      })
-      url = `/proposals/${id}/invites/${inviteId}/invite_email?invited_as=${invitedAs}`
-      Rails.ajax({
-        url,
-        type: "POST",
-        success: () => {
-          setTimeout(function() {
-            window.location.reload();
-          }, 3000)
-        }
-      })
-    }
-    else {
-      url = `/proposals/${id}/invites/${inviteId}/invite_email?invited_as=${invitedAs}`
-      Rails.ajax({
-        url,
-        type: "POST",
-        success: () => {
-          toastr.success('Invitation has been sent!')
-          setTimeout(function() {
-            window.location.reload();
-          }, 2000)
-        }
-      })
-    }
+      }
+    });
   }
 }

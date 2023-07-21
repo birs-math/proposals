@@ -52,9 +52,11 @@ class SubmitProposalsController < ApplicationController
     params[:invites_attributes].each_value do |invite|
       @invite = @proposal.invites.new(invite_params(invite))
       invite_save
-      next if @invite.errors.empty?
-
-      invalid_email_error_message
+      if @invite.errors.empty?
+        @invite.send_invite_email
+      else
+        invalid_email_error_message
+      end
     end
 
     render json: { errors: @errors, counter: @counter }, status: :ok
