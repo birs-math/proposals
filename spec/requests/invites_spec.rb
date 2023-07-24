@@ -288,42 +288,6 @@ RSpec.describe "/proposals/:proposal_id/invites", type: :request do
     end
   end
 
-  describe "POST /invite_email" do
-    context 'when id in params is 0' do
-      before do
-        authenticate_for_controllers
-        params = {
-          proposal_id: proposal.id,
-          id: 0,
-          code: invite.code,
-          invited_as: "Participant",
-          body: "Send email to participant for proposal invitation."
-        }
-        post invite_email_proposal_invite_path(params)
-      end
-      it "send invite email" do
-        expect(response).to have_http_status(:ok)
-      end
-    end
-
-    context 'when id in params is not 0' do
-      before do
-        authenticate_for_controllers
-        params = {
-          proposal_id: proposal.id,
-          id: invite.id,
-          code: invite.code,
-          invited_as: "Participant",
-          body: "Send email to participant for proposal invitation."
-        }
-        post invite_email_proposal_invite_path(params)
-      end
-      it "send invite email" do
-        expect(response).to have_http_status(:ok)
-      end
-    end
-  end
-
   describe "POST /inviter_reminder with staff member" do
     before do
       authenticate_for_controllers

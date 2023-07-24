@@ -27,13 +27,14 @@ class InviteMailerContext
     @invite = params[:invite]
     @proposal = invite.proposal
     @params = params
+    @person = invite.person
   end
 
   def call
     {
-      person_name: invite.person&.fullname,
-      person_firstname: invite.person&.firstname,
-      person_lastname: invite.person&.lastname,
+      person_name: invitee_fullname,
+      person_firstname: invitee_firstname,
+      person_lastname: invitee_lastname,
       invited_as: invited_as_text(invite),
       invited_role: invite.humanize_invited_as,
       proposal_type: proposal.proposal_type.name,
@@ -48,10 +49,22 @@ class InviteMailerContext
 
   private
 
-  attr_reader :invite, :proposal, :params
+  attr_reader :invite, :person, :proposal, :params
+
+  def invitee_firstname
+    person&.firstname || invite.firstname
+  end
+
+  def invitee_lastname
+    person&.lastname || invite.lastname
+  end
+
+  def invitee_fullname
+    "#{invitee_firstname} #{invitee_lastname}"
+  end
 
   def supporting_organizers
-    @supporting_organizers ||= invite.proposal.supporting_organizers.map(&:fullname)
+    @supporting_organizers ||= proposal.supporting_organizers.map(&:fullname)
   end
 
   def invited_as_text(invite)

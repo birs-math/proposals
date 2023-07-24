@@ -164,14 +164,6 @@ RSpec.describe ProposalsHelper, type: :helper do
     end
   end
 
-  describe "#no_of_participants" do
-    let(:proposal) { create(:proposal) }
-    let(:invites) { create_list(:invite, 2, proposal_id: proposal.id, invited_as: "Organizer") }
-    it "returns total  participants" do
-      expect(no_of_participants(proposal.id, "Organizer")).to eq(invites)
-    end
-  end
-
   describe "#confirmed_participants" do
     let(:proposal) { create(:proposal) }
     let(:invites) { create_list(:invite, 2, proposal_id: proposal.id, invited_as: "Organizer", status: "confirmed") }

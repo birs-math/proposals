@@ -1,6 +1,6 @@
 class InvitesController < ApplicationController
   before_action :authenticate_user!, except: %i[show inviter_response thanks cancelled]
-  before_action :set_proposal, only: %i[invite_reminder invite_email new_invite]
+  before_action :set_proposal, only: %i[invite_reminder new_invite]
   before_action :set_invite,
                 only: %i[show inviter_response invite_reminder]
   before_action :set_invite_proposal, only: %i[show]
@@ -30,21 +30,6 @@ class InvitesController < ApplicationController
     else
       redirect_to edit_submitted_proposal_url(@invite.proposal_id), **result.flash_message
     end
-  end
-
-  def invite_email
-    inviters = if params[:id].eql?("0")
-                 Invite.where(proposal_id: @proposal.id, invited_as: params[:invited_as])
-                else
-                  Invite.where(proposal_id: @proposal.id, invited_as: params[:invited_as]).where('id > ?', params[:id])
-                end
-
-    inviters.each do |invite|
-      InviteMailer.with(invite: invite, lead_organizer_copy: false).invite_email.deliver_later
-      InviteMailer.with(invite: invite, lead_organizer_copy: true).invite_email.deliver_later
-    end
-
-    head :ok
   end
 
   def inviter_response

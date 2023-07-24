@@ -82,6 +82,11 @@ class Invite < ApplicationRecord
     deadline_date >= DateTime.current.beginning_of_day
   end
 
+  def send_invite_email
+    InviteMailer.with(invite: self, lead_organizer_copy: false).invite_email.deliver_later
+    InviteMailer.with(invite: self, lead_organizer_copy: true).invite_email.deliver_later
+  end
+
   private
 
   def downcase_email
