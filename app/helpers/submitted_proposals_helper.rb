@@ -9,7 +9,7 @@ module SubmittedProposalsHelper
   end
 
   def all_proposal_types
-    ProposalType.all.map { |pt| [pt.name, pt.id] }
+    @all_proposal_types ||= ProposalType.pluck(:name, :id)
   end
 
   def demographic_data
@@ -69,5 +69,15 @@ module SubmittedProposalsHelper
 
   def seleted_assigned_date(proposal)
     proposal.assigned_date ? "#{proposal.assigned_date} - #{proposal.assigned_date + 5.days}" : ''
+  end
+
+  def edi_reviews_count(proposal_id)
+    @edi_reviews_count ||= Review.unscoped.edi.where(proposal: @proposals).group(:proposal_id).count
+    @edi_reviews_count[proposal_id] || 0
+  end
+
+  def scientific_reviews_count(proposal_id)
+    @scientific_reviews_count ||= Review.unscoped.scientific.where(proposal: @proposals).group(:proposal_id).count
+    @scientific_reviews_count[proposal_id] || 0
   end
 end

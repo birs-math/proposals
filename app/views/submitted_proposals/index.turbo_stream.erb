@@ -36,8 +36,8 @@
         <div class="col-xl col-sm-12 py-md-1"><%= proposal.outcome&.capitalize %></div>
         <div class="col-xl col-sm-12 py-md-1"><%= proposal&.updated_at&.to_date %></div>
         <div class="col-xl col-sm-12 py-md-1"><%= proposal&.edit_flow&.to_date %></div>
-        <div class="col-xl col-sm-12 py-md-1"><%= proposal.reviews.edi.count  %></div>
-        <div class="col-xl col-sm-12 py-md-1"><%= proposal.reviews.scientific.count  %></div>
+        <div class="col-xl col-sm-12 py-md-1"><%= edi_reviews_count(proposal.id)  %></div>
+        <div class="col-xl col-sm-12 py-md-1"><%= scientific_reviews_count(proposal.id)  %></div>
         <div class="col-xl col-sm-12 py-md-1">
           <%= link_to '<i class="align-middle fas fa-fw fa-print"></i>PDF<br>'.html_safe, rendered_proposal_proposal_path(proposal.id, :format => :pdf), target: '_blank', class: 'text-muted', data: { turbo: false } %>
           <%= link_to '<i class="align-middle fas fa-fw fa-pen"></i>Edit<br>'.html_safe, edit_submitted_proposal_url(proposal), class: 'text-muted', data: { turbo: false } %>
