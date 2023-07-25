@@ -5,24 +5,45 @@
 
   <%= turbo_frame_tag "#{type}_proposal_headers" do %>
     <div class="row border-bottom pb-3 mb-1 fw-bold">
-      <div class="col-xl col-sm-12"></div>
-      <div class="col-xl col-sm-12">Code</div>
-      <div class="col-xl col-sm-12">Proposal Title</div>
-      <div class="col-xl col-sm-12">Lead Organizer</div>
-      <div class="col-xl col-sm-12">Preferred Location</div>
-      <div class="col-xl col-sm-12">Assigned Location</div>
-      <div class="col-xl col-sm-12">Status</div>
-      <div class="col-xl col-sm-12">Outcome</div>
-      <div class="col-xl col-sm-12">Updated at</div>
-      <div class="col-xl col-sm-12">Submitted to EditFlow</div>
-      <div class="col-xl col-sm-12"># of EDI reviews</div>
-      <div class="col-xl col-sm-12"># of Scientific reviews</div>
-      <div class="col-xl col-sm-12">Actions</div>
+      <div class="col-xl col-md-12"></div>
+      <div class="col-xl col-md-12">Code</div>
+      <div class="col-xl col-md-12">Proposal Title</div>
+      <div class="col-xl col-md-12">Lead Organizer</div>
+      <div class="col-xl col-md-12">Preferred Location</div>
+      <div class="col-xl col-md-12">Assigned Location</div>
+      <div class="col-xl col-md-12">Status</div>
+      <div class="col-xl col-md-12">Outcome</div>
+      <div class="col-xl col-md-12">Updated at</div>
+      <div class="col-xl col-md-12">Submitted to EditFlow</div>
+      <div class="col-xl col-md-12"># of EDI reviews</div>
+      <div class="col-xl col-md-12"># of Scientific reviews</div>
+      <div class="col-xl col-md-12">Actions</div>
     </div>
   <% end %>
 
   <%= turbo_frame_tag "#{type}_proposals", src: submitted_proposals_path(format: :turbo_stream, page: params[:page], **@search_params.merge(proposal_type: type)), loading: :lazy do %>
     <%= render partial: 'submitted_proposals/index/proposal_placeholder_rows', locals: { type: type } %>
+  <% end %>
+
+  <%= turbo_frame_tag "#{type}_actionbar" do %>
+    <div class="mb-4">
+      <span data-action="click->submitted-proposals#selectAllProposals" class="btn btn-sm btn-primary" data-type="<%= type %>">Select All</span>
+      <span data-action="click->submitted-proposals#unselectAllProposals" class="btn btn-sm btn-primary" data-type="<%= type %>">Select None</span>
+      <span data-action="click->submitted-proposals#invertSelectedProposals" class="btn btn-sm btn-primary" data-type="<%= type %>">Invert Selection</span>
+    </div>
+    <div>
+      <span data-action="click->submitted-proposals#tableOfContent" class="btn btn-sm btn-primary proposal-booklet-btn mb-2" data-type="<%= type %>">Create Booklet</span>
+      <span data-action="click->submitted-proposals#editFlow" class="btn btn-sm btn-primary mb-2" data-type="<%= type %>">Send to EditFlow</span>
+      <span data-action="click->submitted-proposals#workshop" class="btn btn-sm btn-primary mb-2" data-type="<%= type %>">Send to Workshop</span>
+      <button data-action="click->submitted-proposals#downloadCSV" class="btn btn-sm btn-primary mb-2" data-type="<%= type %>">Download CSV</button>
+      <span data-action="click->submitted-proposals#emailModal" class="btn btn-sm btn-primary mb-2" data-type="<%= type %>">Send Decision Email</span>
+      <span data-action="click->submitted-proposals#outcomeLocationModal" id="decline" class="btn btn-sm btn-primary mb-2" data-type="<%= type %>">Set Outcome/Location</span>
+      <% if check_review_privilege %>
+        <span data-action="click->submitted-proposals#reviewsExcelBooklet" class="btn btn-sm btn-primary mb-2" data-type="<%= type %>">Create Reviews Excel Booklet</span>
+        <span data-action="click->submitted-proposals#reviewsContent" class="btn btn-sm btn-primary reviews-booklet-btn mb-2" data-type="<%= type %>">Create Reviews Booklet</span>
+        <span data-action="click->submitted-proposals#importReviews" class="btn btn-sm btn-primary import-reviews-btn mb-2" data-type="<%= type %>">Import Reviews</span>
+      <% end %>
+    </div>
   <% end %>
 
   <%= turbo_frame_tag "#{type}_pagination" %>

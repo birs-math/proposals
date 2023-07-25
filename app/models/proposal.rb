@@ -160,7 +160,7 @@ class Proposal < ApplicationRecord
   end
 
   def lead_organizer
-    proposal_roles.joins(:role).includes(:person).find_by(roles: { name: 'lead_organizer'})&.person
+    Person.joins(proposal_roles: :role).find_by(proposal_roles: { proposal_id: id }, roles: { name: Role::LEAD_ORGANIZER })
   end
 
   def location_names

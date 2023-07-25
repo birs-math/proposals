@@ -9,9 +9,11 @@ class Role < ApplicationRecord
 
   accepts_nested_attributes_for :role_privileges, reject_if: :all_blank, allow_destroy: true
 
+  LEAD_ORGANIZER = 'lead_organizer'.freeze
+
   class << self
     def organizer
-      find_or_create_by!(name: 'lead_organizer')
+      find_or_create_by!(name: LEAD_ORGANIZER)
     end
   end
 end

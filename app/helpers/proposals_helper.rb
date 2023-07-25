@@ -39,15 +39,15 @@ module ProposalsHelper
   end
 
   def locations
-    Location.all.map { |loc| [loc.name, loc.id] }
+    @locations ||= Location.pluck(:name, :id)
   end
 
   def all_proposal_types
-    ProposalType.all.map { |pt| [pt.name, pt.id] }
+    @all_proposal_types ||= ProposalType.pluck(:name, :id)
   end
 
   def all_statuses
-    Proposal.statuses.map { |k, v| [k.humanize.capitalize, v] }
+    @all_statuses ||= Proposal.statuses.map { |k, v| [k.humanize.capitalize, v] }
   end
 
   def specific_proposal_statuses

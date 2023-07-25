@@ -31,7 +31,7 @@ class Person < ApplicationRecord
 
   def lead_organizer?
     proposal_roles.joins(:role)
-                  .where(roles: { name: 'lead_organizer' })
+                  .where(roles: { name: Role::LEAD_ORGANIZER })
                   .present?
   end
 

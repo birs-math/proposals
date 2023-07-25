@@ -66,29 +66,13 @@
                     </div>
                     <%= render partial: 'submitted_proposals/index/years_pagination' %>
                     <%= render partial: "submitted_proposals/index/proposals_list" %>
-                    <div>
-                      <span data-action="click->submitted-proposals#selectAllProposals" data-submitted-proposals-target="allProposals" class="btn btn-primary">Select All</span>
-                      <span data-action="click->submitted-proposals#unselectAllProposals" data-submitted-proposals-target="noProposals" class="btn btn-primary">Select None</span>
-                      <span data-action="click->submitted-proposals#invertSelectedProposals" data-submitted-proposals-target="invertProposals" class="btn btn-primary">Invert Selection</span>
-                    </div>
-                    <div class="text-end m-3">
-                      <span data-action="click->submitted-proposals#tableOfContent" class="btn btn-primary proposal-booklet-btn">Create Booklet</span>
-                      <span data-action="click->submitted-proposals#editFlow" class="btn btn-primary">Send to EditFlow</span>
-                      <span data-action="click->submitted-proposals#workshop" class="btn btn-primary">Send to Workshop</span>
-                      <button data-action="click->submitted-proposals#downloadCSV" class="btn btn-primary">Download CSV</button>
-                      <span data-action="click->submitted-proposals#emailModal" class="btn btn-primary">Send Decision Email</span>
-                      <span data-action="click->submitted-proposals#outcomeLocationModal" id="decline" class="btn btn-primary">Set Outcome/Location</span>
-                      <%= render 'outcome_location_window' %>
-                      <%= render 'email_templates' %>
-                    </div>
-                    <div class="text-end m-3">
-                      <% if check_review_privilege %>
-                        <%= render 'review_booklet_window' %>
-                        <span data-action="click->submitted-proposals#reviewsExcelBooklet" class="btn btn-primary">Create Reviews Excel Booklet</span>
-                        <span data-action="click->submitted-proposals#reviewsContent" class="btn btn-primary reviews-booklet-btn">Create Reviews Booklet</span>
-                        <span data-action="click->submitted-proposals#importReviews" class="btn btn-primary import-reviews-btn">Import Reviews</span>
-                      <% end %>
-                    </div>
+
+                    <%= render partial: 'outcome_location_window' %>
+                    <%= render partial: 'email_templates'%>
+
+                    <% if check_review_privilege %>
+                      <%= render partial: 'review_booklet_window'%>
+                    <% end %>
                   </div>
 
                   <div class="tab-pane" id="tab-2" role="tabpanel">

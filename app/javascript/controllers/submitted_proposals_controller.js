@@ -17,9 +17,17 @@ export default class extends Controller {
     }
   }
 
+  proposalsByTypeCheckbox() {
+    return $(`input[data-type="${event.currentTarget.dataset.type}"]:checkbox`)
+  }
+
+  proposalsByTypeCheckboxChecked(type = event.currentTarget.dataset.type) {
+    return $(`input[data-type="${type}"]:checked`)
+  }
+
   editFlow() {
     var proposalIds = [];
-    $("input:checked").each(function() {
+    this.proposalsByTypeCheckboxChecked().each(function() {
       proposalIds.push(this.dataset.value);
     });
     if(typeof proposalIds[0] === "undefined")
@@ -28,7 +36,8 @@ export default class extends Controller {
     }
     else {
       let data = new FormData()
-      data.append("ids", proposalIds)
+      let selectedProposals = proposalIds.filter((x) => typeof x !== "undefined")
+      data.append("ids", selectedProposals)
       var url = `/submitted_proposals/edit_flow`
       Rails.ajax({
         url,
@@ -67,7 +76,7 @@ export default class extends Controller {
     event.preventDefault()
 
     var proposalIds = [];
-    $("input:checked").each(function() {
+    this.proposalsByTypeCheckboxChecked().each(function() {
       proposalIds.push(this.dataset.value);
     });
     if(typeof proposalIds[0] === "undefined")
@@ -76,7 +85,8 @@ export default class extends Controller {
     }
     else {
       let _this = this
-      $.post(`/emails/email_types`, { ids: proposalIds }, function(data) {
+      let selectedProposals = proposalIds.filter((x) => typeof x !== "undefined")
+      $.post(`/emails/email_types`, { ids: selectedProposals }, function(data) {
         $.each(data.emails, function(index, email) {
           $('#to_organizer_emails').append(`<span class="ms-5">${index + 1}. ${email} </span><br>`)
         })
@@ -90,6 +100,7 @@ export default class extends Controller {
           opt.innerText = item
           selectBox.appendChild(opt);
         });
+        $("#email-templates-proposals").text(selectedProposals)
         $("#email-template").modal('show')
       })
     }
@@ -98,10 +109,7 @@ export default class extends Controller {
   sendEmails(event) {
     event.preventDefault();
 
-    var proposalIds = [];
-    $("input:checked").each(function() {
-      proposalIds.push(this.dataset.value);
-    });
+    let proposalIds = $("#email-templates-proposals").text()
     if(this.templatesTarget.value) {
       $('#birs_email_body').val(tinyMCE.get('birs_email_body').getContent())
       var data = new FormData();
@@ -145,15 +153,16 @@ export default class extends Controller {
       this.tocTarget.checked = true;
     }
     var proposalIds = [];
-    $("input:checked").each(function() {
+    this.proposalsByTypeCheckboxChecked().each(function() {
       proposalIds.push(this.dataset.value);
     });
-    if(typeof proposalIds[1] === "undefined")
+    if(typeof proposalIds[0] === "undefined")
     {
       toastr.error("Please select any checkbox!")
     }
     else {
-      $.post(`/submitted_proposals/table_of_content?proposals=${proposalIds}`,
+      let selectedProposals = proposalIds.filter((x) => typeof x !== "undefined")
+      $.post(`/submitted_proposals/table_of_content?proposals=${selectedProposals}`,
         $('form#submitted-proposal').serialize(), function(data) {
           $('#proposals').text(data.proposals)
           $("#table-window").modal('show')
@@ -163,7 +172,7 @@ export default class extends Controller {
   }
 
   booklet() {
-    let ids = $('#proposals').text().slice(1)
+    let ids = $('#proposals').text()
     let table = ''
     if(this.tocTarget.checked) {
       table = "toc"
@@ -248,7 +257,7 @@ export default class extends Controller {
 
   selectAllProposals() {
     let getId = ''
-    $("input:checkbox").each(function(){
+    this.proposalsByTypeCheckbox().each(function(){
       getId = document.getElementById(this.id)
       getId.checked = true
     });
@@ -256,7 +265,7 @@ export default class extends Controller {
 
   unselectAllProposals() {
     let getId = ''
-    $("input:checkbox").each(function(){
+    this.proposalsByTypeCheckbox().each(function(){
       getId = document.getElementById(this.id)
       getId.checked = false
     });
@@ -264,7 +273,7 @@ export default class extends Controller {
 
   invertSelectedProposals() {
     let checkbox = ''
-    $("input:checkbox").each(function(){
+    this.proposalsByTypeCheckbox().each(function(){
       checkbox = document.getElementById(this.id)
       if(checkbox.checked) {
         checkbox.checked = false
@@ -276,7 +285,7 @@ export default class extends Controller {
 
   downloadCSV() {
     var proposalIds = [];
-    $("input:checked").each(function() {
+    this.proposalsByTypeCheckboxChecked().each(function() {
       proposalIds.push(this.dataset.value);
     });
     if(typeof proposalIds[0] === "undefined")
@@ -291,7 +300,7 @@ export default class extends Controller {
 
   workshop() {
     var proposalIds = [];
-    $("input:checked").each(function() {
+    this.proposalsByTypeCheckboxChecked().each(function() {
       proposalIds.push(this.dataset.value);
     });
     if(typeof proposalIds[0] === "undefined")
@@ -300,13 +309,13 @@ export default class extends Controller {
     }
     else {
       let selectedProposals = proposalIds.filter((x) => typeof x !== "undefined")
-      $.post(`/submitted_proposals/sendToWorkshop?ids=${selectedProposals}`)
+      $.post(`/submitted_proposals/send_to_workshop?ids=${selectedProposals}`)
     }
   }
 
   importReviews() {
     var proposalIds = [];
-    $("input:checked").each(function() {
+    this.proposalsByTypeCheckboxChecked().each(function() {
       proposalIds.push(this.dataset.value);
     });
     if(typeof proposalIds[0] === "undefined")
@@ -314,9 +323,10 @@ export default class extends Controller {
       toastr.error("Please select any checkbox!")
     }
     else {
+      let selectedProposals = proposalIds.filter((x) => typeof x !== "undefined")
       $('.import-reviews-btn').html("Importing...")
       $('.import-reviews-btn').addClass('disabled');
-      $.post(`/submitted_proposals/import_reviews?proposals=${proposalIds}`, function() {
+      $.post(`/submitted_proposals/import_reviews?proposals=${selectedProposals}`, function() {
         toastr.success("Import reviews In progress. You will be notified once its done.")
       })
     }
@@ -328,7 +338,7 @@ export default class extends Controller {
       this.reviewTocTarget.checked = true;
     }
     var proposalIds = [];
-    $("input:checked").each(function() {
+    this.proposalsByTypeCheckboxChecked().each(function() {
       proposalIds.push(this.dataset.value);
     });
     if(typeof proposalIds[0] === "undefined")
@@ -336,15 +346,14 @@ export default class extends Controller {
       toastr.error("Please select any checkbox!")
     }
     else {
+      let selectedProposals = proposalIds.filter((x) => typeof x !== "undefined")
+      $("span#review-window-proposals").text(selectedProposals)
       $("#review-window").modal('show')
     }
   }
 
   reviewsBooklet() {
-    var proposalIds = [];
-    $("input:checked").each(function() {
-      proposalIds.push(this.dataset.value);
-    });
+    let proposalIds = $("span#review-window-proposals").text()
     this.checkReviewType(proposalIds)
   }
 
@@ -398,7 +407,7 @@ export default class extends Controller {
 
   removeFile(evt) {
     let dataset = evt.currentTarget.dataset
-    
+
     $.ajax({
       url: `/reviews/${dataset.reviewId}/remove_file?attachment_id=${dataset.attachmentId}`,
       type: 'DELETE',
@@ -427,7 +436,7 @@ export default class extends Controller {
 
   reviewsExcelBooklet() {
     var proposalIds = [];
-    $("input:checked").each(function() {
+    this.proposalsByTypeCheckboxChecked().each(function() {
       proposalIds.push(this.dataset.value);
     });
     if(typeof proposalIds[0] === "undefined")
@@ -463,7 +472,7 @@ export default class extends Controller {
 
   outcomeLocationModal() {
    var proposalIds = [];
-    $("input:checked").each(function() {
+    this.proposalsByTypeCheckboxChecked().each(function() {
       proposalIds.push(this.dataset.value);
     });
     if(typeof proposalIds[0] === "undefined")
@@ -471,13 +480,15 @@ export default class extends Controller {
       toastr.error("Please select any checkbox!")
     }
     else {
+      $("span#outcome-location-size").text(event.currentTarget.dataset.type)
       $("#outcome-window").modal('show')
-    } 
+    }
   }
 
   outcomeLocation() {
-    var proposalIds = [];
-    $("input:checked").each(function() {
+    let proposalIds = [];
+    let proposalType = $("span#outcome-location-size").text()
+    this.proposalsByTypeCheckboxChecked(proposalType).each(function() {
       proposalIds.push(this.dataset.value);
     });
     if(typeof proposalIds[0] === "undefined")
@@ -485,11 +496,10 @@ export default class extends Controller {
       toastr.error("Please select any checkbox!")
     }
     else {
-      let data = new FormData()
       let outcome = this.outcomeTarget.value
       let location = this.selectedLocationTarget.value
       let size = this.assignedSizeTarget.value
-      var url = `/submitted_proposals/proposal_outcome_location`
+      let url = `/submitted_proposals/proposal_outcome_location`
       $.ajax({
         url,
         type: "POST",

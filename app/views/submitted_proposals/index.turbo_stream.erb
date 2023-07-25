@@ -4,18 +4,18 @@
   <%= turbo_stream.append "#{@type}_proposals" do %>
     <% @proposals&.each do |proposal| %>
       <div class="row border-bottom mb-3 align-items-center small" id="proposal-row-<%= proposal.id %>">
-        <div class="col-xl col-sm-12">
-          <input type="checkbox" name="reviewed" data-action="click->submitted-proposals#storeID" id="<%= proposal.id %>_checkbox" class="proposals-checkboxes" data-value="<%= proposal.id %>">
+        <div class="col-xl col-md-12">
+          <input type="checkbox" name="reviewed" data-action="click->submitted-proposals#storeID" id="<%= proposal.id %>_checkbox" class="proposals-checkboxes" data-value="<%= proposal.id %>" data-type="<%= @type %>">
         </div>
-        <div class="col-xl col-sm-12 py-sm-1"><%= proposal.code %></div>
-        <div class="col-xl col-sm-12 py-sm-1"><%= proposal.title %></div>
-        <div class="col-xl col-sm-12 py-sm-1"><%= proposal.lead_organizer&.fullname %></div>
-        <div class="col-xl col-sm-12 py-sm-1">
+        <div class="col-xl col-md-12 py-sm-1"><%= proposal.code %></div>
+        <div class="col-xl col-md-12 py-sm-1"><%= proposal.title %></div>
+        <div class="col-xl col-md-12 py-sm-1"><%= proposal.lead_organizer&.fullname %></div>
+        <div class="col-xl col-md-12 py-sm-1">
           <% proposal.locations.pluck(:code).each do |code| %>
             <%= code %><br>
           <% end %>
         </div>
-        <div class="col-xl col-sm-12 py-sm-1">
+        <div class="col-xl col-md-12 py-sm-1">
           <div class="form-group" data-submitted-proposals-target="proposalLocation" data-id=<%= proposal.id %> >
             <label data-action="click->submitted-proposals#handleLocations" data-id=<%= proposal.id %>><%= proposal.assigned_location&.code %></label>
           </div>
@@ -24,7 +24,7 @@
             <%= select_tag :status, options_for_select(locations), include_blank: '', class: 'form-select', data: { 'action': 'change->submitted-proposals#proposalLocations', 'submitted-proposals-target': 'location', 'id': proposal.id }, required: true %>
           </div>
         </div>
-        <div class="<%= proposal_status_class(proposal.status) %> col-xl col-sm-12 py-sm-1" >
+        <div class="<%= proposal_status_class(proposal.status) %> col-xl col-md-12 py-sm-1" >
           <div class="form-group" data-submitted-proposals-target="proposalStatus" data-id=<%= proposal.id %> >
             <label data-action="click->submitted-proposals#handleStatus" data-id=<%= proposal.id %>><%= proposal.status&.split('_')&.map(&:capitalize)&.join(' ') %></label>
           </div>
@@ -33,12 +33,12 @@
             <%= select_tag :status, options_for_select(specific_proposal_statuses, proposal.status), include_blank: '', class: 'form-select', data: { 'action': 'change->submitted-proposals#proposalStatuses', 'submitted-proposals-target': 'status', 'id': proposal.id }, required: true %>
           </div>
         </div>
-        <div class="col-xl col-sm-12 py-sm-1"><%= proposal.outcome&.capitalize %></div>
-        <div class="col-xl col-sm-12 py-sm-1"><%= proposal&.updated_at&.to_date %></div>
-        <div class="col-xl col-sm-12 py-sm-1"><%= proposal&.edit_flow&.to_date %></div>
-        <div class="col-xl col-sm-12 py-sm-1"><%= proposal.reviews.edi.count  %></div>
-        <div class="col-xl col-sm-12 py-sm-1"><%= proposal.reviews.scientific.count  %></div>
-        <div class="col-xl col-sm-12 py-sm-1">
+        <div class="col-xl col-sm-12 py-md-1"><%= proposal.outcome&.capitalize %></div>
+        <div class="col-xl col-sm-12 py-md-1"><%= proposal&.updated_at&.to_date %></div>
+        <div class="col-xl col-sm-12 py-md-1"><%= proposal&.edit_flow&.to_date %></div>
+        <div class="col-xl col-sm-12 py-md-1"><%= edi_reviews_count(proposal.id)  %></div>
+        <div class="col-xl col-sm-12 py-md-1"><%= scientific_reviews_count(proposal.id)  %></div>
+        <div class="col-xl col-sm-12 py-md-1">
           <%= link_to '<i class="align-middle fas fa-fw fa-print"></i>PDF<br>'.html_safe, rendered_proposal_proposal_path(proposal.id, :format => :pdf), target: '_blank', class: 'text-muted', data: { turbo: false } %>
           <%= link_to '<i class="align-middle fas fa-fw fa-pen"></i>Edit<br>'.html_safe, edit_submitted_proposal_url(proposal), class: 'text-muted', data: { turbo: false } %>
           <%= link_to '<i class="align-middle fas fa-fw fa-eye"></i>Show<br>'.html_safe, submitted_proposal_url(proposal), class: 'text-muted', data: { turbo: false } %>
@@ -65,6 +65,8 @@
   <% end %>
 <% else %>
   <%= turbo_stream.remove "#{@type}_proposal_headers" %>
+
+  <%= turbo_stream.remove "#{@type}_actionbar" %>
 
   <%= turbo_stream.append "#{@type}_proposals" do %>
     <%= render partial: 'submitted_proposals/index/proposals_not_found' %>

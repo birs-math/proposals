@@ -20,7 +20,7 @@ class SubmittedProposalsController < ApplicationController
       # loads proposals by type using turbo lazy loading
       format.turbo_stream do
         @type = params[:proposal_type]
-        @pagy, @proposals = pagy(proposals_query_with_filters, items: 100)
+        @pagy, @proposals = pagy(proposals_query_with_filters.preload(:assigned_location, locations: :code), items: 100)
       end
     end
   end
