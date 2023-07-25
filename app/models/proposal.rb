@@ -7,7 +7,7 @@ class Proposal < ApplicationRecord
 
   has_many_attached :files
   has_many :proposal_locations, dependent: :destroy
-  has_many :locations, -> { order 'proposal_locations.position' },
+  has_many :locations, -> { joins(:proposal_locations).order('proposal_locations.position') },
            through: :proposal_locations
   belongs_to :proposal_type
   has_many :proposal_roles, dependent: :destroy
