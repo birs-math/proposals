@@ -49,7 +49,7 @@ module SubmittedProposalsHelper
   end
 
   def organizers_email(proposal)
-    proposal.invites.where(invited_as: 'Organizer').map(&:person).map(&:email)
+    proposal.supporting_organizer_invites.pluck(:email)
   end
 
   def review_dates(review)

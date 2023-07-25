@@ -299,6 +299,7 @@ RSpec.describe "/submitted_proposals", type: :request do
         expect(response).to have_http_status(:ok)
       end
     end
+
     context 'when proposal can not be approved/rejected' do
       before do
         proposal.update(status: :submitted)

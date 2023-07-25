@@ -1,13 +1,21 @@
 require "rails_helper"
 
 RSpec.describe ProposalMailer, type: :mailer do
+  let(:proposal) { create(:proposal, :with_organizers) }
+  let(:proposal_role) { create(:proposal_role, proposal: proposal) }
+  let(:organizer) { proposal_role.person.fullname }
+  let(:birs_email) do
+    create(:birs_email, cc_email: cc_email, bcc_email: bcc_email, subject: 'Staff send emails', proposal: proposal)
+  end
+  let(:cc_email) { nil }
+  let(:bcc_email) { nil }
+
+  before do
+    proposal.update(status: :submitted, code: '23w501', title: 'BANFF')
+    proposal_role.role.update(name: 'lead_organizer')
+  end
+
   describe 'proposal_submission with submitted status' do
-    let(:proposal) { create(:proposal, :with_organizers) }
-    let(:proposal_role) { create(:proposal_role, proposal: proposal) }
-    before do
-      proposal.update(status: :submitted, code: '23w501', title: 'BANFF')
-      proposal_role.role.update(name: 'lead_organizer')
-    end
     let(:email) { ProposalMailer.with(proposal: proposal).proposal_submission }
 
     it "sends an proposal_submission email" do
@@ -16,12 +24,6 @@ RSpec.describe ProposalMailer, type: :mailer do
   end
 
   describe 'proposal_submission with nil status' do
-    let(:proposal) { create(:proposal, :with_organizers) }
-    let(:proposal_role) { create(:proposal_role, proposal: proposal) }
-    before do
-      proposal.update(status: nil, code: '23w501', title: 'BANFF')
-      proposal_role.role.update(name: 'lead_organizer')
-    end
     let(:email) { ProposalMailer.with(proposal: proposal).proposal_submission }
 
     it "sends an proposal_submission email" do
@@ -30,99 +32,79 @@ RSpec.describe ProposalMailer, type: :mailer do
   end
 
   describe 'staff_send_emails' do
-    let(:proposal) { create(:proposal) }
-    let(:proposal_role) { create(:proposal_role, proposal: proposal) }
-    before do
-      proposal.update(status: :submitted, code: '23w501', title: 'BANFF')
-      proposal_role.role.update(name: 'lead_organizer')
-    end
-    let(:organizer) { proposal_role.person.fullname }
+    let(:email) { ProposalMailer.with(email_data: birs_email).staff_send_emails }
 
     context "when cc_email and bcc_email are present" do
-      let(:birs_email) do
-        create(:birs_email, subject: "Staff send emails",
-                            cc_email: "[{\"value\":\"chris@gmail.com\"},{\"value\":\"adamvan.tuyl@gmail.com\"}]")
-      end
-      let(:email) { ProposalMailer.with(email_data: birs_email, organizer: organizer).staff_send_emails }
+      let(:cc_email) { 'chris@gmail.com, adamvan.tuyl@gmail.com' }
+      let(:bcc_email) { 'chris@mail.com, adamvan.tuyl@mail.com' }
 
-      it "sends email to lead_organizer & organizers" do
-        expect(email.subject).to eq("Staff send emails")
+      it do
+        expect(email.cc).to eq(cc_email.split(', '))
+        expect(email.bcc).to eq(bcc_email.split(', '))
       end
     end
 
     context "when cc_email is present" do
-      let(:birs_email) do
-        create(:birs_email, bcc_email: nil, subject: "Staff send emails",
-                            cc_email: "[{\"value\":\"chris@gmail.com\"},{\"value\":\"adamvan.tuyl@gmail.com\"}]")
-      end
-      let(:email) { ProposalMailer.with(email_data: birs_email, organizer: organizer).staff_send_emails }
+      let(:cc_email) { 'chris@gmail.com, adamvan.tuyl@gmail.com' }
 
-      it "sends email to lead_organizer & organizers" do
-        expect(email.subject).to eq("Staff send emails")
+      it do
+        expect(email.cc).to eq(cc_email.split(', '))
+        expect(email.bcc).to eq([])
       end
     end
 
     context "when bcc_email is present" do
-      let(:birs_email) { create(:birs_email, cc_email: nil, subject: "Staff send emails") }
-      let(:email) { ProposalMailer.with(email_data: birs_email, organizer: organizer).staff_send_emails }
+      let(:bcc_email) { 'chris@gmail.com, adamvan.tuyl@gmail.com' }
 
-      it "sends email to lead_organizer & organizers" do
-        expect(email.subject).to eq("Staff send emails")
+      it do
+        expect(email.cc).to eq([])
+        expect(email.bcc).to eq(bcc_email.split(', '))
       end
     end
 
     context "when cc_email and bcc_email are not present" do
-      let(:birs_email) { create(:birs_email, cc_email: nil, bcc_email: nil, subject: "Staff send emails") }
-      let(:email) { ProposalMailer.with(email_data: birs_email, organizer: organizer).staff_send_emails }
-
-      it "sends email to lead_organizer & organizers" do
-        expect(email.subject).to eq("Staff send emails")
+      it do
+        expect(email.cc).to eq([])
+        expect(email.bcc).to eq([])
       end
     end
   end
 
   describe 'new_staff_send_emails' do
-    let(:proposal) { create(:proposal) }
-    let(:proposal_role) { create(:proposal_role, proposal: proposal) }
-    before do
-      proposal.update(status: :submitted, code: '23w501', title: 'BANFF')
-      proposal_role.role.update(name: 'lead_organizer')
-    end
-    let(:organizer) { proposal_role.person.fullname }
+    let(:email) { ProposalMailer.with(email_data: birs_email, organizer: organizer).new_staff_send_emails }
 
     context "when cc_email and bcc_email are present" do
-      let(:birs_email) { create(:birs_email, subject: "Staff send emails") }
-      let(:email) { ProposalMailer.with(email_data: birs_email, organizer: organizer).new_staff_send_emails }
+      let(:cc_email) { 'chris@gmail.com, adamvan.tuyl@gmail.com' }
+      let(:bcc_email) { 'chris@mail.co, adamvan.tuyl@mail.co' }
 
-      it "sends email to lead_organizer & organizers" do
-        expect(email.subject).to eq("Staff send emails")
+      it do
+        expect(email.cc).to eq(cc_email.split(', '))
+        expect(email.bcc).to eq(bcc_email.split(', '))
       end
     end
 
     context "when cc_email is present" do
-      let(:birs_email) { create(:birs_email, bcc_email: nil, subject: "Staff send emails") }
-      let(:email) { ProposalMailer.with(email_data: birs_email, organizer: organizer).new_staff_send_emails }
+      let(:cc_email) { 'chris@gmail.com, adamvan.tuyl@gmail.com' }
 
-      it "sends email to lead_organizer & organizers" do
-        expect(email.subject).to eq("Staff send emails")
+      it do
+        expect(email.cc).to eq(cc_email.split(', '))
+        expect(email.bcc).to eq([])
       end
     end
 
     context "when bcc_email is present" do
-      let(:birs_email) { create(:birs_email, cc_email: nil, subject: "Staff send emails") }
-      let(:email) { ProposalMailer.with(email_data: birs_email, organizer: organizer).new_staff_send_emails }
+      let(:bcc_email) { 'chris@mail.co, adamvan.tuyl@mail.co' }
 
-      it "sends email to lead_organizer & organizers" do
-        expect(email.subject).to eq("Staff send emails")
+      it do
+        expect(email.cc).to eq([])
+        expect(email.bcc).to eq(bcc_email.split(', '))
       end
     end
 
     context "when cc_email and bcc_email are not present" do
-      let(:birs_email) { create(:birs_email, cc_email: nil, bcc_email: nil, subject: "Staff send emails") }
-      let(:email) { ProposalMailer.with(email_data: birs_email, organizer: organizer).new_staff_send_emails }
-
-      it "sends email to lead_organizer & organizers" do
-        expect(email.subject).to eq("Staff send emails")
+      it do
+        expect(email.cc).to eq([])
+        expect(email.bcc).to eq([])
       end
     end
   end
