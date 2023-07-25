@@ -309,7 +309,17 @@ export default class extends Controller {
     }
     else {
       let selectedProposals = proposalIds.filter((x) => typeof x !== "undefined")
-      $.post(`/submitted_proposals/send_to_workshop?ids=${selectedProposals}`)
+      $.ajax({
+        url: `/submitted_proposals/send_to_workshop?ids=${selectedProposals}`,
+        type: 'POST',
+        success: () => {
+          toastr.success('Export started')
+          this.unselectAllProposals()
+        },
+        error: () => {
+          toastr.error('Something unexpected happened')
+        }
+      })
     }
   }
 

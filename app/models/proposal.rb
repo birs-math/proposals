@@ -280,6 +280,26 @@ class Proposal < ApplicationRecord
     emails.map { |disp, _value| disp }
   end
 
+  # This method calculates event start_date for Workshops integration,
+  # schedules assign applied_date but manual exports don't, ideally it should be calculated in dedicated serializer
+  def safe_applied_date
+    return @safe_applied_date if defined?(@safe_applied_date)
+
+    @safe_applied_date =
+      begin
+        return applied_date if applied_date.present?
+
+        proposal_or_current_year = year.to_s || Time.zone.now.year.to_s
+        Date.strptime(proposal_or_current_year, "%Y")
+      end
+  end
+
+  def safe_assigned_location
+    return assigned_location if assigned_location.present?
+
+    Location.birs
+  end
+
   private
 
   def preferred_impossible_field

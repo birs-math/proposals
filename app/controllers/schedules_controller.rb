@@ -67,7 +67,7 @@ class SchedulesController < ApplicationController
       proposals += update_proposal_date(schedule, program_weeks)
     end
 
-    ExportScheduledProposalsJob.perform_now(proposals)
+    ExportProposalsJob.perform_now(proposals)
 
     redirect_to new_schedule_path, notice: 'Proposals have been updated with
       selected dates, and exported to Workshops.'.squish
