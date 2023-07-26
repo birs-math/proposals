@@ -129,11 +129,14 @@ module SurveyHelper
   end
 
   def indigenous_person_yes_options
-    indigenous_yes = [['First Nation', 'First Nation'], %w[Métis Métis], %w[Inuit Inuit],
-                      ['Native American', 'Native American'],
-                      ['Indigenous from outside of what is now known as Canada and the United States',
-                       'Indigenous from outside of what is now known as Canada and the United States'],
-                      ['Prefer not to answer', 'Prefer not to answer']]
+    indigenous_yes = [
+      ['First Nation', 'First Nation'], %w[Métis Métis], %w[Inuit Inuit],
+      ['Native American (including Natives of Alaska and Hawaii)',
+       'Native American (including Natives of Alaska and Hawaii)'],
+      ['Indigenous from outside of what is now known as Canada and the United States',
+       'Indigenous from outside of what is now known as Canada and the United States'],
+      ['Prefer not to answer', 'Prefer not to answer']
+    ]
     indigenous_yes.map { |disp, _value| disp }
   end
 
