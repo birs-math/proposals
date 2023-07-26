@@ -12,6 +12,8 @@ class Proposal < ApplicationRecord
   belongs_to :proposal_type
   has_many :proposal_roles, dependent: :destroy
   has_many :people, through: :proposal_roles
+  has_one :lead_organizer_proposal_role, -> { lead_organizer }, class_name: 'ProposalRole'
+  has_one :lead_organizer, through: :lead_organizer_proposal_role, source: :person
   has_many(:answers, -> { order 'answers.proposal_field_id' },
            inverse_of: :proposal, dependent: :destroy)
   has_many :invites, dependent: :destroy
@@ -157,10 +159,6 @@ class Proposal < ApplicationRecord
 
   def create_organizer_role(person, organizer)
     proposal_roles.create!(person: person, role: organizer)
-  end
-
-  def lead_organizer
-    Person.joins(proposal_roles: :role).find_by(proposal_roles: { proposal_id: id }, roles: { name: Role::LEAD_ORGANIZER })
   end
 
   def location_names
