@@ -46,6 +46,8 @@ class InvitesController < ApplicationController
         send_email_on_response
       elsif @invite.yes?
         session[:is_invited_person] = true
+        InviteMailer.with(invite: @invite).invite_acceptance.deliver_later
+
         redirect_to new_person_path(code: @invite.code, response: @invite.response)
       end
     else
