@@ -74,7 +74,6 @@ class SurveyController < ApplicationController
     return unless @invite.save
 
     create_role
-    send_email_on_response
   end
 
   def create_role
@@ -82,12 +81,6 @@ class SurveyController < ApplicationController
 
     proposal_role
     create_user if @invite.invited_as == 'Organizer' && !@invite.person.user
-  end
-
-  def send_email_on_response
-    return if @invite.no?
-
-    InviteMailer.with(invite: @invite).invite_acceptance.deliver_later
   end
 
   def proposal_role

@@ -33,20 +33,48 @@ RSpec.describe "/proposals/:proposal_id/invites", type: :request do
       }
     end
 
-    before do
-      post inviter_response_proposal_invite_path(params)
-    end
+    let(:invite_response) { post inviter_response_proposal_invite_path(params) }
 
     context 'when response is invalid' do
       let(:commit) { 'Ok' }
 
-      it { expect(response).to redirect_to(invite_url(code: invite.code)) }
+      it { expect(invite_response).to redirect_to(invite_url(code: invite.code)) }
     end
 
     context 'when response is no' do
       let(:commit) { 'No' }
 
-      it { expect(response).to have_http_status(:found) }
+      it { expect(invite_response).to redirect_to(thanks_proposal_invites_path(invite.proposal)) }
+
+      it 'sends invite_decline email' do
+        expect(InviteMailer).to receive_message_chain(:with, :invite_decline, :deliver_later)
+
+        invite_response
+      end
+    end
+
+    context 'when response is maybe' do
+      let(:commit) { 'Maybe' }
+
+      it { expect(invite_response).to redirect_to(thanks_proposal_invites_path(invite.proposal)) }
+
+      it 'sends invite_uncertain email' do
+        expect(InviteMailer).to receive_message_chain(:with, :invite_uncertain, :deliver_later)
+
+        invite_response
+      end
+    end
+
+    context 'when response is yes' do
+      let(:commit) { 'yes' }
+
+      it { expect(invite_response).to redirect_to(new_person_path(code: invite.code, response: 'yes')) }
+
+      it 'sends invite_acceptance email' do
+        expect(InviteMailer).to receive_message_chain(:with, :invite_acceptance, :deliver_later)
+
+        invite_response
+      end
     end
 
     context 'when deadline' do
@@ -62,13 +90,13 @@ RSpec.describe "/proposals/:proposal_id/invites", type: :request do
       context 'is today' do
         let(:deadline) { DateTime.current }
 
-        it { expect(response).to redirect_to(new_person_path(code: invite.code, response: 'yes')) }
+        it { expect(invite_response).to redirect_to(new_person_path(code: invite.code, response: 'yes')) }
       end
 
       context 'is tomorrow' do
         let(:deadline) { DateTime.current + 1.day }
 
-        it { expect(response).to redirect_to(new_person_path(code: invite.code, response: 'yes')) }
+        it { expect(invite_response).to redirect_to(new_person_path(code: invite.code, response: 'yes')) }
       end
 
       context 'was yesterday' do
@@ -78,7 +106,7 @@ RSpec.describe "/proposals/:proposal_id/invites", type: :request do
           post inviter_response_proposal_invite_path(params)
         end
 
-        it { expect(response).to have_rendered(:invalid_code) }
+        it { expect(invite_response).to have_rendered(:invalid_code) }
       end
     end
   end
