@@ -81,6 +81,8 @@ RSpec.describe Invite, type: :model do
         it 'creates new person if does not exist' do
           expect { invite.update_invited_person }.to change(Person, :count).by(1)
           expect(invite.person.email).to eq(invite.email)
+          expect(invite.person.firstname).to eq(invite.firstname)
+          expect(invite.person.lastname).to eq(invite.lastname)
         end
       end
 
@@ -93,6 +95,14 @@ RSpec.describe Invite, type: :model do
           expect { invite.update_invited_person }.to change(Person, :count).by(0)
           invite.reload
           expect(invite.person_id).to eq(existing_person.id)
+        end
+
+        it 'changes invite firstname and lastname to match person' do
+          invite.update_invited_person
+          invite.reload
+
+          expect(invite.firstname).to eq(existing_person.firstname)
+          expect(invite.lastname).to eq(existing_person.lastname)
         end
       end
     end

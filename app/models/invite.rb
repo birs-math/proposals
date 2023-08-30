@@ -68,6 +68,9 @@ class Invite < ApplicationRecord
     assign_person
     person.affiliation = affiliation if affiliation
 
+    self.firstname = person.firstname
+    self.lastname = person.lastname
+
     person.skip_person_validation = true
     person.save && save
   end
