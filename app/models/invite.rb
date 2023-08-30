@@ -67,7 +67,9 @@ class Invite < ApplicationRecord
   def update_invited_person(affiliation = nil)
     assign_person
     person.affiliation = affiliation if affiliation
-    person.save
+
+    person.skip_person_validation = true
+    person.save && save
   end
 
   def code_expired?

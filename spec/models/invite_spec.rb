@@ -60,8 +60,41 @@ RSpec.describe Invite, type: :model do
 
   describe '#update_invited_person' do
     let(:invite) { create(:invite, invited_as: "Organizer") }
-    it "returns a Supporting Organizer" do
-      expect(invite.update_invited_person("Test Affiliation")).to be_truthy
+    let(:existing_person) do
+      create(:person, email: invite.email, firstname: invite.firstname, lastname: invite.lastname)
+    end
+
+    it "updates affiliation" do
+      invite.update_invited_person("Test Affiliation")
+
+      expect(invite.person.affiliation).to eq("Test Affiliation")
+    end
+
+    context 'when email changed' do
+      before do
+        invite.update(email: 'new_email_address@testmail.com')
+      end
+
+      context 'when email is not taken' do
+        it { expect(Person.exists?(email: invite.email)).to be_falsey }
+
+        it 'creates new person if does not exist' do
+          expect { invite.update_invited_person }.to change(Person, :count).by(1)
+          expect(invite.person.email).to eq(invite.email)
+        end
+      end
+
+      context 'when email is taken' do
+        before { existing_person }
+
+        it { expect(Person.exists?(email: invite.email)).to be_truthy }
+
+        it 'assigns existing person to invite' do
+          expect { invite.update_invited_person }.to change(Person, :count).by(0)
+          invite.reload
+          expect(invite.person_id).to eq(existing_person.id)
+        end
+      end
     end
   end
 
