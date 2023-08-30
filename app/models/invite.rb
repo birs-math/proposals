@@ -64,14 +64,10 @@ class Invite < ApplicationRecord
     invited_as == 'Organizer' ? 'Supporting Organizer' : 'Participant'
   end
 
-  def update_invited_person(affiliation)
-    person = self.person
-    person.affiliation = affiliation
-    person.firstname = firstname
-    person.lastname = lastname
-    person.email = email
-
-    return true if person.save(validate: false)
+  def update_invited_person(affiliation = nil)
+    assign_person
+    person.affiliation = affiliation if affiliation
+    person.save
   end
 
   def code_expired?
