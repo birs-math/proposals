@@ -43,9 +43,24 @@ class InvitesController < ApplicationController
 
     if @invite.save
       if @invite.no? || @invite.maybe?
+        @invite.proposal.proposal_roles.delete_by(person_id: @invite.person_id)
+
         send_email_on_response
       elsif @invite.yes?
         session[:is_invited_person] = true
+
+        ActiveRecord::Base.transaction do
+          role = Role.find_or_create_by!(name: @invite.invited_as)
+          @invite.proposal.proposal_roles.create(role: role, person: @invite.person)
+
+          if @invite.invited_as == 'Organizer' && !@invite.person.user
+            user = User.new(email: @invite.person.email,
+                            password: SecureRandom.urlsafe_base64(20), confirmed_at: Time.zone.now)
+            user.person = @invite.person
+            user.save
+          end
+        end
+
         InviteMailer.with(invite: @invite).invite_acceptance.deliver_later
 
         redirect_to new_person_path(code: @invite.code, response: @invite.response)
