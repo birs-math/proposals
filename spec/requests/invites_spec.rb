@@ -4,6 +4,7 @@ RSpec.describe "/proposals/:proposal_id/invites", type: :request do
   let(:proposal_type) { create(:proposal_type) }
   let(:proposal) { create(:proposal, proposal_type: proposal_type) }
   let(:invite) { create(:invite, proposal: proposal) }
+  let(:invited_as_role) { create(:role, name: invite.invited_as) }
   let(:person) { create(:person) }
   let(:role) { create(:role, name: 'Staff') }
   let(:user) { create(:user, person: person) }
@@ -43,8 +44,16 @@ RSpec.describe "/proposals/:proposal_id/invites", type: :request do
 
     context 'when response is no' do
       let(:commit) { 'No' }
+      let(:proposal_role) { create(:proposal_role, role: invited_as_role, person: invite.person, proposal: proposal) }
 
       it { expect(invite_response).to redirect_to(thanks_proposal_invites_path(invite.proposal)) }
+
+      it 'deletes proposal role' do
+        proposal_role
+        invite_response
+
+        expect { proposal_role.reload }.to raise_error(ActiveRecord::RecordNotFound)
+      end
 
       it 'sends invite_decline email' do
         expect(InviteMailer).to receive_message_chain(:with, :invite_decline, :deliver_later)
@@ -55,8 +64,16 @@ RSpec.describe "/proposals/:proposal_id/invites", type: :request do
 
     context 'when response is maybe' do
       let(:commit) { 'Maybe' }
+      let(:proposal_role) { create(:proposal_role, role: invited_as_role, person: invite.person, proposal: proposal) }
 
       it { expect(invite_response).to redirect_to(thanks_proposal_invites_path(invite.proposal)) }
+
+      it 'deletes proposal role' do
+        proposal_role
+        invite_response
+
+        expect { proposal_role.reload }.to raise_error(ActiveRecord::RecordNotFound)
+      end
 
       it 'sends invite_uncertain email' do
         expect(InviteMailer).to receive_message_chain(:with, :invite_uncertain, :deliver_later)
@@ -67,13 +84,48 @@ RSpec.describe "/proposals/:proposal_id/invites", type: :request do
 
     context 'when response is yes' do
       let(:commit) { 'yes' }
+      let(:created_proposal_role) { invite.person.proposal_roles.last }
 
       it { expect(invite_response).to redirect_to(new_person_path(code: invite.code, response: 'yes')) }
+
+      it 'creates proposal role' do
+        invite_response
+
+        expect(created_proposal_role).to be_present
+        expect(created_proposal_role.role.name).to eq(invite.invited_as)
+        expect(created_proposal_role.proposal_id).to eq(proposal.id)
+      end
 
       it 'sends invite_acceptance email' do
         expect(InviteMailer).to receive_message_chain(:with, :invite_acceptance, :deliver_later)
 
         invite_response
+      end
+
+      context 'when invited as Organizer' do
+        let(:invite) { create(:invite, proposal: proposal, invited_as: 'Organizer') }
+
+        it { expect(invite.person.user).to be_nil }
+
+        it 'creates user record' do
+          invite_response
+          invite.reload
+
+          expect(invite.person.user).to be_present
+        end
+      end
+
+      context 'when invited as Participant' do
+        let(:invite) { create(:invite, proposal: proposal, invited_as: 'Participant') }
+
+        it { expect(invite.person.user).to be_nil }
+
+        it 'does not create user record' do
+          invite_response
+          invite.reload
+
+          expect(invite.person.user).to be_nil
+        end
       end
     end
 
