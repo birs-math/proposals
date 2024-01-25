@@ -76,7 +76,7 @@ RSpec.describe "/submit_proposals", type: :request do
       it 'updates the proposal' do
         proposal.reload
         expect(proposal.title).to eq('Test proposal')
-        expect(proposal.year).to eq(Date.today.year)
+        expect(proposal.year).to eq(Date.today.year.to_i)
         expect(proposal.assigned_date).to eq(Date.today)
         expect(proposal.applied_date).to eq(Date.today)
         expect(proposal.subject_id).to eq(subject.id)
