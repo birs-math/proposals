@@ -57,7 +57,7 @@ jobs:
           name: Bundle install
           command: |
             cd /home/app/proposals
-            gem install bundler
+            gem install bundler -v 2.4.22
             bundle install
       - run:
           name: Load schema
