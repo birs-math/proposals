@@ -46,7 +46,7 @@ COPY --chown=app . $APP_HOME
 WORKDIR $APP_HOME
 
 RUN /usr/local/rvm/bin/rvm --default use 2.7.7
-RUN /usr/local/rvm/bin/rvm-exec 2.7.7 gem install bundler
+RUN /usr/local/rvm/bin/rvm-exec 2.7.7 gem install bundler -v 2.4.22
 RUN bundle install --jobs=3 --retry=3
 RUN chown app:app -R /usr/local/rvm/gems
 
