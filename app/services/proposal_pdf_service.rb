@@ -124,7 +124,7 @@ class ProposalPdfService
   end
 
   def confirmed_organizers
-    @confirmed_organizers ||= proposal.supporting_organizer_invites
+    @confirmed_organizers ||= proposal.supporting_organizer_invites + [lead_organizer_invitation]
   end
 
   def confirmed_participants
@@ -400,7 +400,7 @@ class ProposalPdfService
     @confirmed_invitations = proposal.invites.where(status: "confirmed").order(:id).uniq(&:person_id)
 
     # add the Lead Organizer, who has no invitation
-    @confirmed_invitations << Invite.new(person: proposal.lead_organizer)
+    @confirmed_invitations << lead_organizer_invitation
   end
 
   def number_of_indigenous
@@ -521,5 +521,9 @@ class ProposalPdfService
 
   def invites_gender_data
     @data = invites_graph_data("gender", "gender_other")
+  end
+
+  def lead_organizer_invitation
+    @lead_organizer_invitation ||= Invite.new(person: proposal.lead_organizer)
   end
 end
