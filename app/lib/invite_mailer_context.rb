@@ -18,7 +18,8 @@ class InviteMailerContext
         supporting_organizers: '[Supporting organizers]',
         all_organizers: "[Lead organizer and Supporting organizers]",
         deadline_date: '[Invitation deadline]',
-        invite_url: '[Invite URL]'
+        invite_url: '[Invite URL]',
+        lead_organizer_email: '[Lead organizer email]'
       }.freeze
     end
   end
@@ -43,7 +44,8 @@ class InviteMailerContext
       supporting_organizers: supporting_organizers.join(', '),
       all_organizers: supporting_organizers.unshift(proposal.lead_organizer&.fullname).compact.join(', '),
       deadline_date: invite.deadline_date&.to_date,
-      invite_url: safe_invite_url
+      invite_url: safe_invite_url,
+      lead_organizer_email: proposal.lead_organizer&.email
     }
   end
 
