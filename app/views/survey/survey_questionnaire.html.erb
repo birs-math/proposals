@@ -24,6 +24,13 @@
                     <div class="mb-3">
                       <div>
                         <label class="form-label required">2. Do you identify as an Indigenous person?</label>
+                          <div>
+                          <label>
+                            <em>For more information about Indigenous person, please look at our 
+                            <%= link_to "FAQs", faqs_survey_index_path, target: "_blank" %>.
+                            </em>
+                          </label>
+                         </div>
                         <%= f.select "indigenous_person", options_for_select(indigenous_person_options),{ include_blank: '' }, data: {'survey-target': 'indigenous',action: 'change->survey#handleIndigenousOptions'}, class: "form-select", required: true %>
                         <div class="hidden mt-3" data-survey-target="indigenousYes">
                           <%= f.select "indigenous_person_yes", options_for_select(indigenous_person_yes_options), {}, class: "form-control", id: 'indigenous_person_yes', multiple: true %>
@@ -59,6 +66,13 @@
                     <div class="mb-3">
                       <div>
                         <label class="form-label required">5. Do you identify as a member of the 2SLGBTQIA+ community?</label>
+                          <div>
+                          <label>
+                            <em>For more information, please look at our 
+                            <%= link_to "FAQs", faqs_survey_index_path, target: "_blank" %>.
+                            </em>
+                          </label>
+                         </div>
                         <%= f.select(:community, options_for_select([['Yes', 'Yes'], ['No', 'No'], ['Prefer not to answer', 'Prefer not to answer']]),{ include_blank: '' }, {class: "form-select", required: true}) %>
                       </div>
                     </div>

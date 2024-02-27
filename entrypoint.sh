@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+source /etc/profile.d/rvm.sh
+
 echo
 echo "Welcome to OS:"
 uname -v
@@ -46,14 +48,8 @@ echo "Yarn version:"
 yarn --version
 
 echo
-echo "Installing latest bundler..."
-/usr/local/rvm/bin/rvm-exec 2.7.7 gem install bundler
-
-if [ ! -e /usr/local/rvm/gems/ruby-2.7.7/gems/rails-6.1.4.1 ]; then
-  echo
-  echo "Installing Rails 6.1.4.1..."
-  su - app -c "cd /home/app/proposals; /usr/local/rvm/bin/rvm-exec 2.7.7 gem install rails -v 6.1.4.1"
-fi
+echo "Installing bundler..."
+/usr/local/rvm/bin/rvm-exec 2.7.7 gem install bundler -v 2.4.22
 
 if [ ! -e /home/app/proposals/bin ]; then
   echo
@@ -61,13 +57,13 @@ if [ ! -e /home/app/proposals/bin ]; then
   su - app -c "cd /home/app; rails new proposals"
 fi
 
-# echo
-# echo "Bundle install..."
-# su - app -c "cd /home/app/proposals; /usr/local/rvm/gems/default/bin/bundle install"
-
 echo
-echo "Bundle update..."
-su - app -c "cd /home/app/proposals; /usr/local/rvm/gems/default/bin/bundle update"
+echo "Bundle install..."
+su - app -c "cd /home/app/proposals; /usr/local/rvm/gems/default/bin/bundle install"
+
+#echo
+#echo "Bundle update..."
+#su - app -c "cd /home/app/proposals; /usr/local/rvm/gems/default/bin/bundle update"
 
 root_owned_files=`find /usr/local/rvm/gems -user root -print`
 if [ -z "$root_owned_files" ]; then
@@ -79,11 +75,12 @@ fi
 if [ -e /home/app/proposals/db/migrate ]; then
   echo
   echo "Running migrations..."
+  echo "this in prod migrations section"
   cd /home/app/proposals
   SECRET_KEY_BASE=token DB_USER=$DB_USER DB_PASS=$DB_PASS
-  rake db:migrate RAILS_ENV=production
-  rake db:migrate RAILS_ENV=development
-  rake db:migrate RAILS_ENV=test
+  bundle exec rake db:migrate RAILS_ENV=production
+  bundle exec rake db:migrate RAILS_ENV=development
+  bundle exec rake db:migrate RAILS_ENV=test
 fi
 
 if [ ! -e /home/app/proposals/config/webpacker.yml ]; then
@@ -116,6 +113,7 @@ chmod 755 /home/app/proposals/node_modules
 su - app -c "cd /home/app/proposals; yarn install"
 
 if [ "$RAILS_ENV" == "production" ]; then
+  echo "this in prod rails section"
   su - app -c "cd /home/app/proposals; RAILS_ENV=production SECRET_KEY_BASE=token bundle exec rake assets:precompile --trace"
   su - app -c "cd /home/app/proposals; yarn"
 

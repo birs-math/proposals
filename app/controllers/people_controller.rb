@@ -12,8 +12,12 @@ class PeopleController < ApplicationController
 
   def update
     if @person.update(person_params)
-      redirect_to new_survey_path(code: params[:code], response: params[:response]),
-                  notice: t('people.update.success')
+      if @person.demographic_data.present?
+        redirect_to root_path
+      else
+        redirect_to new_survey_path(code: params[:code], response: params[:response]),
+                    notice: t('people.update.success')
+      end
     else
       @invited_as = invite&.invited_as
       render :new

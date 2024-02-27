@@ -1,0 +1,74 @@
+<%= turbo_stream.remove "#{@type}_placeholders" %>
+
+<% if @proposals.present? %>
+  <%= turbo_stream.append "#{@type}_proposals" do %>
+    <% @proposals&.each do |proposal| %>
+      <div class="row border-bottom mb-3 align-items-center small" id="proposal-row-<%= proposal.id %>">
+        <div class="col-xl col-md-12">
+          <input type="checkbox" name="reviewed" data-action="click->submitted-proposals#storeID" id="<%= proposal.id %>_checkbox" class="proposals-checkboxes" data-value="<%= proposal.id %>" data-type="<%= @type %>">
+        </div>
+        <div class="col-xl col-md-12 py-sm-1"><%= proposal.code %></div>
+        <div class="col-xl col-md-12 py-sm-1"><%= proposal.title %></div>
+        <div class="col-xl col-md-12 py-sm-1"><%= proposal.lead_organizer&.fullname %></div>
+        <div class="col-xl col-md-12 py-sm-1">
+          <% proposal.locations.pluck(:code).each do |code| %>
+            <%= code %><br>
+          <% end %>
+        </div>
+        <div class="col-xl col-md-12 py-sm-1">
+          <div class="form-group" data-submitted-proposals-target="proposalLocation" data-id=<%= proposal.id %> >
+            <label data-action="click->submitted-proposals#handleLocations" data-id=<%= proposal.id %>><%= proposal.assigned_location&.code %></label>
+          </div>
+          <div class="hidden form-group" data-submitted-proposals-target="locationOptions" data-id=<%= proposal.id %> >
+            <input type="hidden" id="proposal_id" name="proposal_id" value="<%= proposal.id %>">
+            <%= select_tag :status, options_for_select(locations), include_blank: '', class: 'form-select', data: { 'action': 'change->submitted-proposals#proposalLocations', 'submitted-proposals-target': 'location', 'id': proposal.id }, required: true %>
+          </div>
+        </div>
+        <div class="<%= proposal_status_class(proposal.status) %> col-xl col-md-12 py-sm-1" >
+          <div class="form-group" data-submitted-proposals-target="proposalStatus" data-id=<%= proposal.id %> >
+            <label data-action="click->submitted-proposals#handleStatus" data-id=<%= proposal.id %>><%= proposal.status&.split('_')&.map(&:capitalize)&.join(' ') %></label>
+          </div>
+          <div class="hidden form-group" data-submitted-proposals-target="statusOptions" data-id=<%= proposal.id %> >
+            <input type="hidden" id="proposal_id" name="proposal_id" value="<%= proposal.id %>">
+            <%= select_tag :status, options_for_select(specific_proposal_statuses, proposal.status), include_blank: '', class: 'form-select', data: { 'action': 'change->submitted-proposals#proposalStatuses', 'submitted-proposals-target': 'status', 'id': proposal.id }, required: true %>
+          </div>
+        </div>
+        <div class="col-xl col-sm-12 py-md-1"><%= proposal.outcome&.capitalize %></div>
+        <div class="col-xl col-sm-12 py-md-1"><%= proposal&.updated_at&.to_date %></div>
+        <div class="col-xl col-sm-12 py-md-1"><%= proposal&.edit_flow&.to_date %></div>
+        <div class="col-xl col-sm-12 py-md-1"><%= edi_reviews_count(proposal.id)  %></div>
+        <div class="col-xl col-sm-12 py-md-1"><%= scientific_reviews_count(proposal.id)  %></div>
+        <div class="col-xl col-sm-12 py-md-1">
+          <%= link_to '<i class="align-middle fas fa-fw fa-print"></i>PDF<br>'.html_safe, rendered_proposal_proposal_path(proposal.id, :format => :pdf), target: '_blank', class: 'text-muted', data: { turbo: false } %>
+          <%= link_to '<i class="align-middle fas fa-fw fa-pen"></i>Edit<br>'.html_safe, edit_submitted_proposal_url(proposal), class: 'text-muted', data: { turbo: false } %>
+          <%= link_to '<i class="align-middle fas fa-fw fa-eye"></i>Show<br>'.html_safe, submitted_proposal_url(proposal), class: 'text-muted', data: { turbo: false } %>
+          <%= link_to '<i class="align-middle mr-2 fas fa-fw fa-clone"></i>Versions<br>'.html_safe, versions_proposal_url(proposal), class: 'text-muted', data: { turbo: false } %>
+          <%= link_to '<i class="align-middle fas fa-fw fa-trash" data-toggle="tooltip" title="Delete"></i>Delete<br>'.html_safe, submitted_proposal_url(proposal), method: :delete , data: {confirm: "Are you sure you want to delete this proposal?"}, class: 'text-muted' %>
+          <%= link_to '<i class="align-middle mr-2 fas fa-fw fa-file"></i>Reviews<br>'.html_safe, reviews_submitted_proposal_path(proposal), class: 'text-muted', data: { turbo: false } %>
+        </div>
+      </div>
+    <% end %>
+    <% if @pagy.next.present? %>
+      <%= render partial: 'submitted_proposals/index/proposal_placeholder_rows', locals: { type: @type, rows: 1 } %>
+    <% end %>
+  <% end %>
+
+  <%= turbo_stream.update "#{@type}_pagination" do %>
+    <% if @pagy.next.present? %>
+      <%= turbo_stream.replace "#{@type}_pagination" do %>
+        <%= turbo_frame_tag "#{@type}_pagination", src: submitted_proposals_path(page: @pagy.next, format: :turbo_stream, **@search_params), loading: :lazy %>
+      <% end %>
+    <% end %>
+    <div class="row">
+      <p class="text-center"><%== pagy_info @pagy %></p>
+    </div>
+  <% end %>
+<% else %>
+  <%= turbo_stream.remove "#{@type}_proposal_headers" %>
+
+  <%= turbo_stream.remove "#{@type}_actionbar" %>
+
+  <%= turbo_stream.append "#{@type}_proposals" do %>
+    <%= render partial: 'submitted_proposals/index/proposals_not_found' %>
+  <% end %>
+<% end %>

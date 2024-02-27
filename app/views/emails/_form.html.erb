@@ -8,7 +8,8 @@
       <div class="mb-3">
         <h4>Email Addresses of Organizers</h4>
         <div class="mb-3">
-          <p><%= @proposal.lead_organizer.email %></p>
+          <%= f.label :recipient, class: 'form-label' %>
+          <%= f.text_field :recipient, class: 'form-control', value: @proposal.lead_organizer.email %>
           <label>CC</label>
           <input name="cc_email" id="cc_email" data-submitted-proposals-target="organizersEmail" value="<%= organizers_email(@proposal) %>">
           <small>This text field supports a list of Cc emails. For example: birs@example.com, noreply@example.com, …</small>

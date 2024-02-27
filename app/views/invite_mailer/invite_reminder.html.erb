@@ -1,13 +1,1 @@
-<p>Dear <%= @person&.fullname %>:</p>
-<p>
-  This is a friendly reminder to indicate your interest in being <%= @invited_as %> a proposed <%= @proposal.proposal_type.name %> titled “<%= @proposal.title %>”, which is currently being organized by <%= @proposal.lead_organizer&.fullname %><%= @existing_organizers %>.
-</p>
-
-<p>Please indicate your interest in this proposal by following this link by <%= @invite&.deadline_date&.to_date %>:</p>
-
-<p><%= link_to invite_url(code: @invite.code), invite_url(code: @invite.code) %></p>
-
-<p>Thank you for indicating your interest in this proposed workshop!</p>
-
-<p>Banff International Research Station</p>
-<p>And the organizing committee.</p>
+<%= simple_format(@body) %>

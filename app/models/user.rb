@@ -23,8 +23,7 @@ class User < ApplicationRecord
   end
 
   def staff_member?
-    staff = Role.find_by(name: 'Staff')
-    roles.include?(staff)
+    @staff_member ||= roles.exists?(name: 'Staff')
   end
 
   def organizer?(proposal)

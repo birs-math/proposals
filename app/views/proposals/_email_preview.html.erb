@@ -8,13 +8,11 @@
       <div class="modal-body text-justify" style="text-align: justify;">
         <p>To: [invited person's email]</p>
         <p>Cc: <%= @proposal.lead_organizer.email %></p>
-        <p>Dear [Firstname Lastname],</p>
         <p id="email_body_preview"></p>
         <p id="email_body" class="d-none"></p>
       </div>
       <div class="modal-footer" data-controller="nested-invites">
-        <button data-action="click->nested-invites#sendInvite" data-id="<%= @proposal.id %>" class="btn btn-secondary" data-organizer="<%= no_of_participants(@proposal.id, 'Organizer').last&.id %>"
-        data-participant="<%= no_of_participants(@proposal.id, 'Participant').last&.id %>">Send Invitation</button>
+        <button data-action="click->nested-invites#sendInvite" data-id="<%= @proposal.id %>" class="btn btn-secondary">Send Invitation</button>
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
       </div>
     </div>

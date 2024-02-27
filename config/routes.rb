@@ -16,11 +16,14 @@ Rails.application.routes.draw do
   get 'dashboards', to: 'proposal_types#index'
 
   resources :submitted_proposals do
+    get :booklet_log, on: :collection
+
     collection do
       get :download_csv
       post :send_to_workshop
       post :proposals_booklet
       get :download_booklet
+      get :download_log_file
       post :edit_flow
       post :revise_proposal_editflow
       post :approve_decline_proposals
@@ -30,6 +33,7 @@ Rails.application.routes.draw do
       get :download_review_booklet
       get :reviews_excel_booklet
       post :proposal_outcome_location
+      get :demographic_data
     end
     member do
       post :update_status
@@ -82,7 +86,6 @@ Rails.application.routes.draw do
       member do
         post :inviter_response
         post :invite_reminder
-        post :invite_email
         post :new_invite
       end
       collection do
@@ -107,6 +110,7 @@ Rails.application.routes.draw do
     collection do
       get :thanks
       post :invitation_template
+      post :create_invite
     end
   end
   resources :proposal_types do
@@ -125,6 +129,7 @@ Rails.application.routes.draw do
     member do
       get :location_based_fields
       get :proposal_type_locations
+      get :years
     end
   end
   resources :locations do

@@ -1,4 +1,4 @@
-class ExportScheduledProposalsJob < ApplicationJob
+class ExportProposalsJob < ApplicationJob
   queue_as :default
 
   def workshops_api
@@ -8,11 +8,11 @@ class ExportScheduledProposalsJob < ApplicationJob
   end
 
   def publish_proposal(proposal, url)
-    request_body = ScheduledProposalService.new(proposal).event
+    request_body = WorkshopsApiProposal.new(proposal).event
     response = RestClient.post url, request_body.to_json, content_type: :json, accept: :json
     Rails.logger.info("Posted proposal #{proposal.code} to Workshops. Response: #{response}")
   rescue => e
-    Rails.logger.info("Error posting proposal #{proposal.code} to Workshops: #{e}. Reponse: #{response}")
+    Rails.logger.info("Error posting proposal #{proposal.code} to Workshops: #{e}. Response: #{response}")
   end
 
   def perform(proposal_codes)

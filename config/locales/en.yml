@@ -30,14 +30,35 @@
 # available at https://guides.rubyonrails.org/i18n.html.
 
 en:
-  hello: "Hello world"
   errors:
     messages:
       invites:
         invalid_code: This invitation code is invalid
+      something_went_wrong: 'Something went wrong.'
+      resource_not_found: 'Requested resource not found'
       email_verifier:
         email_not_real: must point to a real mail account
         out_of_mail_server: appears to point to dead mail server
         no_mail_server: appears to point to domain which doesn't handle e-mail
         failure:  delivery failed! The email you have entered not found.
         exception: could not be sent
+  proposals:
+    initialize: 'Started a new %{proposal_type} proposal!'
+    limit_per_type_per_year: 'There is a limit of one %{proposal_type} proposal per year.'
+    ui:
+      no_proposals: No proposals found
+      current_year: 'Current year (%{year})'
+      no_year_set: 'Empty year'
+    form:
+      add_organizers: 'Add Supporting Organizers:'
+      add_participants: 'Add Participants:'
+      new_participants_invite: Click here to send out additional participant invitation
+      new_organizers_invite: Click here to send out additional organizer invitation
+      invite_participants: Invite Participant(s)
+      invite_organizers: Invite Organizer(s)
+      fill_in_title: Please, fill in title and save before proceeding
+      preamble: LaTeX Preamble
+      preamble_note: If you need to use custom LaTeX macros, enter them here to add them to the document preamble.
+      bibliography: Bibliography
+      bibliography_note: If you have a LaTeX bibliography, please enter it in this field. It will be included when you click the "Print Proposal" button.
+      see_guidelines: See Guidelines for more information

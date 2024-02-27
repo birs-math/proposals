@@ -32,28 +32,43 @@ RSpec.describe "Proposals", type: :request do
   end
 
   describe "POST /create" do
+    subject(:post_request) { post proposals_path, params: params }
+
     let(:proposal_form) { create(:proposal_form, proposal_type: proposal.proposal_type, status: 'active') }
+    let(:proposal_type) { create(:proposal_type) }
+    let(:form) { create(:proposal_form, status: :active, proposal_type: proposal_type) }
+    let(:params) do
+      { proposal: { proposal_type_id: form.proposal_type.id, title: 'Test proposal' } }
+    end
+
     before do
       proposal_form
-      post proposals_path, params: params
     end
 
-    context 'when already has proposal it will not create' do
-      let(:params) do
-        { proposal: { proposal_type_id: proposal.proposal_type.id, title: 'Test proposal', year: '2023' } }
-      end
-
-      it { expect(response).to redirect_to(new_proposal_path) }
+    it 'creates' do
+      expect { post_request }.to change { Proposal.count }.by(1)
     end
 
-    context 'when does not have proposal it will create new' do
-      let(:proposal_type) { create(:proposal_type) }
-      let(:form) { create(:proposal_form, status: :active, proposal_type: proposal_type) }
-      let(:params) do
-        { proposal: { proposal_type_id: form.proposal_type.id, title: 'Test proposal', year: '2025' } }
+    it 'redirects to edit_proposal_path' do
+      post_request
+
+      expect(response).to redirect_to(edit_proposal_path(Proposal.last))
+    end
+
+    context 'when error' do
+      before do
+        allow_any_instance_of(Proposals::Initialize).to receive(:ensure_organizer_role).and_raise(StandardError)
       end
 
-      it { expect(response).to redirect_to(edit_proposal_path(Proposal.last)) }
+      it 'does not create' do
+        expect { post_request }.not_to change { Proposal.count }
+      end
+
+      it 'redirects to new_proposal_path' do
+        post_request
+
+        expect(response).to redirect_to(new_proposal_path)
+      end
     end
   end
 

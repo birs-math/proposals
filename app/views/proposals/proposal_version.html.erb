@@ -6,7 +6,7 @@
       </h1>
       <nav aria-label="breadcrumb">
         <ol class="breadcrumb" data-turbo="false">
-          <li class="breadcrumb-item"> <%= link_to "Dashboard", dashboards_path %> </a></li>
+          <li class="breadcrumb-item"> <%= link_to "Dashboard", dashboards_path %></li>
           <% if current_user.staff_member? %>
             <li class="breadcrumb-item active" aria-current="page"><%= link_to "Submitted Proposals", submitted_proposals_path %></li>
           <% else %>
@@ -28,7 +28,7 @@
                 data-nested-invites-max-participant-value="<%= @proposal.proposal_type.participant %>"
                 data-nested-invites-max-organizer-value="<%= @proposal.proposal_type.co_organizer %>"
                 data-nested-invites-organizer-value="<%= confirmed_participants(@proposal.id, 'Organizer').count %>"
-                data-nested-invites-participant-value="<%= confirmed_participants(@proposal.id, 'Participant').count %>" 
+                data-nested-invites-participant-value="<%= confirmed_participants(@proposal.id, 'Participant').count %>"
               >
               <input type="hidden" name="version" data-submit-proposals-target="proposalVersion" value="<%= @version %>" id="proposal_version">
                 <div class="col-12 col-lg-12">
@@ -57,7 +57,7 @@
                               Please list all the changes you have made to your proposal here.
                             </p>
                             <p>
-                              For example, you could say, "As requested by the BIRS program committee, we have increased our number of early-career participants by inviting the following people ... ". 
+                              For example, you could say, "As requested by the BIRS program committee, we have increased our number of early-career participants by inviting the following people ... ".
                             </p>
                             <%= f.text_area(:cover_letter, size: '5x5', class:'form-control', value: @proposal&.cover_letter, disabled: action) %>
                           </div>
@@ -102,73 +102,26 @@
                             <div class="col-6 mt-2">
                               <div class="mb-3">
                                 <label class="required">AMS Subject Code 1</label>
-                                <%= select_tag :ams_subjects, options_for_select(ams_subjects_code, @proposal_version.ams_subject_one), include_blank: '', disabled: true, class: "form-select", name:'ams_subjects[code1]' %>
+                                <%= select_tag :ams_subjects, options_for_select(ams_subjects_select, @proposal_version.ams_subject_one), include_blank: '', disabled: true, class: "form-select", name:'ams_subjects[code1]' %>
                               </div>
 
                               <div class="mb-3">
                                 <label class="required">AMS Subject Code 2</label>
-                                <%= select_tag :ams_subjects, options_for_select(ams_subjects_code, @proposal_version.ams_subject_two), include_blank: '', disabled: true, class: "form-select", name:'ams_subjects[code2]' %>
+                                <%= select_tag :ams_subjects, options_for_select(ams_subjects_select, @proposal_version.ams_subject_two), include_blank: '', disabled: true, class: "form-select", name:'ams_subjects[code2]' %>
                               </div>
                             </div>
                           <% else %>
                             <div class="mb-3">
-                            <%= label_tag :year %>
-                            <%= select_tag :year, options_for_select(proposal_type_year(@proposal.proposal_type),  @proposal.year), disabled: true, class: "form-select w-25" %>
-                          </div>
-                          <div class="mb-3 row">
-                            <h4>Subject Areas</h4>
-                            <div class="col-6 mt-2">
-                              <label class="required">Subject Area</label>
-                              <%= select_tag :subject_id, options_for_select(subjects_area, @proposal.subject&.id), include_blank: '' , disabled: true, class: "form-select" %>
-                              <% if @submission && @proposal.subject&.id.nil? %>
-                                <p class="field-validation">Subject is required</p>
-                              <% end %>
+                              <%= label_tag :year %>
+                              <%= select_tag :year, options_for_select(proposal_type_year(@proposal.proposal_type),  @proposal.year), disabled: true, class: "form-select w-25" %>
                             </div>
-                            <div class="col-6 mt-2">
-                              <div class="mb-3">
-                                <label class="required">AMS Subject Code 1</label>
-                                <%= select_tag :ams_subjects, options_for_select(ams_subjects_code, proposal_ams_subjects_code(@proposal, 'code1')), include_blank: '', disabled: true, class: "form-select", name:'ams_subjects[code1]' %>
-                                <% if @submission && proposal_ams_subjects_code(@proposal, 'code1').blank? %>
-                                  <p class="field-validation">AMS Subject Code 1 is required</p>
-                                <% end %>
-                              </div>
-
-                              <div class="mb-3">
-                                <label class="required">AMS Subject Code 2</label>
-                                <%= select_tag :ams_subjects, options_for_select(ams_subjects_code, proposal_ams_subjects_code(@proposal, 'code2')), include_blank: '', disabled: true, class: "form-select", name:'ams_subjects[code2]' %>
-                                <% if @submission && proposal_ams_subjects_code(@proposal, 'code2').blank? %>
-                                  <p class="field-validation">AMS Subject Code 2 is required</p>
-                                <% end %>
-                              </div>
-                            </div>
+                            <div class="mb-3 row">
+                              <%= render partial: 'proposals/form/subject_area', locals: { form: f, disabled: true } %>
                           <% end %>
                           <div>
                             <% if params[:action] == 'proposal_version' %>
-                              <div>
-                                <%= render partial: 'lead_organizer' %>
-                                <div>
-                                  <h3 class="form-section">Supporting Organizers:</h3>
-                                  <% if @proposal.invites.organizer %>
-                                    <%= render partial: 'organizer', locals: { invites: @proposal.invites.organizer } %>
-                                  <% end %>
-                                </div>
-                                <div class="mt-4">
-                                  <div class="mb-3">
-                                    <h3 class="form-section">Participants:</h3>
-                                    <% if @proposal.invites.participant %>
-                                      <%= render partial: 'organizer', locals: { invites: @proposal.invites.participant } %>
-                                    <% end %>
-                                  </div>
-                                </div>
-                                <div class="mt-4">
-                                  <div class="mb-3">
-                                    <% unless @proposal.get_confirmed_participant(@proposal).blank? %>
-                                      <h3 class="form-section">Confirmed Participants:</h3>
-                                          <%= render partial: 'proposals/confirm_participant', locals: { confirmed_participants: @proposal.get_confirmed_participant(@proposal) } %>
-                                    <% end %>
-                                  </div>
-                                </div>
-                              </div>
+                              <%= render partial: 'proposals/form/invitees' %>
+                              <%= render partial: 'proposals/form/confirmed_participants' %>
                             <% end %>
 
                             <div class="mt-4" data-controller="multi-upload">
@@ -205,23 +158,7 @@
                         <div class="mb-3">
                           <p><%= @proposal.proposal_form.introduction2&.html_safe %></p>
                         </div>
-                        <div>
-                          <h3>LaTeX Preamble</h3>
-                          <p>If you have custom LaTeX macros, enter them here to add them to the document preamble.</p>
-                          <div class="form-group mb-2">
-                            <%= f.text_area(:preamble, size: '5x5', class:'form-control', value: @proposal.preamble, disabled: action)%>
-                          </div>
-                        </div>
-                        <div class="form-group mb-3">
-                          <h3>Bibliography</h3>
-                          <p>If you have a LaTeX bibliography, please enter it in this field. It will be included when you click the "Print Proposal" button.</p>
-                          <div class="form-group mb-2">
-                            <%= f.text_area(:bibliography, size: '5x5', class:'form-control', value: @proposal.bibliography, disabled: action)%>
-                          </div>
-                        </div>
-                        <!-- <h4 class="tab-title">Common Fields</h4> -->
-                        <%= render partial: 'proposal_forms/proposal_fields', locals: { proposal_fields: common_proposal_fields(@proposal) } %>
-
+                        <%= render partial: 'proposals/form/fields', locals: { proposal: @proposal, form: f, disabled: action, no_latex: false } %>
                         <div class="row mt-20">&nbsp;</div>
                         <div class="d-flex">
                           <%= link_to "Print Proposal", rendered_proposal_proposal_path(@proposal.id, :format => :pdf), target: '_blank', class: 'me-auto p-2 btn btn-primary',
@@ -230,7 +167,7 @@
                           <button id="changeTab" class="p-2 btn btn-primary" data-action='click->submit-proposals#nextTab'>Next</button>
                          </div>
                       </div>
-                      
+
                       <div class="tab-pane" id="tab-3" role="tabpanel">
                         <div class="mb-3">
                           <p><%= @proposal.proposal_form.introduction3&.html_safe %></p>
@@ -255,106 +192,7 @@
                       </div>
 
                       <div class="tab-pane" id="tab-4" role="tabpanel">
-                        <div class="mb-3">
-                          <p><%= @proposal.proposal_form.introduction_charts&.html_safe %></p>
-                        </div>
-                        <div class="row">
-                          <div class="col-12 col-lg-6">
-                            <div class="card flex-fill w-100">
-                              <div class="card-header">
-                                <h5 class="card-title">Nationality</h5>
-                              </div>
-                              <div class="card-body">
-                                <table class="table">
-                                  <thead>
-                                    <tr>
-                                      <th>Nationality</th>
-                                      <th>No.</th>
-                                    </tr>
-                                  </thead>
-                                  <tbody>
-                                    <% nationality_data(@proposal).each do |key, value| %>
-                                    <tr>
-                                      <td><%= key %></td>
-                                      <td><%=  value %></td>
-                                    </tr>
-                                    <% end %>
-                                  </tbody>
-                                </table>
-                              </div>
-                            </div>
-                          </div>
-                          <div class="col-12 col-lg-6">
-                            <div class="card flex-fill w-100">
-                              <div class="card-header">
-                                <h5 class="card-title">Ethnicity</h5>
-                              </div>
-                              <div class="card-body">
-                                <table class="table">
-                                  <thead>
-                                    <tr>
-                                      <th>Ethnicity</th>
-                                      <th>No.</th>
-                                    </tr>
-                                  </thead>
-                                  <tbody>
-                                    <% ethnicity_data(@proposal).each do |key, value| %>
-                                    <tr>
-                                      <td><%= key %></td>
-                                      <td><%=  value %></td>
-                                    </tr>
-                                    <% end %>
-                                  </tbody>
-                                </table>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="row">
-                          <div class="col-12 col-lg-6">
-                            <div class="card flex-fill w-100">
-                              <div class="card-header">
-                                <h5 class="card-title">Gender</h5>
-                                <!-- <h6 class="card-subtitle text-muted">A line chart is a way of plotting data points on a line.</h6> -->
-                              </div>
-                              <div class="card-body">
-                                <div class="chart">
-                                  <canvas id="chartjs-gender"></canvas>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                          <div class="col-12 col-lg-6">
-                            <div class="card flex-fill w-100">
-                              <div class="card-header">
-                                <h5 class="card-title">Under-represented minority in STEM</h5>
-                                <!-- <h6 class="card-subtitle text-muted">A line chart is a way of plotting data points on a line.</h6> -->
-                              </div>
-                              <div class="card-body">
-                                <div class="chart">
-                                  <canvas id="chartjs-stem"></canvas>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                          <div class="d-flex flex-row-reverse">
-                            <button id="changeTab" class="p-2 btn btn-primary" data-action='click->submit-proposals#nextTab'>Next</button>
-                          </div>
-                        </div>
-                        <div class="row">
-                          <div class="col-12 col-lg-6">
-                            <div class="card flex-fill w-100">
-                              <div class="card-header">
-                                <h5 class="card-title">Career Stage</h5>
-                              </div>
-                              <div class="card-body">
-                                <div class="chart">
-                                  <canvas id="chartjs-career"></canvas>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
+                        <%= render partial: 'submitted_proposals/demographic_charts', locals: { title: @proposal.proposal_form.introduction_charts&.html_safe } %>
                         <div class="row mt-20">&nbsp;</div>
                         <div class="d-flex">
                           <%= link_to "Print Proposal", rendered_proposal_proposal_path(@proposal.id, :format => :pdf), target: '_blank', class: 'p-2 mx-2 btn btn-primary' %>
@@ -365,161 +203,11 @@
                     </div>
                   </div>
                 </div>
-              </div> 
+              </div>
             </div>
           </div>
         </div>
       </div>
+    </div>
   </div>
 </main>
-
-<script>
-  document.addEventListener("DOMContentLoaded", function() {
-    new Chart(document.getElementById("chartjs-gender"), {
-      type: "bar",
-      data: {
-        labels: <%= gender_labels(@proposal).to_json.html_safe %>,
-        datasets: [{
-          fill: true,
-          backgroundColor: "rgba(50, 83, 168)",
-          borderColor: window.theme.primary,
-          data: <%= gender_values(@proposal) %>
-        }]
-      },
-      options: {
-        maintainAspectRatio: false,
-        legend: {
-          display: false
-        },
-        tooltips: {
-          intersect: false
-        },
-        hover: {
-          intersect: true
-        },
-        plugins: {
-          filler: {
-            propagate: false
-          }
-        },
-        scales: {
-          xAxes: [{
-            reverse: true,
-            gridLines: {
-              color: "rgba(0,0,0,0.05)"
-            }
-          }],
-          yAxes: [{
-            ticks: {
-              stepSize: 500
-            },
-            display: true,
-            borderDash: [5, 5],
-            gridLines: {
-              color: "rgba(0,0,0,0)",
-              fontColor: "#fff"
-            }
-          }]
-        }
-      }
-    });
-
-    new Chart(document.getElementById("chartjs-stem"), {
-      type: "bar",
-      data: {
-        labels: <%= stem_labels(@proposal).to_json.html_safe %>,
-        datasets: [{
-          fill: true,
-          backgroundColor: "rgba(50, 83, 168)",
-          borderColor: window.theme.primary,
-          data: <%= stem_values(@proposal) %>
-        }]
-      },
-      options: {
-        maintainAspectRatio: false,
-        legend: {
-          display: false
-        },
-        tooltips: {
-          intersect: false
-        },
-        hover: {
-          intersect: true
-        },
-        plugins: {
-          filler: {
-            propagate: false
-          }
-        },
-        scales: {
-          xAxes: [{
-            reverse: true,
-            gridLines: {
-              color: "rgba(0,0,0,0.05)"
-            }
-          }],
-          yAxes: [{
-            ticks: {
-              stepSize: 500
-            },
-            display: true,
-            borderDash: [5, 5],
-            gridLines: {
-              color: "rgba(0,0,0,0)",
-              fontColor: "#fff"
-            }
-          }]
-        }
-      }
-    });
-
-    new Chart(document.getElementById("chartjs-career"), {
-      type: "bar",
-      data: {
-        labels: <%= career_labels(@proposal).to_json.html_safe %>,
-        datasets: [{
-          fill: true,
-          backgroundColor: "rgba(50, 83, 168)",
-          borderColor: window.theme.primary,
-          data: <%= career_values(@proposal) %>
-        }]
-      },
-      options: {
-        maintainAspectRatio: false,
-        legend: {
-          display: false
-        },
-        tooltips: {
-          intersect: false
-        },
-        hover: {
-          intersect: true
-        },
-        plugins: {
-          filler: {
-            propagate: false
-          }
-        },
-        scales: {
-          xAxes: [{
-            reverse: true,
-            gridLines: {
-              color: "rgba(0,0,0,0.05)"
-            }
-          }],
-          yAxes: [{
-            ticks: {
-              stepSize: 500
-            },
-            display: true,
-            borderDash: [5, 5],
-            gridLines: {
-              color: "rgba(0,0,0,0)",
-              fontColor: "#fff"
-            }
-          }]
-        }
-      }
-    });
-  });
-</script>

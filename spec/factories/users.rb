@@ -7,5 +7,13 @@ FactoryBot.define do
     f.password { password }
     f.password_confirmation { password }
     f.confirmed_at { Time.current }
+
+    trait :with_privilege do
+      after(:create) do |user, options|
+        user_role = create(:user_role, user: user)
+        privilege_name = options[:privilege_name] || 'SubmitProposalsController'
+        create(:role_privilege, permission_type: 'Manage', privilege_name: privilege_name, role: user_role.role)
+      end
+    end
   end
 end

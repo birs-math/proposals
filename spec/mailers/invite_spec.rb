@@ -1,6 +1,12 @@
-require "rails_helper"
+require 'rails_helper'
 
 RSpec.describe InviteMailer, type: :mailer do
+  Proposals::Application.load_tasks
+
+  before(:all) do
+    Rake::Task['birs:liquid_email_templates'].invoke
+  end
+
   describe '#invited_as_text' do
     context 'when invite is organizer' do
       let(:invite) { create(:invite, invited_as: 'Organizer') }
@@ -23,35 +29,40 @@ RSpec.describe InviteMailer, type: :mailer do
     let(:proposal) { create(:proposal, :with_organizers) }
     let(:invite) { create(:invite, proposal: proposal) }
     let(:person) { create(:person, invite: invite) }
+    let(:email) { InviteMailer.with(invite: invite).invite_email }
 
     context 'when lead organizer is present' do
-      let(:proposal_role) { create(:proposal_role, proposal: proposal) }
-      let(:body) { "Invitation email body" }
-      before do
-        proposal_role.role.update(name: 'lead_organizer')
-      end
-      let(:lead_organizer) { proposal_role.person }
-      let(:email) { InviteMailer.with(invite: invite, body: body, lead_organizer: lead_organizer).invite_email }
+      let(:email) { InviteMailer.with(invite: invite, lead_organizer_copy: true).invite_email }
 
-      it "sends an invite_email" do
-        expect(email.subject).to eq("BIRS Proposal Invitation for #{invite.invited_as?}")
+      it { expect(email.subject).to eq("BIRS Proposal: Invitation for #{invite.humanize_invited_as}") }
+
+      it 'sends to lead organizer' do
+        expect(email.to).to eq([proposal.lead_organizer.email])
       end
     end
 
     context 'when lead organizer is not present' do
-      let(:body) { "Invitation email body" }
-      let(:email) { InviteMailer.with(invite: invite, body: body).invite_email }
+      it { expect(email.subject).to eq("BIRS Proposal: Invitation for #{invite.humanize_invited_as}") }
 
-      it "sends an invite_email" do
-        expect(email.subject).to eq("BIRS Proposal Invitation for #{invite.invited_as?}")
+      it 'sends to participant' do
+        expect(email.to).to eq([invite.email])
       end
+    end
+
+    context 'rendering liquid' do
+      before do
+        email.deliver_now
+      end
+
+      let(:delivery) { ActionMailer::Base.deliveries.last }
+
+      it { expect(delivery.html_part.body.to_s).to include(proposal.title) }
     end
   end
 
   describe 'invite_acceptance' do
     let(:proposal) { create(:proposal, :with_organizers) }
     let(:invite) { create(:invite, proposal: proposal) }
-    let(:person) { create(:person, invite: invite) }
     let(:email) { InviteMailer.with(invite: invite, organizers: nil).invite_acceptance }
 
     context 'when organizers are present' do
@@ -65,6 +76,16 @@ RSpec.describe InviteMailer, type: :mailer do
 
     it "sends an invite acceptance email" do
       expect(email.subject).to eq("BIRS Proposal Confirmation of Interest")
+    end
+
+    context 'rendering liquid' do
+      before do
+        email.deliver_now
+      end
+
+      let(:delivery) { ActionMailer::Base.deliveries.last }
+
+      it { expect(delivery.html_part.body.to_s).to include(invite.person.fullname) }
     end
   end
 
@@ -90,12 +111,22 @@ RSpec.describe InviteMailer, type: :mailer do
       let(:organizers) { invites.map(&:person).map(&:fullname).join(', ') }
       let(:email) { InviteMailer.with(invite: invite, organizers: organizers).invite_reminder }
       it "sends an invite reminder email" do
-        expect(email.subject).to eq("Please Respond – BIRS Proposal Invitation for #{invite.invited_as?}")
+        expect(email.subject).to eq("Please Respond – BIRS Proposal Invitation for #{invite.humanize_invited_as}")
       end
     end
 
     it "sends an invite reminder email" do
-      expect(email.subject).to eq("Please Respond – BIRS Proposal Invitation for #{invite.invited_as?}")
+      expect(email.subject).to eq("Please Respond – BIRS Proposal Invitation for #{invite.humanize_invited_as}")
+    end
+
+    context 'rendering liquid' do
+      before do
+        email.deliver_now
+      end
+
+      let(:delivery) { ActionMailer::Base.deliveries.last }
+
+      it { expect(delivery.html_part.body.to_s).to include(invite.deadline_date.to_date.to_s) }
     end
   end
 end

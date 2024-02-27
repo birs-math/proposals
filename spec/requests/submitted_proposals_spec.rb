@@ -59,14 +59,10 @@ RSpec.describe "/submitted_proposals", type: :request do
   end
 
   describe "POST /send_to_workshop" do
-    before do
-      stub_request(:post, "#{ENV['WORKSHOPS_API_URL']}/events/proposals")
-    end
+    let(:request) { post send_to_workshop_submitted_proposals_path(ids: [proposal.id]) }
 
     it 'posts to workshops API' do
-      post send_to_workshop_submitted_proposals_path(ids: [proposal.id])
-
-      expect(WebMock).to have_requested(:post, "#{ENV['WORKSHOPS_API_URL']}/events/proposals").once
+      expect { request }.to have_enqueued_job(ExportProposalsJob)
     end
   end
 
@@ -299,6 +295,7 @@ RSpec.describe "/submitted_proposals", type: :request do
         expect(response).to have_http_status(:ok)
       end
     end
+
     context 'when proposal can not be approved/rejected' do
       before do
         proposal.update(status: :submitted)

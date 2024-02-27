@@ -6,7 +6,7 @@
       </h1>
       <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><%= link_to "Dashboard", dashboards_path %> </a></li>
+          <li class="breadcrumb-item"><%= link_to "Dashboard", dashboards_path %></li>
           <li class="breadcrumb-item active" aria-current="page"><%= link_to "Email Templates", email_templates_path %></li>
           <li class="breadcrumb-item active" aria-current="page"><%= @email_template.new_record? ? 'New' : 'Edit' %></li>
         </ol>
@@ -18,6 +18,11 @@
           <div class="card-body">
             <%= form_for @email_template do |f| %>
               <div class="mb-3">
+                <% if @email_template.liquid_template? %>
+                  <div class="mb-3">
+                    <h4><i class="align-middle fas fa-check-square"></i>&nbsp;This template uses liquid</h4>
+                  </div>
+                <% end %>
                 <div class="mb-3">
                   <%= f.label "Email Type", class: 'form-label' %>
                   <%= f.select :email_type, options_for_select(types_of_email, @email_template.email_type), { include_blank: '' }, required: true, class: 'form-select w-25' %>
@@ -34,6 +39,12 @@
                   <%= f.label :body, class: 'form-label' %>
                   <%= f.text_area(:body, size: '3x5', class:'form-control tinymce') %>
                 </div>
+                <% if @email_template.liquid_template? %>
+                  <div class="mb-3">
+                    <h4>Liquid variables:</h4><br>
+                    <%= show_context %>
+                  </div>
+                <% end %>
                 <div class="text-end m-3">
                   <%= f.submit "Submit", class:  'btn btn-primary' %>
                 </div>

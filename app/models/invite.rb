@@ -19,9 +19,11 @@ class Invite < ApplicationRecord
   validate :deadline_not_in_past, :proposal_title
   validate :one_invite_per_person, on: :create
   after_commit :log_activity
+
   default_scope { order(created_at: :asc) }
-  scope :organizer, -> { where(invited_as: "Organizer") }
-  scope :participant, -> { where(invited_as: "Participant") }
+  scope :organizer, -> { where(invited_as: 'Organizer') }
+  scope :participant, -> { where(invited_as: 'Participant') }
+
   enum status: { pending: 0, confirmed: 1, cancelled: 2 }
   enum response: { yes: 0, maybe: 1, no: 2 }
 
@@ -58,17 +60,19 @@ class Invite < ApplicationRecord
     add_person
   end
 
-  def invited_as?
+  def humanize_invited_as
     invited_as == 'Organizer' ? 'Supporting Organizer' : 'Participant'
   end
 
-  def update_invited_person(affiliation)
-    person = self.person
-    person.affiliation = affiliation
-    person.firstname = firstname
-    person.lastname = lastname
-    person.email = email
-    return true if person.save(validate: false)
+  def update_invited_person(affiliation = nil)
+    assign_person
+    person.affiliation = affiliation if affiliation
+
+    self.firstname = person.firstname
+    self.lastname = person.lastname
+
+    person.skip_person_validation = true
+    person.save && save
   end
 
   def code_expired?
@@ -77,6 +81,11 @@ class Invite < ApplicationRecord
 
   def code_valid?
     deadline_date >= DateTime.current.beginning_of_day
+  end
+
+  def send_invite_email
+    InviteMailer.with(invite: self, lead_organizer_copy: false).invite_email.deliver_later
+    InviteMailer.with(invite: self, lead_organizer_copy: true).invite_email.deliver_later
   end
 
   private

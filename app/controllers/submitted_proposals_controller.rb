@@ -1,28 +1,55 @@
 class SubmittedProposalsController < ApplicationController
   before_action :authenticate_user!
   before_action :authorize_user
-  before_action :set_proposals, only: %i[index]
   before_action :set_proposal, except: %i[index download_csv import_reviews
-                                          reviews_booklet reviews_excel_booklet]
+                                          reviews_booklet reviews_excel_booklet booklet_log]
   before_action :template_params, only: %i[approve_decline_proposals]
   before_action :check_reviews_permissions, only: %i[import_reviews
                                                      reviews_booklet
                                                      reviews_excel_booklet]
 
-  def index; end
+  def index
+    @current_year = Time.zone.today.year
+    @selected_year = params[:workshop_year] || @current_year
+    @selected_year = ProposalFiltersQuery::EMPTY_YEAR if @selected_year.to_i.zero?
+    @search_params = query_params.merge(workshop_year: @selected_year)
+
+    respond_to do |format|
+      # loads initial page, but without proposals
+      format.html { selected_year_pagination }
+      # loads proposals by type using turbo lazy loading
+      format.turbo_stream do
+        @type = params[:proposal_type]
+        @pagy, @proposals =
+          pagy(proposals_query_with_filters.includes(:assigned_location, :locations, :lead_organizer), items: 100)
+      end
+    end
+  end
+
+  def demographic_data
+    @proposal_ids = proposals_query_with_filters(demographic_data_params).pluck(:id)
+  end
 
   def show
     @proposal.review! if @proposal.may_review?
+    @proposal_ids = [@proposal.id]
+
     log_activity(@proposal)
   end
 
   def edit
     @proposal.invites.build
+    @proposal_ids = [@proposal.id]
   end
 
   def send_to_workshop
-    proposals = Proposal.where(id: params[:ids].split(','))
-    post_to_workshop(proposals)
+    return head :unprocessable_entity if params[:ids].blank?
+
+    proposal_codes = Proposal.where(id: params[:ids].split(',')).pluck(:code)
+
+    ExportProposalsJob.perform_later(proposal_codes)
+
+    head :ok
   end
 
   def download_csv
@@ -34,7 +61,7 @@ class SubmittedProposalsController < ApplicationController
 
   def edit_flow
     params[:ids]&.split(',')&.each do |id|
-      @proposal = Proposal.find_by(id: id.to_i)
+      @proposal = Proposal.find(id)
       check_proposal_status and return unless @proposal.may_progress?
 
       next unless post_to_editflow
@@ -48,13 +75,14 @@ class SubmittedProposalsController < ApplicationController
   end
 
   def revise_proposal_editflow
-    @proposal = Proposal.find_by(id: params[:proposal_id].to_i)
+    @proposal = Proposal.find(params[:proposal_id])
+
     unless @proposal.may_requested? || @proposal.may_revision?
       return redirect_to versions_proposal_url(@proposal),
                   alert: "Proposal status should be initial_review or revision_submitted_before_review."
     end
+
     check_proposal_editflow_id
-    nil
   end
 
   def staff_discussion
@@ -81,9 +109,9 @@ class SubmittedProposalsController < ApplicationController
       return
     end
     add_files
-    organizers_email_addresses
     if @email.save
-      @email.email_organizers(@organizers_email)
+      @email.send_email
+      log_activity(@proposal)
       page_redirect
     else
       @message = @email.errors.full_messages
@@ -99,6 +127,7 @@ class SubmittedProposalsController < ApplicationController
                     notice: t('submitted_proposals.destroy.success')
       end
       format.json { head :no_content }
+      format.turbo_stream { flash.now[:notice] = t('submitted_proposals.destroy.success') }
     end
   end
 
@@ -126,9 +155,12 @@ class SubmittedProposalsController < ApplicationController
   end
 
   def download_booklet
-    f = File.open(Rails.root.join('tmp/booklet-proposals.pdf'))
+    file = Rails.root.join('tmp', "booklet-proposals-#{current_user.id}.pdf")
+
+    return head(:not_found) unless file.exist?
+
     send_file(
-      f,
+      file.open,
       filename: "proposal_booklet.pdf",
       type: "application/pdf"
     )
@@ -202,27 +234,50 @@ class SubmittedProposalsController < ApplicationController
     head :ok
   end
 
+  def booklet_log
+    @log = LatexToPdfLog.find(params[:log_id])
+  end
+
+  def download_log_file
+    log = LatexToPdfLog.find_by(id: params[:log_id])
+
+    return head(:not_found) if log.blank?
+
+    file = Rails.root.join('tmp', log.file_name)
+
+    return head(:not_found) unless file.exist?
+
+    send_file(
+      file.open,
+      filename: log.file_name,
+      type: log.mime_type
+    )
+  end
+
   private
+
+  def proposals_query_with_filters(params = query_params)
+    ProposalFiltersQuery.new(Proposal.order(:code, :created_at)).find(params)
+  end
+
+  def query_params
+    params.permit(:workshop_year, :keywords, :proposal_type, :location, :outcome, status: [], subject_area: [])
+  end
+
+  def demographic_data_params
+    query_params.slice(:workshop_year).merge(status: :not_draft)
+  end
 
   def selected_proposal_ids
     params.require(:proposal).permit(id: [])
   end
-
-  # def query_params?
-  #   params.values.any?(&:present?)
-  # end
 
   def outcome_location_params
     params.require(:proposal).permit(:outcome, :assigned_location_id, :assigned_size)
   end
 
   def email_params
-    params.permit(:subject, :body, :cc_email, :bcc_email)
-  end
-
-  def set_proposals
-    @proposals = Proposal.order(:code, :created_at)
-    @proposals = ProposalFiltersQuery.new(@proposals).find(params)
+    params.permit(:subject, :body, :recipient, :cc_email, :bcc_email)
   end
 
   def change_status
@@ -263,23 +318,6 @@ class SubmittedProposalsController < ApplicationController
     Rails.logger.info { "\n\nError creating #{@proposal&.code} PDF: #{e.message}\n\n" }
     flash[:alert] = "Error creating #{@proposal&.code} PDF: #{e.message}"
     false
-  end
-
-
-  def post_to_workshop(proposals)
-    proposals = proposals.map do |proposal|
-        {
-          proposal_type: proposal.proposal_type.name,
-          proposal_year: proposal.year,
-          proposal_id: proposal.id,
-          code: proposal.code,
-          workshop_name: proposal.title,
-          participants: proposal.invites.where(status: "confirmed", invited_as: "Participant"),
-          dates: proposal.assigned_date
-        }
-    end
-
-    RestClient.post "#{ENV['WORKSHOPS_API_URL']}/events/proposals", {proposals: proposals}.to_json, content_type: 'application/json'
   end
 
   def post_to_editflow
@@ -447,7 +485,7 @@ class SubmittedProposalsController < ApplicationController
   end
 
   def set_proposal
-    @proposal = Proposal.find_by(id: params[:id])
+    @proposal = Proposal.find(params[:id])
   end
 
   def template_params
@@ -465,7 +503,7 @@ class SubmittedProposalsController < ApplicationController
   def send_email_proposals
     add_attachments
     organizers_email = @proposal.invites.where(invited_as: 'Organizer', status: :confirmed)&.pluck(:email)
-    @email.new_email_organizers(organizers_email) if @email.save
+    @email.email_organizers(organizers_email) if @email.save
     @errors << @email.errors.full_messages unless @email.errors.empty?
   end
 
@@ -478,7 +516,7 @@ class SubmittedProposalsController < ApplicationController
   end
 
   def create_birs_email(id)
-    @proposal = Proposal.find_by(id: id)
+    @proposal = Proposal.find(id)
     @email = Email.new(email_params.merge(proposal_id: @proposal.id))
     change_status
   end
@@ -538,7 +576,7 @@ class SubmittedProposalsController < ApplicationController
 
     pids = @proposal_ids&.is_a?(String) ? @proposal_ids&.split(',') : @proposal_ids
     pids&.each do |id|
-      @proposal = Proposal.find_by(id: id)
+      @proposal = Proposal.find(id)
       reviews_conditions
     end
   end
@@ -571,5 +609,13 @@ class SubmittedProposalsController < ApplicationController
 
   def check_reviews_permissions
     raise CanCan::AccessDenied unless @ability.can?(:manage, Review)
+  end
+
+  def selected_year_pagination
+    return if @selected_year.to_i.zero?
+
+    @selected_year_object = DateTime.strptime(@selected_year.to_s, "%Y")
+    @prev_year = 1.year.ago(@selected_year_object).year
+    @next_year = 1.year.from_now(@selected_year_object).year
   end
 end

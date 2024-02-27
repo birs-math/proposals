@@ -28,4 +28,30 @@ FactoryBot.define do
       end
     end
   end
+
+  trait :with_participants do
+    after(:create) do |proposal|
+      3.times do
+        person = create(:person)
+        create(:invite, proposal: proposal, status: :confirmed,
+               invited_as: 'Participant', response: :yes,
+               firstname: person.firstname, lastname: person.lastname,
+               email: person.email, person: person)
+      end
+    end
+  end
+
+  trait :submission do
+    after(:create) do |proposal|
+      proposal.ams_subjects << create_list(:ams_subject, 2)
+      assigned_location = create(:location)
+      proposal.locations << assigned_location
+      proposal.assigned_location = assigned_location
+
+      create(:invite, invited_as: 'Organizer', response: :yes, status: :confirmed, proposal: proposal)
+
+      proposal.is_submission = true
+      proposal.save
+    end
+  end
 end

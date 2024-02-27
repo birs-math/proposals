@@ -22,6 +22,10 @@ class ProposalType < ApplicationRecord
 
   scope :active_forms, -> { joins(:proposal_forms).where('proposal_forms.status =?', 1).distinct }
 
+  FIVE_DAY_WORKSHOP = '5-Day Workshop'.freeze
+  SUMMER_SCHOOL = 'Summer School'.freeze
+  FIVE_DAY_WORKSHOP_AND_SUMMER_SCHOOL = "#{FIVE_DAY_WORKSHOP} and #{SUMMER_SCHOOL}".freeze
+
   def active_form
     proposal_forms.where('proposal_forms.status =?', 1).last
   end

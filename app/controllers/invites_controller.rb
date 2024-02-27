@@ -1,6 +1,6 @@
 class InvitesController < ApplicationController
   before_action :authenticate_user!, except: %i[show inviter_response thanks cancelled]
-  before_action :set_proposal, only: %i[invite_reminder invite_email new_invite]
+  before_action :set_proposal, only: %i[invite_reminder new_invite]
   before_action :set_invite,
                 only: %i[show inviter_response invite_reminder]
   before_action :set_invite_proposal, only: %i[show]
@@ -22,30 +22,14 @@ class InvitesController < ApplicationController
   def update
     @proposal = Proposal.find(params[:proposal_id])
     @invite = @proposal.invites.find(params[:id])
-    if @invite.update(invite_params)
-      if @invite.update_invited_person(params["invite"]["affiliation"])
-        flash[:success] = t('invites.update.success')
-      else
-        flash[:alert] = t('invites.update.failure')
-      end
-    end
+
+    result = Invites::Update.new(invite: @invite, params: params[:invite]).call
+
     if lead_organizer?
-      redirect_to edit_proposal_path(@invite.proposal_id)
+      redirect_to edit_proposal_path(@invite.proposal_id), **result.flash_message
     else
-      redirect_to edit_submitted_proposal_url(@invite.proposal_id)
+      redirect_to edit_submitted_proposal_url(@invite.proposal_id), **result.flash_message
     end
-  end
-
-  def invite_email
-    @inviters = if params[:id].eql?("0")
-                  Invite.where(proposal_id: @proposal.id, invited_as: params[:invited_as])
-                else
-                  Invite.where(proposal_id: @proposal.id, invited_as: params[:invited_as]).where('id > ?', params[:id])
-                end
-
-    send_invite_emails
-
-    head :ok
   end
 
   def inviter_response
@@ -59,9 +43,26 @@ class InvitesController < ApplicationController
 
     if @invite.save
       if @invite.no? || @invite.maybe?
+        @invite.proposal.proposal_roles.delete_by(person_id: @invite.person_id)
+
         send_email_on_response
       elsif @invite.yes?
         session[:is_invited_person] = true
+
+        ActiveRecord::Base.transaction do
+          role = Role.find_or_create_by!(name: @invite.invited_as)
+          @invite.proposal.proposal_roles.create(role: role, person: @invite.person)
+
+          if @invite.invited_as == 'Organizer' && !@invite.person.user
+            user = User.new(email: @invite.person.email,
+                            password: SecureRandom.urlsafe_base64(20), confirmed_at: Time.zone.now)
+            user.person = @invite.person
+            user.save
+          end
+        end
+
+        InviteMailer.with(invite: @invite).invite_acceptance.deliver_later
+
         redirect_to new_person_path(code: @invite.code, response: @invite.response)
       end
     else
@@ -72,8 +73,7 @@ class InvitesController < ApplicationController
 
   def invite_reminder
     if @invite.pending?
-      @organizers = @invite.proposal.list_of_organizers
-      InviteMailer.with(invite: @invite, organizers: @organizers).invite_reminder.deliver_later
+      InviteMailer.with(invite: @invite).invite_reminder.deliver_later
       check_user
     else
       redirect_to edit_proposal_path(@proposal), notice: t('invites.invite_reminder.success')
@@ -100,10 +100,11 @@ class InvitesController < ApplicationController
   end
 
   def cancel_confirmed_invite
-    @proposal_role = @invite.proposal.proposal_roles.find_by(person_id: @invite.person.id)
-    @proposal_role.destroy
-    @invite.skip_deadline_validation = true if @invite.deadline_date < Date.current
-    @invite.update(status: 'cancelled')
+    ActiveRecord::Base.transaction do
+      @invite.proposal.proposal_roles.delete_by(person_id: @invite.person_id)
+      @invite.update_attribute(:status, 'cancelled')
+    end
+
     if current_user.staff_member?
       redirect_to edit_submitted_proposal_url(@invite.proposal), notice: t('invites.cancel_confirmed_invite.success')
     else
@@ -139,7 +140,7 @@ class InvitesController < ApplicationController
   end
 
   def set_invite_proposal
-    @proposal = Proposal.find_by(id: @invite&.proposal)
+    @proposal = @invite&.proposal
   end
 
   def response_params
@@ -167,15 +168,6 @@ class InvitesController < ApplicationController
   def invite_params
     params.require(:invite).permit(:firstname, :lastname, :email, :invited_as,
                                    :deadline_date)
-  end
-
-  def send_invite_emails
-    @email_body = params[:body]
-    @inviters.each do |invite|
-      InviteMailer.with(invite: invite, body: @email_body).invite_email.deliver_later
-      InviteMailer.with(invite: invite, lead_organizer: @proposal.lead_organizer,
-                        body: @email_body).invite_email.deliver_later
-    end
   end
 
   def send_email_on_response

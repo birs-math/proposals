@@ -7,11 +7,13 @@ class Proposal < ApplicationRecord
 
   has_many_attached :files
   has_many :proposal_locations, dependent: :destroy
-  has_many :locations, -> { order 'proposal_locations.position' },
+  has_many :locations, -> { includes(:proposal_locations).order('proposal_locations.position') },
            through: :proposal_locations
   belongs_to :proposal_type
   has_many :proposal_roles, dependent: :destroy
   has_many :people, through: :proposal_roles
+  has_one :lead_organizer_proposal_role, -> { lead_organizer }, class_name: 'ProposalRole'
+  has_one :lead_organizer, through: :lead_organizer_proposal_role, source: :person
   has_many(:answers, -> { order 'answers.proposal_field_id' },
            inverse_of: :proposal, dependent: :destroy)
   has_many :invites, dependent: :destroy
@@ -137,6 +139,10 @@ class Proposal < ApplicationRecord
     joins(:proposal_type).where(proposal_type: { name: type })
   }
 
+  def to_param
+    code || id.to_s
+  end
+
   def self.find(param)
     return if param.blank?
 
@@ -148,61 +154,47 @@ class Proposal < ApplicationRecord
   end
 
   def demographics_data
-    DemographicData.where(person_id: invites.where(invited_as: 'Participant')
-                   .pluck(:person_id))
-  end
-
-  def invites_demographic_data
-    # persons can have multiple confirmed invites
-    # for persons with more than one demo data record, use the latest one
-    DemographicData.where(person_id: invites.where(status: 'confirmed')
-                   .pluck(:person_id).uniq).order(:id)
-                   .index_by(&:person_id).values
+    @demographics_data ||= DemographicData.where(person_id: participant_invites.pluck(:person_id))
   end
 
   def create_organizer_role(person, organizer)
     proposal_roles.create!(person: person, role: organizer)
   end
 
-  def lead_organizer
-    proposal_roles.joins(:role).includes(:person).find_by(roles: { name: 'lead_organizer'})&.person
-  end
-
-  def the_locations
+  def location_names
     locations.pluck(:name).join(', ')
   end
 
-  def list_of_organizers
-    invites.where(invites: { invited_as: 'Organizer', status: 'confirmed' }).map(&:person)
-           .map(&:fullname).join(', ')
-  end
-
   def supporting_organizers
-    invites.where(invited_as: 'Organizer').where(response: %w[yes maybe])
+    Person.where(id: supporting_organizer_invites.pluck(:person_id))
   end
 
   def participants
-    invites.where(invited_as: 'Participant').where(response: %w[yes maybe])
+    Person.where(id: participant_invites.pluck(:person_id))
   end
 
-  def get_confirmed_participant(proposal)
-    proposal.invites.where(status: 1, invited_as: "Participant").map(&:person)
+  def supporting_organizer_invites
+    invites.confirmed.organizer
+  end
+
+  def participant_invites
+    invites.confirmed.participant
   end
 
   def self.supporting_organizer_fullnames(proposal)
-    proposal&.supporting_organizers&.map { |org| "#{org.firstname} #{org.lastname}" }&.join(', ')
+    proposal&.supporting_organizer_invites&.map { |org| "#{org.firstname} #{org.lastname}" }&.join(', ')
   end
 
   def self.participants_fullnames(proposal)
-    proposal&.participants&.map { |org| "#{org.firstname} #{org.lastname}" }&.join(', ')
+    proposal&.participant_invites&.map { |org| "#{org.firstname} #{org.lastname}" }&.join(', ')
   end
 
   def self.participants_emails(proposal)
-    proposal&.participants&.map { |org| "#{org.email}" }&.join(', ')
+    proposal&.participant_invites&.map(&:email)&.join(', ')
   end
 
   def self.supporting_organizer_emails(proposal)
-    proposal&.supporting_organizers&.map { |org| "#{org.email}" }&.join(', ')
+    proposal&.supporting_organizer_invites&.map(&:email)&.join(', ')
   end
 
   def self.to_csv(proposals)
@@ -223,7 +215,7 @@ class Proposal < ApplicationRecord
 
   def self.each_row(proposal)
     [proposal&.code, proposal&.title, proposal&.proposal_type&.name,
-     proposal&.the_locations, proposal&.assigned_location&.name, proposal&.status, proposal&.outcome,
+     proposal&.location_names, proposal&.assigned_location&.name, proposal&.status, proposal&.outcome,
      proposal&.updated_at&.to_date, proposal&.edit_flow&.to_date,
      proposal&.subject&.title, proposal&.lead_organizer&.fullname,
      proposal&.lead_organizer&.email, supporting_organizer_fullnames(proposal),
@@ -286,6 +278,26 @@ class Proposal < ApplicationRecord
     emails.map { |disp, _value| disp }
   end
 
+  # This method calculates event start_date for Workshops integration,
+  # schedules assign applied_date but manual exports don't, ideally it should be calculated in dedicated serializer
+  def safe_applied_date
+    return @safe_applied_date if defined?(@safe_applied_date)
+
+    @safe_applied_date =
+      begin
+        return applied_date if applied_date.present?
+
+        proposal_or_current_year = year.to_s || Time.zone.now.year.to_s
+        Date.strptime(proposal_or_current_year, "%Y")
+      end
+  end
+
+  def safe_assigned_location
+    return assigned_location if assigned_location.present?
+
+    Location.birs
+  end
+
   private
 
   def preferred_impossible_field
@@ -338,6 +350,7 @@ class Proposal < ApplicationRecord
     return if code.present?
 
     tc = proposal_type.code || 'xx'
+
     self.code = year.to_s[-2..] + tc + next_number
   end
 

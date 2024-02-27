@@ -10,9 +10,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_06_20_114340) do
+ActiveRecord::Schema.define(version: 2023_07_18_074420) do
 
   # These are extensions that must be enabled in order to support this database
+  enable_extension "pgcrypto"
   enable_extension "plpgsql"
 
   create_table "action_text_rich_texts", force: :cascade do |t|
@@ -68,6 +69,8 @@ ActiveRecord::Schema.define(version: 2022_06_20_114340) do
     t.bigint "subject_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.datetime "discarded_at"
+    t.index ["discarded_at"], name: "index_ams_subjects_on_discarded_at"
     t.index ["subject_id"], name: "index_ams_subjects_on_subject_id"
   end
 
@@ -97,6 +100,7 @@ ActiveRecord::Schema.define(version: 2022_06_20_114340) do
     t.integer "email_type", default: 0
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.boolean "liquid_template", default: false
   end
 
   create_table "emails", force: :cascade do |t|
@@ -108,6 +112,7 @@ ActiveRecord::Schema.define(version: 2022_06_20_114340) do
     t.datetime "updated_at", precision: 6, null: false
     t.string "cc_email"
     t.string "bcc_email"
+    t.string "recipient"
     t.index ["proposal_id"], name: "index_emails_on_proposal_id"
   end
 
@@ -145,6 +150,14 @@ ActiveRecord::Schema.define(version: 2022_06_20_114340) do
     t.datetime "updated_at", precision: 6, null: false
     t.index ["person_id"], name: "index_invites_on_person_id"
     t.index ["proposal_id"], name: "index_invites_on_proposal_id"
+  end
+
+  create_table "latex_to_pdf_logs", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.text "log"
+    t.string "file_name"
+    t.string "mime_type"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
   end
 
   create_table "locations", force: :cascade do |t|
@@ -297,8 +310,8 @@ ActiveRecord::Schema.define(version: 2022_06_20_114340) do
     t.bigint "created_by_id"
     t.bigint "updated_by_id"
     t.string "title"
-    t.integer "version", default: 0
     t.text "introduction"
+    t.integer "version", default: 0
     t.text "introduction2"
     t.text "introduction3"
     t.text "introduction_charts"
@@ -449,11 +462,10 @@ ActiveRecord::Schema.define(version: 2022_06_20_114340) do
     t.integer "cases"
     t.integer "aborted"
     t.integer "year"
-    t.bigint "location_id", null: false
+    t.integer "location_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.boolean "test_mode", default: false
-    t.index ["location_id"], name: "index_schedule_runs_on_location_id"
   end
 
   create_table "schedules", force: :cascade do |t|
@@ -601,7 +613,6 @@ ActiveRecord::Schema.define(version: 2022_06_20_114340) do
   add_foreign_key "reviews", "people"
   add_foreign_key "reviews", "proposals"
   add_foreign_key "role_privileges", "roles"
-  add_foreign_key "schedule_runs", "locations"
   add_foreign_key "schedules", "schedule_runs"
   add_foreign_key "staff_discussions", "proposals"
   add_foreign_key "subject_area_categories", "subject_categories"

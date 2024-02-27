@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.feature "Proposal New", type: :feature do
+RSpec.describe "Proposal New", type: :feature do
   before do
     proposal_type = create(:proposal_type)
     create(:proposal_form, status: :active, proposal_type: proposal_type)
@@ -14,7 +14,8 @@ RSpec.feature "Proposal New", type: :feature do
     end
   end
 
-  scenario "creating a new proposal " do
+  # TODO: fix after adding selenium webdriver to capybara
+  pending "creating a new proposal " do
     find('input[name="commit"]').click
     expect(Proposal.count).to eq(1)
     expect(page).to have_current_path(edit_proposal_path(Proposal.last))

@@ -30,10 +30,10 @@
             <% else %>
               <td>-</td>
             <% end %>
-            <td> <label for="status" class=<%= invite_response_color(invite.response) %> ><%= invite_status(invite.response, invite.status) %></label> </td>
+            <td> <label for="status" class=<%= invite_response_color(invite.response, invite.status) %> ><%= invite_status(invite.response, invite.status) %></label> </td>
             <td><%= invite.created_at.to_date %></td>
             <td><%= invite.deadline_date.to_date %></td>
-            
+
             <div>
               <% if invite.pending? && params[:action] == 'edit' %>
                 <div><td><%= link_to '<i class="align-middle"></i>Cancel Invite'.html_safe, cancel_url(code: invite.code), class: 'btn', method: :post %>

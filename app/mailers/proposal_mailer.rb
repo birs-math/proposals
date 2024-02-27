@@ -12,20 +12,23 @@ class ProposalMailer < ApplicationMailer
 
   def staff_send_emails
     @email = params[:email_data]
+    @recipient_name = @email.recipient_fullname_or_email
 
     preview_placeholders if @email.proposal.decision_email_sent?
 
-    @organizer = params[:organizer]
     mail_attachments
-    send_mails
+
+    mail(**@email.to_action_mailer_hash)
   end
 
+  # TODO: we don't need two similar methods
   def new_staff_send_emails
     @email = params[:email_data]
     preview_placeholders if @email.proposal.decision_email_sent?
     @organizer = params[:organizer]
     mail_attachments
-    new_send_mails
+
+    mail(**@email.to_action_mailer_hash.merge(to: params[:email]))
   end
 
   private
@@ -36,34 +39,6 @@ class ProposalMailer < ApplicationMailer
            cc: @proposal.birs_emails)
     else
       mail(to: email, subject: "BIRS Proposal #{@proposal.code}: #{@proposal.title}")
-    end
-  end
-
-  def new_send_mails
-    email_address = params[:email]
-    if @email.cc_email.present? && @email.bcc_email.present?
-      mail(to: email_address, subject: @email.subject, cc: @email.all_emails(@email.cc_email),
-           bcc: @email.all_emails(@email.bcc_email))
-    elsif @email.cc_email.present?
-      mail(to: email_address, subject: @email.subject, cc: @email.all_emails(@email.cc_email))
-    elsif @email.bcc_email.present?
-      mail(to: email_address, subject: @email.subject, bcc: @email.all_emails(@email.bcc_email))
-    else
-      mail(to: email_address, subject: @email.subject)
-    end
-  end
-
-  def send_mails
-    email_address = params[:email]
-    if @email.cc_email.present? && @email.bcc_email.present?
-      mail(to: email_address, subject: @email.subject, cc: @email.all_cc_emails(@email.cc_email),
-           bcc: @email.all_emails(@email.bcc_email))
-    elsif @email.cc_email.present?
-      mail(to: email_address, subject: @email.subject, cc: @email.all_cc_emails(@email.cc_email))
-    elsif @email.bcc_email.present?
-      mail(to: email_address, subject: @email.subject, bcc: @email.all_emails(@email.bcc_email))
-    else
-      mail(to: email_address, subject: @email.subject)
     end
   end
 
@@ -111,8 +86,7 @@ class ProposalMailer < ApplicationMailer
                                                                      .map do |p|
                                                                  "#{p.firstname} #{p.lastname}"
                                                                end.join(', '),
-                     "[WORKSHOP SUPPORTING_ORGANIZER_EMAIL]" => "#{JSON.parse(@email.cc_email).map(&:values).flatten
-                     .join(', ')}, #{@email.bcc_email}",
+                     "[WORKSHOP SUPPORTING_ORGANIZER_EMAIL]" => @email.cc_email,
                      "[INSERT ASSIGNED DATES]" => workshop_date_range(@email.proposal&.assigned_date),
                      "[INSERT APPLIED DATES]" => workshop_date_range(@email.proposal&.applied_date) }
     placeholders.each { |k, v| @template_body.gsub!(k, v) }

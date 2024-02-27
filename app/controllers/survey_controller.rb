@@ -71,37 +71,7 @@ class SurveyController < ApplicationController
   def invite_response_save
     @invite.response = params[:response]
     @invite.status = 'confirmed' unless @invite.no?
-    return unless @invite.save
-
-    create_role
-    send_email_on_response
-  end
-
-  def create_role
-    return if @invite.no?
-
-    proposal_role
-    create_user if @invite.invited_as == 'Organizer' && !@invite.person.user
-  end
-
-  def send_email_on_response
-    return if @invite.no?
-
-    @organizers = @invite.proposal.list_of_organizers.remove(@invite.person&.fullname)
-    InviteMailer.with(invite: @invite, organizers: @organizers)
-                .invite_acceptance.deliver_later
-  end
-
-  def proposal_role
-    role = Role.find_or_create_by!(name: @invite.invited_as)
-    @invite.proposal.proposal_roles.create(role: role, person: @invite.person)
-  end
-
-  def create_user
-    user = User.new(email: @invite.person.email,
-                    password: SecureRandom.urlsafe_base64(20), confirmed_at: Time.zone.now)
-    user.person = @invite.person
-    user.save
+    @invite.save
   end
 
   def post_demographic_form_path

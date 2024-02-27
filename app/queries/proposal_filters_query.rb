@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class ProposalFiltersQuery
+  EMPTY_YEAR = 'empty_year'
+
   def initialize(relation)
     @result = relation
   end
@@ -26,7 +28,9 @@ class ProposalFiltersQuery
   def filter_by_workshop_year(workshop_year)
     return @result if workshop_year.blank?
 
-    @result.search_proposal_year(workshop_year)
+    return @result.where(year: ['', nil]) if workshop_year == EMPTY_YEAR
+
+    @result.where(year: workshop_year)
   end
 
   def filter_by_subject_area(subject_area)
@@ -38,28 +42,32 @@ class ProposalFiltersQuery
   def filter_by_proposal_type(proposal_type)
     return @result if proposal_type.blank?
 
-    @result.search_proposal_type(proposal_type)
+    if proposal_type == ProposalType::FIVE_DAY_WORKSHOP_AND_SUMMER_SCHOOL
+      return @result
+             .joins(:proposal_type)
+             .where(proposal_type: { name: [ProposalType::FIVE_DAY_WORKSHOP, ProposalType::SUMMER_SCHOOL] })
+    end
+
+    @result.joins(:proposal_type).where(proposal_type: { name: proposal_type })
   end
 
   def filter_by_status(statuses)
     return @result if statuses.blank?
 
-    r = []
-    statuses.each do |status|
-      r << @result.search_proposal_status(status).sort_by { |p| p.code || '' }
-    end
-    @result = r.flatten
+    return @result.not_draft if statuses == :not_draft
+
+    @result.where(status: statuses)
   end
 
   def filter_by_location(location)
     return @result if location.blank?
 
-    @result.search_proposal_location(location)
+    @result.joins(:locations).where(locations: { id: location })
   end
 
   def filter_by_outcome(outcome)
     return @result if outcome.blank?
 
-    @result.search_proposal_outcome(outcome)
+    @result.where(outcome: outcome)
   end
 end
