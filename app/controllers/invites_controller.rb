@@ -5,6 +5,7 @@ class InvitesController < ApplicationController
                 only: %i[show inviter_response invite_reminder]
   before_action :set_invite_proposal, only: %i[show]
   before_action :unsafe_set_invite, only: %i[cancel new_invite cancel_confirmed_invite]
+  before_action :authorize_user, only: %i[cancel cancel_confirmed_invite]
 
   def show
     redirect_to root_path and return if @invite.confirmed?
@@ -92,11 +93,7 @@ class InvitesController < ApplicationController
     @invite.skip_deadline_validation = true if @invite.deadline_date < Date.current
     @invite.update(status: 'cancelled')
 
-    if current_user.staff_member?
-      redirect_to edit_submitted_proposal_url(@invite.proposal), notice: t('invites.cancel.success')
-    else
-      redirect_to edit_proposal_path(@invite.proposal), notice: t('invites.cancel.failure')
-    end
+    redirect_to edit_submitted_proposal_url(@invite.proposal), notice: t('invites.cancel.success')
   end
 
   def cancel_confirmed_invite
@@ -105,11 +102,7 @@ class InvitesController < ApplicationController
       @invite.update_attribute(:status, 'cancelled')
     end
 
-    if current_user.staff_member?
-      redirect_to edit_submitted_proposal_url(@invite.proposal), notice: t('invites.cancel_confirmed_invite.success')
-    else
-      redirect_to edit_proposal_path(@invite.proposal), notice: t('invites.cancel_confirmed_invite.success')
-    end
+    redirect_to edit_submitted_proposal_url(@invite.proposal), notice: t('invites.cancel_confirmed_invite.success')
   end
 
   def new_invite
@@ -194,5 +187,12 @@ class InvitesController < ApplicationController
 
   def unsafe_set_invite
     @invite = Invite.find_by(code: params[:code])
+  end
+
+  def authorize_user
+    return if current_user.staff_member?
+
+    redirect_back fallback_location: edit_proposal_path(@invite.proposal),
+                  alert: I18n.t('errors.messages.not_authorized'), code: 422
   end
 end
