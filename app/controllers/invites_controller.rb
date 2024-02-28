@@ -193,6 +193,6 @@ class InvitesController < ApplicationController
     return if current_user.staff_member?
 
     redirect_back fallback_location: edit_proposal_path(@invite.proposal),
-                  alert: I18n.t('errors.messages.not_authorized'), code: 422
+                  alert: I18n.t('errors.messages.not_authorized')
   end
 end
