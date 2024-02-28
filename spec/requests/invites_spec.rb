@@ -334,8 +334,11 @@ RSpec.describe "/proposals/:proposal_id/invites", type: :request do
 
       it { expect(user.staff_member?).to be_falsey }
 
-      it "updates the invite status" do
-        expect(invite.reload.status).to eq('cancelled')
+      it "doest update the invite status" do
+        expect(invite.reload.status).to eq('confirmed')
+      end
+
+      it "redirects back to edit form" do
         expect(response).to redirect_to(edit_proposal_path(invite.proposal))
       end
     end
