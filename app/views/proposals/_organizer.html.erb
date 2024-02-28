@@ -36,17 +36,17 @@
 
             <div>
               <% if invite.pending? && params[:action] == 'edit' %>
-                <div><td><%= link_to '<i class="align-middle"></i>Cancel Invite'.html_safe, cancel_url(code: invite.code), class: 'btn', method: :post %>
-                <%= link_to '<i class="align-middle"></i>Invite Reminder'.html_safe, invite_reminder_proposal_invite_url(invite.proposal, invite, code: invite.code), class: 'btn', method: :post %>
-                </td></div>
-              <% elsif invite.confirmed? && params[:action] == 'edit' && lead_organizer(invite, current_user) %>
-                <div><td><%= link_to '<i class="align-middle"></i>Cancel Invite'.html_safe, cancel_confirmed_invite_url(code: invite.code), class: 'btn', method: :post %>
+                <td>
+                  <% if current_user.staff_member? %>
+                    <%= link_to '<i class="align-middle"></i>Cancel Invite'.html_safe, cancel_url(code: invite.code), class: 'btn', method: :post %>
+                  <% end %>
+                  <%= link_to '<i class="align-middle"></i>Invite Reminder'.html_safe, invite_reminder_proposal_invite_url(invite.proposal, invite, code: invite.code), class: 'btn', method: :post %>
+                </td>
+              <% elsif invite.confirmed? && params[:action] == 'edit' && current_user.staff_member? %>
+                <td>
+                  <%= link_to '<i class="align-middle"></i>Cancel Invite'.html_safe, cancel_confirmed_invite_url(code: invite.code), class: 'btn', method: :post %>
                   <button id="edit-invite-id" class="align-middle btn" data-action="click->nested-invites#editPreview" data-id="<%= invite.id %>">Edit Invite</button>
-                </td></div>
-              <% elsif invite.confirmed? && params[:action] == 'edit' %>
-                <div><td><%= link_to '<i class="align-middle"></i>Cancel Invite'.html_safe, cancel_confirmed_invite_url(code: invite.code), class: 'btn', method: :post %>
-                  <button id="edit-invite-id" class="align-middle btn" data-action="click->nested-invites#editPreview" data-id="<%= invite.id %>">Edit Invite</button>
-                </td></div>
+                </td>
               <% else %>
                 <td>-</td>
               <% end %>
