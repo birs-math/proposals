@@ -314,6 +314,7 @@ RSpec.describe "/proposals/:proposal_id/invites", type: :request do
       proposal_role.role.update(name: "Organizer")
       person.proposal_roles << proposal_role
       role.update(name: role_name)
+      invite.update(status: :confirmed, response: 'yes')
 
       post cancel_confirmed_invite_path(code: invite.code), params: { invite: invite }
     end
