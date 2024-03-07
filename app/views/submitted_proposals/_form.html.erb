@@ -28,9 +28,11 @@
             <%= form_with(url: submit_proposals_path(proposal: @proposal.id), html: {'data-turbo':false, id: 'submit_proposal' }) do  |f| %>
               <div data-controller="submit-proposals proposal-form nested-invites auto-save-proposal"
                 data-submit-proposals-proposal-type-id-value="<%= @proposal.proposal_type.id %>"
-                data-submit-proposals-proposal-value="<%= @proposal.id %>"data-nested-invites-wrapper-selector-value=".nested-invites-wrapper"
-                data-nested-invites-max-participant-value="<%= @proposal.proposal_type.participant %>"
-                data-nested-invites-max-organizer-value="<%= @proposal.proposal_type.co_organizer %>"
+                data-submit-proposals-proposal-value="<%= @proposal.id %>"
+                data-nested-invites-wrapper-selector-value=".nested-invites-wrapper"
+                data-nested-invites-max-participant-value="<%= @proposal.max_participant %>"
+                data-nested-invites-max-organizer-value="<%= @proposal.max_supporting_organizers %>"
+                data-nested-invites-venue-capacity-value="<%= @proposal.safe_assigned_location.capacity %>"
                 data-nested-invites-organizer-value="<%= confirmed_participants(@proposal.id, 'Organizer').count %>"
                 data-nested-invites-participant-value="<%= confirmed_participants(@proposal.id, 'Participant').count %>"
               >
