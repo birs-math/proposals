@@ -17,8 +17,6 @@
             amsopn,amstext,amsxtra,euscript,amscd,amsthm}
 \usepackage{mathrsfs}
 \bibliographystyle{amsref}
-%\usepackage{epsfig}
-%\usepackage{graphics}
 \usepackage[pdftex]{graphicx}
 \usepackage{times}
 \usepackage{color}
@@ -31,6 +29,15 @@
 \hypersetup{pdfborder={0 0 0 [0 0]}}
 \usepackage{comment}
 \usepackage{pdfpages}
+\usepackage[table]{xcolor}
+\usepackage{geometry}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage[all, knot]{xy}
+\usepackage{epstopdf}
+\usepackage{tikz}
+\usepackage{longtable}
+
 
 % problem unicode characters
 \DeclareUnicodeCharacter{2028}{\linebreak}
@@ -41,7 +48,6 @@
 \DeclareUnicodeCharacter{6625}{}
 \DeclareUnicodeCharacter{94A2}{}
 \DeclareUnicodeCharacter{0301}{}
-
 \DeclareMathOperator{\Gal}{Gal}
 \DeclareMathOperator{\SL}{SL}
 \DeclareMathOperator\ed{\mathrm{ed}}
@@ -63,44 +69,21 @@
 \newtheorem{proposition}[theorem]{Proposition}
 \newtheorem{corollary}[theorem]{Corollary}
 
-% 22w5057
-\usepackage[table]{xcolor}
-\usepackage{geometry}
-\usepackage{booktabs}
-\usepackage{multirow}
+
 \newcommand{\greyrule}{\arrayrulecolor{black!30}\midrule\arrayrulecolor{black}}
-%\newcommand{\ve}{\varepsilon}
-%\newcommand{\R}{\mathbb{R}}
-%\newcommand{\rmd}{\mathrm{d}}
-%\DeclareMathOperator{\Id}{Id}
+
 \def\txtd{{\textnormal{d}}}
 
-% 22w5143
 \newcommand{\etalchar}[1]{$^{#1}$}
-
-% 16w5061 begin
-%\newtheorem{thm}{Theorem}
-%\newtheorem{conj}[thm]{Conjecture}
-%\newtheorem{prob}[thm]{Problem}
-%\newcommand{\Q}{\ensuremath{\mathbb{Q}} }
-%\def\HFi {\operatorname{HF}^\infty}
-%\newcommand{\spincs}{\mathfrak s}
-% 16w5061 end
-
-% 17w5009 begin
-\usepackage[all, knot]{xy}
 \newcommand{\Z}{\mathbb{Z}}
 \newcommand{\R}{\mathbb{R}}
 \newcommand{\Q}{\mathbb{Q}}
 \newcommand\op{*}
 \def\VR(#1,#2){\vrule width0pt height#1mm depth#2mm}
-% 17w5009 end
 
-% 18w5009+
 \newcommand{\C}{\mathbb C}
 \newcommand{\eps}{\epsilon}
 
-% 20w5147
 \def\en{\mathbb N}
 \def\er{\mathbb R}
 \newcommand{\divo}{\textnormal{div}}
@@ -118,35 +101,23 @@
           {\mathop{\kern 0.1em\vrule width 0.5em height 0.69678ex depth -0.60387ex
                   \kern -0.6em \intop}\nolimits_{#1}}}
 
-% 20w5069
 \newcommand{\tbl}{}
-\usepackage{epstopdf}
 \newcommand{\FM}{{\mathcal A}}
 \newcommand{\Rec}{{\mathcal R}}
 \newcommand{\rp}{{\alpha}}
 \newcommand{\D}{{\mathcal D}}
 
-% 20w5031
-%\usepackage[UTF8]{ctex}
-%\RequirePackage{CJKutf8}
-%\usepackage{CJK}
 
-% 20w5181
 \def\txtd{{\textnormal{d}}}
 \newcommand{\ve}{\varepsilon}
 \newcommand{\rmd}{\mathrm{d}}
 \DeclareMathOperator{\Id}{Id}
 \def\txtd{{\textnormal{d}}}
 
-% 20w5124
 \newtheorem*{conjecture*}{Conjecture}
 \newtheorem*{problem}{Problem}
-\usepackage{tikz}
 
-% 20w5176
-\usepackage{longtable}
 
-% 20w5160
 \theoremstyle{plain}
 \newtheorem{thm}{Theorem}[section]
 \newtheorem{prop}[thm]{Proposition}
@@ -162,13 +133,11 @@
 \newcommand{\nov}{\text{Nov}}
 \newcommand{\F}{\mathbb{F}}
 
-% 20w5193
 \newtheorem{conjecture}[equation]{Conjecture}
 \newcommand{\sfe}{{{\mathbb S}^{n-1}}}
 \newcommand{\s}{\mathbb S}
 \def\Vol{{\mathrm{Vol}}}
 
-% \proof defined elsewhere
 \newenvironment{definition}[1][Definition]{\begin{trivlist}
 \item[\hskip \labelsep {\bfseries #1}]}{\end{trivlist}}
 \newenvironment{example}[1][Example]{\begin{trivlist}
