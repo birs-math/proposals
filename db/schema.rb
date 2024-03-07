@@ -171,6 +171,7 @@ ActiveRecord::Schema.define(version: 2023_07_18_074420) do
     t.date "end_date"
     t.text "exclude_dates", default: [], array: true
     t.string "time_zone"
+    t.integer "capacity"
     t.index ["code"], name: "index_locations_on_code", unique: true
   end
 
@@ -466,6 +467,7 @@ ActiveRecord::Schema.define(version: 2023_07_18_074420) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.boolean "test_mode", default: false
+    t.index ["location_id"], name: "index_schedule_runs_on_location_id"
   end
 
   create_table "schedules", force: :cascade do |t|
@@ -613,6 +615,7 @@ ActiveRecord::Schema.define(version: 2023_07_18_074420) do
   add_foreign_key "reviews", "people"
   add_foreign_key "reviews", "proposals"
   add_foreign_key "role_privileges", "roles"
+  add_foreign_key "schedule_runs", "locations"
   add_foreign_key "schedules", "schedule_runs"
   add_foreign_key "staff_discussions", "proposals"
   add_foreign_key "subject_area_categories", "subject_categories"
