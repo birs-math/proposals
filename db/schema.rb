@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_07_18_074420) do
+ActiveRecord::Schema.define(version: 2024_03_05_130135) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
@@ -311,8 +311,8 @@ ActiveRecord::Schema.define(version: 2023_07_18_074420) do
     t.bigint "created_by_id"
     t.bigint "updated_by_id"
     t.string "title"
-    t.text "introduction"
     t.integer "version", default: 0
+    t.text "introduction"
     t.text "introduction2"
     t.text "introduction3"
     t.text "introduction_charts"
@@ -463,7 +463,7 @@ ActiveRecord::Schema.define(version: 2023_07_18_074420) do
     t.integer "cases"
     t.integer "aborted"
     t.integer "year"
-    t.integer "location_id"
+    t.bigint "location_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.boolean "test_mode", default: false
