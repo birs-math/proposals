@@ -234,11 +234,11 @@ class Proposal < ApplicationRecord
   end
 
   def max_supporting_organizers
-    proposal_type&.co_organizer
+    [proposal_type&.co_organizer, safe_assigned_location.capacity].min
   end
 
   def max_participants
-    proposal_type&.participant
+    [proposal_type.participant, safe_assigned_location.capacity].min
   end
 
   def max_virtual_participants
