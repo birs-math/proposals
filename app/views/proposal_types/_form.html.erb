@@ -24,24 +24,29 @@
         <div class="card-body">
           <%= form_for @proposal_type do |f| %>
             <div class="mb-3">
-              <%= f.label :name , class: 'form-label' %><br>
-              <%= f.text_field :name %>
+              <%= f.label :name , class: 'form-label' %>
+              <%= f.text_field :name, class: 'form-control' %>
             </div>
 
             <div class="mb-3">
-              <%= f.label :code, class: 'form-label' %><br>
-              <%= f.text_field :code %>
+              <%= f.label :capacity, class: 'form-label' %>
+              <%= f.number_field :capacity, min: 1, required: true, class: 'form-control' %>
             </div>
 
             <div class="mb-3">
-              <%= f.label :year, class: 'form-label' %><br>
+              <%= f.label :code, class: 'form-label' %>
+              <%= f.text_field :code, class: 'form-control' %>
+            </div>
+
+            <div class="mb-3">
+              <%= f.label :year, class: 'form-label' %>
               <%= f.text_field :year, class: 'form-control' %>
               <small>This text field supports a list of years i.e. 2021, 2022..</small>
             </div>
 
             <div class="mb-3">
-              <%= f.label :'Length of Event in Days:', class:'mb-2 form-label' %><br>
-              <%= f.number_field :length %>
+              <%= f.label :'Length of Event in Days:', class: 'mb-2 form-label' %>
+              <%= f.number_field :length, class: 'form-control' %>
             </div>
 
             <div class="mb-3">
@@ -55,47 +60,47 @@
             </div>
 
             <div class="mb-3">
-              <%= f.label :'Maximum number of Organizers' , class: 'form-label' %><br>
-              <%= f.number_field :co_organizer %>
+              <%= f.label :'Maximum number of Organizers', class: 'form-label' %>
+              <%= f.number_field :co_organizer, class: 'form-control' %>
             </div>
 
             <div class="mb-3">
-              <%= f.label :'Maximum number of onsite Participants', class: 'form-label' %><br>
-              <%= f.number_field :participant %>
+              <%= f.label :'Maximum number of onsite Participants', class: 'form-label' %>
+              <%= f.number_field :participant, class: 'form-control' %>
             </div>
 
             <div class="mb-3">
-              <%= f.label :'Maximum number of Preferred Dates' , class: 'form-label' %><br>
-              <%= f.number_field :max_no_of_preferred_dates, min: 2, max: 5, class: 'set-dates-width' %>
+              <%= f.label :'Maximum number of Preferred Dates' , class: 'form-label' %>
+              <%= f.number_field :max_no_of_preferred_dates, min: 2, max: 5, class: 'form-control set-dates-width' %>
             </div>
 
             <div class="mb-3">
-              <%= f.label :'Minimum number of Preferred Dates' , class: 'form-label' %><br>
-              <%= f.number_field :min_no_of_preferred_dates, min: 2, max: 5, class: 'set-dates-width' %>
+              <%= f.label :'Minimum number of Preferred Dates', class: 'form-label' %>
+              <%= f.number_field :min_no_of_preferred_dates, min: 2, max: 5, class: 'form-control set-dates-width' %>
             </div>
 
             <div class="mb-3">
-              <%= f.label :'Maximum number of impossible Dates' , class: 'form-label' %><br>
-              <%= f.number_field :max_no_of_impossible_dates, min: 0, max: 2, class: 'set-dates-width' %>
+              <%= f.label :'Maximum number of impossible Dates' , class: 'form-label' %>
+              <%= f.number_field :max_no_of_impossible_dates, min: 0, max: 2, class: 'form-control set-dates-width' %>
             </div>
 
             <div class="mb-3">
-              <%= f.label :'Minimum number of impossible Dates' , class: 'form-label' %><br>
-              <%= f.number_field :min_no_of_impossible_dates, min: 0, max: 2, class: 'set-dates-width' %>
+              <%= f.label :'Minimum number of impossible Dates' , class: 'form-label' %>
+              <%= f.number_field :min_no_of_impossible_dates, min: 0, max: 2, class: 'form-control set-dates-width' %>
             </div>
 
             <div class="mb-3">
-              <%= f.label :'Description for Organizers', class:'mb-2' %>
-              <%=f.text_area(:organizer_description, size: '3x5', class:'form-control') %>
+              <%= f.label :'Description for Organizers', class: 'mb-2' %>
+              <%=f.text_area(:organizer_description, size: '3x5', class: 'form-control') %>
             </div>
 
             <div class="mb-3">
-              <%= f.label :'Description for Participants', class:'mb-2' %>
-              <%= f.text_area(:participant_description, size: '3x5', class:'form-control') %>
+              <%= f.label :'Description for Participants', class: 'mb-2' %>
+              <%= f.text_area(:participant_description, size: '3x5', class: 'form-control') %>
             </div>
 
             <div class="mb-3">
-              <%= f.label :Location , class: 'form-label' %><br>
+              <%= f.label :Location , class: 'form-label' %>
               <%= f.select :location_ids, locations, {}, class: 'form-control', multiple: true %>
             </div>
             <%= f.submit @proposal_type.new_record? ? "Create Proposal Type" : "Update Proposal Type", class:  'btn btn-primary' %>
