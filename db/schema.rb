@@ -10,10 +10,9 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2024_03_05_130135) do
+ActiveRecord::Schema.define(version: 2024_03_08_114004) do
 
   # These are extensions that must be enabled in order to support this database
-  enable_extension "pgcrypto"
   enable_extension "plpgsql"
 
   create_table "action_text_rich_texts", force: :cascade do |t|
@@ -171,7 +170,6 @@ ActiveRecord::Schema.define(version: 2024_03_05_130135) do
     t.date "end_date"
     t.text "exclude_dates", default: [], array: true
     t.string "time_zone"
-    t.integer "capacity"
     t.index ["code"], name: "index_locations_on_code", unique: true
   end
 
@@ -368,6 +366,7 @@ ActiveRecord::Schema.define(version: 2024_03_05_130135) do
     t.integer "min_no_of_preferred_dates"
     t.integer "max_no_of_impossible_dates"
     t.integer "min_no_of_impossible_dates"
+    t.integer "capacity"
     t.index ["code"], name: "index_proposal_types_on_code", unique: true
   end
 
