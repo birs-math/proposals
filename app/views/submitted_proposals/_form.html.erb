@@ -32,7 +32,6 @@
                 data-nested-invites-wrapper-selector-value=".nested-invites-wrapper"
                 data-nested-invites-max-participant-value="<%= @proposal.max_participants %>"
                 data-nested-invites-max-organizer-value="<%= @proposal.max_supporting_organizers %>"
-                data-nested-invites-venue-capacity-value="<%= @proposal.safe_assigned_location.capacity %>"
                 data-nested-invites-organizer-value="<%= confirmed_participants(@proposal.id, 'Organizer').count %>"
                 data-nested-invites-participant-value="<%= confirmed_participants(@proposal.id, 'Participant').count %>"
               >
