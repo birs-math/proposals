@@ -1,0 +1,171 @@
+<div class="modal-content" style='width: 50rem'>
+  <div class="modal-header">
+    <h5 class="modal-title" id="preambleModalLabel">BIRS LaTeX preamble</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+  </div>
+  <div class="modal-body">
+    <pre style="max-height: 50rem; overflow-y: auto;"><code>
+      \documentclass[12pt,table]{report}
+      \setlength{\textwidth}{6.0in}
+      \setlength{\textheight}{9in}
+      \setlength{\oddsidemargin}{0.3in}
+      \setlength{\evensidemargin}{0in}
+      \setlength{\topmargin}{-0.25in}
+      \pagestyle{myheadings}
+
+      \usepackage{amsmath,amssymb,amsbsy,amsfonts,amsthm,latexsym,
+      amsopn,amstext,amsxtra,euscript,amscd,amsthm}
+      \usepackage{mathrsfs}
+      \bibliographystyle{amsref}
+      \usepackage[pdftex]{graphicx}
+      \usepackage{times}
+      \usepackage{color}
+      \usepackage{hyphenat}
+      \usepackage{fancyhdr}
+      \usepackage{here}
+      \usepackage{multirow}
+      \usepackage[utf8]{inputenc}
+      \usepackage{hyperref}
+      \hypersetup{pdfborder={0 0 0 [0 0]}}
+      \usepackage{comment}
+      \usepackage{pdfpages}
+      \usepackage[table]{xcolor}
+      \usepackage{geometry}
+      \usepackage{booktabs}
+      \usepackage{multirow}
+      \usepackage[all, knot]{xy}
+      \usepackage{epstopdf}
+      \usepackage{tikz}
+      \usepackage{longtable}
+
+
+      % problem unicode characters
+      \DeclareUnicodeCharacter{2028}{\linebreak}
+      \DeclareUnicodeCharacter{03B5}{$\epsilon$}
+      \DeclareUnicodeCharacter{03B4}{$\delta$}
+      \DeclareUnicodeCharacter{2264}{$\leq$}
+      \DeclareUnicodeCharacter{6731}{}
+      \DeclareUnicodeCharacter{6625}{}
+      \DeclareUnicodeCharacter{94A2}{}
+      \DeclareUnicodeCharacter{0301}{}
+      \DeclareMathOperator{\Gal}{Gal}
+      \DeclareMathOperator{\SL}{SL}
+      \DeclareMathOperator\ed{\mathrm{ed}}
+      \DeclareMathOperator\ho{\mathrm{H}}
+      \DeclareMathOperator{\Diff}{Diff}
+      \DeclareMathOperator{\Homeo}{Homeo}
+
+      \newfont{\pimspacific}{pagd at 50pt}
+      \newfont{\titlefont}{pagd at 40pt}
+
+      \newcommand{\writeblack}{\special{ps: gsave 0 setgray}}
+      \newcommand{\writeblue}{\color[rgb]{0,0.106,0.576}}
+      \newcommand{\writegrey}{\color[gray]{0.4}}
+
+      % commonly used math environments
+      % from http://www.maths.tcd.ie/~dwilkins/LaTeXPrimer/Theorems.html
+      \newtheorem{theorem}{Theorem}[section]
+      \newtheorem{lemma}[theorem]{Lemma}
+      \newtheorem{proposition}[theorem]{Proposition}
+      \newtheorem{corollary}[theorem]{Corollary}
+
+
+      \newcommand{\greyrule}{\arrayrulecolor{black!30}\midrule\arrayrulecolor{black}}
+
+      \def\txtd{{\textnormal{d}}}
+
+      \newcommand{\etalchar}[1]{$^{#1}$}
+      \newcommand{\Z}{\mathbb{Z}}
+      \newcommand{\R}{\mathbb{R}}
+      \newcommand{\Q}{\mathbb{Q}}
+      \newcommand\op{*}
+      \def\VR(#1,#2){\vrule width0pt height#1mm depth#2mm}
+
+      \newcommand{\C}{\mathbb C}
+      \newcommand{\eps}{\epsilon}
+
+      \def\en{\mathbb N}
+      \def\er{\mathbb R}
+      \newcommand{\divo}{\textnormal{div}}
+      \newcommand{\dista}{\dist \,( \Omega', \partial\Omega)}
+      \newcommand{\rif}[1]{(\ref{#1})}
+      \def\eqn#1$$#2$${\begin{equation}\label#1#2\end{equation}}
+      \def\mean#1{\mathchoice%
+      {\mathop{\kern 0.2em\vrule width 0.6em height 0.69678ex depth -0.58065ex
+      \kern -0.8em \intop}\nolimits_{\kern -0.4em#1}}%
+      {\mathop{\kern 0.1em\vrule width 0.5em height 0.69678ex depth -0.60387ex
+      \kern -0.6em \intop}\nolimits_{#1}}%
+      {\mathop{\kern 0.1em\vrule width 0.5em height 0.69678ex
+      depth -0.60387ex
+      \kern -0.6em \intop}\nolimits_{#1}}%
+      {\mathop{\kern 0.1em\vrule width 0.5em height 0.69678ex depth -0.60387ex
+      \kern -0.6em \intop}\nolimits_{#1}}}
+
+      \newcommand{\tbl}{}
+      \newcommand{\FM}{{\mathcal A}}
+      \newcommand{\Rec}{{\mathcal R}}
+      \newcommand{\rp}{{\alpha}}
+      \newcommand{\D}{{\mathcal D}}
+
+
+      \def\txtd{{\textnormal{d}}}
+      \newcommand{\ve}{\varepsilon}
+      \newcommand{\rmd}{\mathrm{d}}
+      \DeclareMathOperator{\Id}{Id}
+      \def\txtd{{\textnormal{d}}}
+
+      \newtheorem*{conjecture*}{Conjecture}
+      \newtheorem*{problem}{Problem}
+
+
+      \theoremstyle{plain}
+      \newtheorem{thm}{Theorem}[section]
+      \newtheorem{prop}[thm]{Proposition}
+      \newtheorem{coro}[thm]{Corollary}
+      \newtheorem{question}[thm]{Question}
+      \theoremstyle{definition}
+      \newtheorem{propdef}[thm]{Proposition/Definition}
+      \newtheorem{remarks}[thm]{Remarks}
+      \newtheorem{ex}[thm]{Example}
+      \theoremstyle{remark}
+      \newtheorem*{note}{Note}
+      \numberwithin{equation}{section}
+      \newcommand{\nov}{\text{Nov}}
+      \newcommand{\F}{\mathbb{F}}
+
+      \newtheorem{conjecture}[equation]{Conjecture}
+      \newcommand{\sfe}{{{\mathbb S}^{n-1}}}
+      \newcommand{\s}{\mathbb S}
+      \def\Vol{{\mathrm{Vol}}}
+
+      \newenvironment{definition}[1][Definition]{\begin{trivlist}
+      \item[\hskip \labelsep {\bfseries #1}]}{\end{trivlist}}
+      \newenvironment{example}[1][Example]{\begin{trivlist}
+      \item[\hskip \labelsep {\bfseries #1}]}{\end{trivlist}}
+      \newenvironment{remark}[1][Remark]{\begin{trivlist}
+      \item[\hskip \labelsep {\bfseries #1}]}{\end{trivlist}}
+
+      \newcommand{\birschapter}[4]{\chapter{#1}
+      \begin{itemize}
+      {\large #2}
+      \end{itemize}}
+
+      \fancyhf{}
+      \fancyhead[CO,CE]{\bfseries Banff International Research Station {year} Proposal Submission}
+      \pagestyle{fancy}
+      \renewcommand{\thepage}{\arabic{page}}
+      \rfoot{\thepage}
+
+
+      %---------------------------- begin proposal contents ----------------------------%
+
+      %---------------------------- end proposal contents ----------------------------%
+
+      \end{document}
+    </code></pre>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+    <button type="button" class="btn btn-primary" data-action="click->submit-proposals#copyToClipboard" data-bs-toggle="tooltip" id="copyButton" title="Copy to clipboard">Copy to clipboard</button>
+  </div>
+</div>
