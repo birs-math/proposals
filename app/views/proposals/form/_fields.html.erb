@@ -1,15 +1,29 @@
 <div class="form-group mb-3 <%= 'hidden' if no_latex %>" name="latexPreamble" id="latexPreamble" data-submit-proposals-target="latexPreamble">
   <h3><%= I18n.t('proposals.form.preamble') %></h3>
-  <p><%= I18n.t('proposals.form.preamble_note') %></p>
+  <div class="row justify-content-between mb-2">
+    <div class="col-9">
+      <%= I18n.t('proposals.form.preamble_note') %>
+    </div>
+    <div class="col-auto d-flex align-items-center justify-content-end">
+      <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#preambleModal">
+        Show BIRS Preamble
+      </button>
+    </div>
+  </div>
+  <div class="modal fade" id="preambleModal" tabindex="-1" aria-labelledby="preambleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <%= render 'proposals/form/birs_preamble' %>
+    </div>
+  </div>
   <div class="form-group mb-2">
-    <%= form.text_area(:preamble, size: '5x5', class:'form-control', value: proposal.preamble, disabled: disabled)%>
+    <%= form.text_area(:preamble, size: '5x5', class: 'form-control', value:  proposal.preamble, disabled: disabled) %>
   </div>
 </div>
 <div class="form-group mb-3 <%= 'hidden' if no_latex %>" name="latexBibliography" id="latexBibliography" data-submit-proposals-target="latexBibliography">
   <h3><%= I18n.t('proposals.form.bibliography') %></h3>
   <p><%= I18n.t('proposals.form.bibliography_note') %></p>
   <div class="form-group mb-2">
-    <%= form.text_area(:bibliography, size: '5x5', class:'form-control', value: proposal.bibliography, disabled: disabled)%>
+    <%= form.text_area(:bibliography, size: '5x5', class: 'form-control', value:  proposal.bibliography, disabled: disabled) %>
   </div>
 </div>
 <%= render partial: 'proposal_forms/proposal_fields', locals: { proposal_fields: common_proposal_fields(proposal) } %>
