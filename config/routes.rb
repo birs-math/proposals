@@ -148,9 +148,11 @@ Rails.application.routes.draw do
     end
   end
 
-  get 'profile/' => 'profile#edit'
-  patch 'update' => 'profile#update'
-  post 'demographic_data' => 'profile#demographic_data'
+  resources :profiles, only: %i[edit index demographic_data] # This will generate the edit route with an ID
+  get 'profile/edit', to: 'profiles#edit', as: 'profile' # This will generate the edit route without an ID
+
+  patch 'update' => 'profiles#update'
+  post 'demographic_data' => 'profiles#demographic_data'
 
   resources :roles do
     member do
