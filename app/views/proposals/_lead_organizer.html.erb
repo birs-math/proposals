@@ -20,7 +20,7 @@
       </div>
     <% end %>
     <% if current_user&.staff_member? %>
-      <button id="edit-lead-organizer-id" class="btn btn-primary" data-action="click->nested-invites#editLeadPreview" data-id="<%= @proposal.id %>">Edit</button>
+      <%= link_to 'Edit', edit_profile_path(@proposal.lead_organizer), class: 'btn btn-primary', target: '_blank' %>
     <% end %>
   </div>
 </div>
