@@ -9,10 +9,56 @@ RSpec.describe "/profile", type: :request do
   end
 
   describe "GET /edit" do
-    before do
-      get profile_url
+    context 'when editing own profile' do
+      context 'with profile_url' do
+        before do
+          get profile_url
+        end
+
+        it { expect(response).to have_http_status(:ok) }
+      end
+
+      context 'with edit_profile_url' do
+        before do
+          get edit_profile_url(person)
+        end
+
+        it { expect(response).to have_http_status(:ok) }
+      end
     end
-    it { expect(response).to have_http_status(:ok) }
+
+    context 'when editing other profile' do
+      let(:other_person) { create(:person, firstname: 'Other name') }
+
+      context 'and user is not staff' do
+        before do
+          get edit_profile_url(other_person)
+        end
+
+        it { expect(response).to have_http_status(:ok) }
+
+        it 'show the edit page with the current user profile' do
+          expect(response.body).to include(person.firstname)
+        end
+
+        it 'does not show the edit page with the other person profile' do
+          expect(response.body).not_to include(other_person.firstname)
+        end
+      end
+
+      context 'when user is staff' do
+        before do
+          user.roles << create(:role, name: 'Staff')
+          get edit_profile_url(other_person)
+        end
+
+        it { expect(response).to have_http_status(:ok) }
+
+        it 'show the edit page with the other person profile' do
+          expect(response.body).to include(other_person.firstname)
+        end
+      end
+    end
   end
 
   describe "PATCH /update" do
@@ -29,7 +75,7 @@ RSpec.describe "/profile", type: :request do
 
       it "updates the requested Person" do
         expect(person.reload.lastname).to eq('jhones')
-        expect(response).to redirect_to profile_path
+        expect(response).to redirect_to edit_profile_path(person)
       end
     end
 
@@ -40,7 +86,7 @@ RSpec.describe "/profile", type: :request do
       end
 
       it "does not update Person" do
-        expect(response).to redirect_to profile_path
+        expect(response).to redirect_to edit_profile_path(person)
       end
     end
   end
@@ -60,7 +106,7 @@ RSpec.describe "/profile", type: :request do
       end
 
       it "updates the person's demographic_data" do
-        expect(response).to redirect_to profile_path
+        expect(response).to redirect_to edit_profile_path(person)
       end
     end
 
@@ -76,7 +122,7 @@ RSpec.describe "/profile", type: :request do
       end
 
       it "does not update person's demographic_data" do
-        expect(response).to redirect_to profile_path
+        expect(response).to redirect_to edit_profile_path(person)
       end
     end
   end
