@@ -5,9 +5,9 @@ class ProfilesController < ApplicationController
 
   def index
     if params[:email].present?
-      @pagy, @profiles = pagy(Person.where('email ILIKE ?', "%#{params[:email]}%"))
+      @pagy, @profiles = pagy(Person.where('email ILIKE ?', "%#{params[:email]}%").order(id: :desc))
     else
-      @pagy, @profiles = pagy(Person.all)
+      @pagy, @profiles = pagy(Person.all.order(id: :desc))
     end
   end
 
