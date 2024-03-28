@@ -35,6 +35,8 @@
               <th>Email</th>
               <th>Affiliation</th>
               <th>Country</th>
+              <th>Department</th>
+              <th>Academic Status</th>
               <th>Actions</th>
             </tr>
             </thead>
@@ -45,6 +47,8 @@
                 <td> <%= profile.email %> </td>
                 <td> <%= profile.affiliation %> </td>
                 <td> <%= profile.country %> </td>
+                <td> <%= profile.department %> </td>
+                <td> <%= profile.academic_status %> </td>
                 <td class="table-action">
                   <%= link_to '<i class="align-middle fas fa-fw fa-pen" data-toggle="tooltip" title="Edit"></i>Edit'.html_safe, edit_profile_path(profile) %>
                 </td>
