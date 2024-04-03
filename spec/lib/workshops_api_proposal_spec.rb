@@ -42,7 +42,7 @@ RSpec.describe WorkshopsApiProposal do
       end
 
       it 'returns correct custom fields data' do
-        expect(subject.first).to include(:title, :description, :value)
+        expect(subject.first).to include(:title, :description, :position, :value)
       end
 
       it 'returns correct value in custom fields attributes' do
@@ -50,11 +50,11 @@ RSpec.describe WorkshopsApiProposal do
       end
 
       it 'returns correct description in custom fields attributes' do
-        expect(subject.first[:description]).to eq('Press release description')
+        expect(subject.first[:description]).to eq(first_proposal_field.description)
       end
 
       it 'returns correct title in custom fields attributes' do
-        expect(subject.first[:title]).to eq('Press release')
+        expect(subject.first[:title]).to eq(first_proposal_field.statement)
       end
     end
 

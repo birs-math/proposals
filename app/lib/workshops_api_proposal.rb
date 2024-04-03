@@ -115,6 +115,7 @@ class WorkshopsApiProposal
         {
           title: field.statement,
           description: field.description,
+          position: field.position,
           value: proposal.answers.find_by(proposal_field: field)&.answer
         }
       end
