@@ -41,7 +41,7 @@ class ProposalFieldsController < ApplicationController
   private
 
   def proposal_field_params
-    params.require(:proposal_field).permit(:position, :description, :location_id, :statement, :guideline_link,
+    params.require(:proposal_field).permit(:position, :description, :location_id, :statement, :guideline_link, :export,
                                            validations_attributes: %i[id _destroy validation_type value error_message],
                                            options_attributes: %i[id index value text _destroy])
   end
