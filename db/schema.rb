@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_07_18_074420) do
+ActiveRecord::Schema.define(version: 2024_04_03_165829) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
@@ -250,6 +250,7 @@ ActiveRecord::Schema.define(version: 2023_07_18_074420) do
     t.bigint "fieldable_id"
     t.string "fieldable_type"
     t.string "guideline_link"
+    t.boolean "export", default: false, null: false
     t.index ["fieldable_type", "fieldable_id"], name: "index_proposal_fields_on_fieldable_type_and_fieldable_id"
     t.index ["proposal_form_id"], name: "index_proposal_fields_on_proposal_form_id"
   end
@@ -310,8 +311,8 @@ ActiveRecord::Schema.define(version: 2023_07_18_074420) do
     t.bigint "created_by_id"
     t.bigint "updated_by_id"
     t.string "title"
-    t.text "introduction"
     t.integer "version", default: 0
+    t.text "introduction"
     t.text "introduction2"
     t.text "introduction3"
     t.text "introduction_charts"
