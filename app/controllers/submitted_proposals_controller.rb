@@ -1,6 +1,6 @@
 class SubmittedProposalsController < ApplicationController
   before_action :authenticate_user!
-  before_action :authorize_user
+  before_action :authorize_user, except: %i[booklet_log download_log_file]
   before_action :set_proposal, except: %i[index download_csv import_reviews
                                           reviews_booklet reviews_excel_booklet booklet_log]
   before_action :template_params, only: %i[approve_decline_proposals]

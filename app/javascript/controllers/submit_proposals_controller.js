@@ -1,6 +1,7 @@
 import { Controller } from "stimulus"
 import Sortable from "sortablejs"
 import Rails from '@rails/ujs'
+import { Tooltip } from 'bootstrap'
 
 import { get } from '@rails/request.js'
 
@@ -130,6 +131,21 @@ export default class extends Controller {
       this.latexPreambleTarget.classList.remove("hidden")
       this.latexBibliographyTarget.classList.remove("hidden")
     }
+  }
+
+  copyToClipboard() {
+    let text = document.querySelector(".modal-body code").innerText;
+    navigator.clipboard.writeText(text).then(() => {
+      console.log('Copying to clipboard was successful!');
+      let tooltip = new Tooltip(document.getElementById('copyButton'), {
+        title: "Copied!",
+        trigger: 'manual'
+      });
+      tooltip.show();
+      setTimeout(() => tooltip.hide(), 2000); // hides the tooltip after 2 seconds
+    }, function(err) {
+      console.error('Could not copy text: ', err);
+    });
   }
 
   fillProposalYears(event) {
