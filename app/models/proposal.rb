@@ -37,6 +37,7 @@ class Proposal < ApplicationRecord
   validate :preferred_locations, if: :is_submission
   validate :not_before_opening, if: :is_submission
   validate :cover_letter_field, if: :is_submission
+  validates :press_release, presence: true, if: :is_submission
 
   pg_search_scope :search_proposals, against: %i[title code],
                                      associated_against: {
