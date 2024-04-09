@@ -16,8 +16,8 @@ RSpec.describe WorkshopsApiProposal do
 
     it 'returns event data' do
       expect(subject).to include(:code, :name, :start_date, :end_date, :event_type,
-                                 :location, :press_release, :description, :subjects,
-                                 :custom_fields_attributes)
+                                 :location, :press_release, :subjects,
+                                 :custom_fields_attributes, :press_release)
     end
 
     context 'when proposal has custom fields to export' do
