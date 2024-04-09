@@ -7,7 +7,7 @@ module Proposals
 
     MODEL_ATTRS = %i[title year subject_id ams_subject_ids location_ids
                      no_latex preamble bibliography cover_letter applied_date
-                     same_week_as week_after assigned_date assigned_size].freeze
+                     same_week_as week_after assigned_date assigned_size press_release].freeze
 
     Result = Struct.new(:submission, :proposal, :error_messages, keyword_init: true) do
       def initialize(submission:, proposal:, error_messages: [])
