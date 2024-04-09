@@ -2,6 +2,7 @@ FactoryBot.define do
   factory :proposal do
     year { Date.current.year.to_i + 2 }
     title { Faker::Lorem.sentence(word_count: 4) }
+    press_release { Faker::Lorem.sentence(word_count: 4) }
     sequence(:code) { |n| "#{rand(99)}w5#{rand(99)}#{n}" }
 
     submission do
