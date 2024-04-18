@@ -26,7 +26,8 @@ class WorkshopsApiProposal
       end_date: event_end_date,
       event_type: @proposal.proposal_type.name,
       location: @proposal.safe_assigned_location.code,
-      press_release: @proposal.press_release,
+      press_release: proposal_press_release,
+      description: proposal_objective,
       subjects: proposal_subjects,
       custom_fields_attributes: custom_fields_data
     }
@@ -36,6 +37,15 @@ class WorkshopsApiProposal
     return (@proposal.safe_applied_date + 5.days) if @proposal.proposal_type.length.blank?
 
     @proposal.safe_applied_date + @proposal.proposal_type.length.days
+  end
+
+  def proposal_press_release
+    release = @proposal.answers.joins(:proposal_field)
+                       .where("proposal_fields.fieldable_type =?", "ProposalFields::Text")
+                       .where("statement =?", "Press release")
+    return '' if release.blank?
+
+    release.first.answer
   end
 
   def proposal_objective
