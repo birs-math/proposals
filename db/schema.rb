@@ -10,10 +10,9 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2024_04_09_120709) do
+ActiveRecord::Schema.define(version: 2024_04_18_152154) do
 
   # These are extensions that must be enabled in order to support this database
-  enable_extension "pgcrypto"
   enable_extension "plpgsql"
 
   create_table "action_text_rich_texts", force: :cascade do |t|
@@ -415,7 +414,6 @@ ActiveRecord::Schema.define(version: 2024_04_09_120709) do
     t.integer "assigned_location_id"
     t.string "assigned_size"
     t.date "applied_date"
-    t.text "press_release"
     t.index ["code"], name: "index_proposals_on_code", unique: true
     t.index ["proposal_form_id"], name: "index_proposals_on_proposal_form_id"
     t.index ["proposal_type_id"], name: "index_proposals_on_proposal_type_id"
@@ -464,10 +462,11 @@ ActiveRecord::Schema.define(version: 2024_04_09_120709) do
     t.integer "cases"
     t.integer "aborted"
     t.integer "year"
-    t.integer "location_id"
+    t.bigint "location_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.boolean "test_mode", default: false
+    t.index ["location_id"], name: "index_schedule_runs_on_location_id"
   end
 
   create_table "schedules", force: :cascade do |t|
