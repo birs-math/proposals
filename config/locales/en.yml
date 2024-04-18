@@ -63,5 +63,3 @@ en:
       bibliography: Bibliography
       bibliography_note: If you have a LaTeX bibliography, please enter it in this field. It will be included when you click the "Print Proposal" button.
       see_guidelines: See Guidelines for more information
-      press_release_note: Please provide 1-2 paragraphs for a press release. It should be understandable by the general public.
-      press_release: Press Release
