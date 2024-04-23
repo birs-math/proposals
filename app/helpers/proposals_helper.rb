@@ -151,11 +151,11 @@ module ProposalsHelper
   end
 
   def invite_first_name(invite)
-    invite.firstname || invite.person&.firstname
+    invite.person&.firstname || invite.firstname
   end
 
   def invite_last_name(invite)
-    invite.lastname || invite.person&.lastname
+    invite.person&.lastname || invite.lastname
   end
 
   def proposal_version_title(version, proposal)

@@ -11,7 +11,7 @@
       <div class="fw-bold"></div>
       <small><%= current_user&.fullname %>
         <% unless current_user&.staff_member? %>
-          <%= link_to '<i class="align-middle fas fa-fw fa-pen"></i>'.html_safe, profile_url %>
+          <%= link_to '<i class="align-middle fas fa-fw fa-pen"></i>'.html_safe, profile_edit_url %>
         <% end %>
       </small>
     </div>
@@ -26,6 +26,12 @@
           <i class="align-middle me-2 fas fa-fw fa-home"></i> <span class="align-middle">Dashboards</span>
           </a>
           <ul id="dashboards" class="sidebar-dropdown list-unstyled <%= dashboard_menu %> collapse" data-bs-parent="#sidebar">
+            <li class="sidebar-item <%= active_menu(locations_path) %>">
+              <%= link_to profiles_path, class: "sidebar-link" do %>
+                <i class="far fa-user"></i>
+                <span class="nav-link-text">Profiles</span>
+              <% end %>
+            </li>
             <li class="sidebar-item <%= active_menu(locations_path) %>">
               <%= link_to locations_path, class: "sidebar-link" do %>
                 <i class="far fa-compass"></i>
@@ -135,7 +141,7 @@
       <% end %>
       <li class="sidebar-item">
         <%= link_to sign_out_path, method: :delete, class: "sidebar-link" do %>
-          <i class="fas fa-sign-out-alt"></i>
+          <i class="fas fa-sign-out-alt ms-1"></i>
           <span class="nav-link-text">Log out</span>
         <% end %>
       </li>
