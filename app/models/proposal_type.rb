@@ -11,6 +11,7 @@ class ProposalType < ApplicationRecord
             numericality: { less_than_or_equal_to: 2, greater_than_or_equal_to: 0, only_integer: true }
   validates :min_no_of_impossible_dates,
             numericality: { less_than_or_equal_to: 2, greater_than_or_equal_to: 0, only_integer: true }
+  validates :capacity, numericality: { only_integer: true, greater_than: 0 }
   validates :code, uniqueness: true
   has_many :proposals, dependent: :destroy
   has_many :proposal_forms, dependent: :destroy
@@ -19,6 +20,7 @@ class ProposalType < ApplicationRecord
   validate :not_closed_date_greater
   validate :max_preferred_greater_than_min_preferred
   validate :max_impossible_greater_than_min_impossible
+  validate :capacity_amount
 
   scope :active_forms, -> { joins(:proposal_forms).where('proposal_forms.status =?', 1).distinct }
 
@@ -63,4 +65,14 @@ class ProposalType < ApplicationRecord
                " of impossible dates can not be greater than maximum number of impossible dates".squish)
   end
   # rubocop:enable Metrics/AbcSize
+
+  private
+
+  def capacity_amount
+    return if capacity.nil?
+    return if participant + co_organizer < capacity
+
+    errors.add("Capacity", " should be greater than the sum of maximum number " \
+                           "of organizers and maximum number of onsite participants".squish)
+  end
 end

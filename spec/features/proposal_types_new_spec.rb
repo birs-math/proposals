@@ -34,6 +34,7 @@ RSpec.feature "Proposal Type new", type: :feature do
     fill_in 'proposal_type_min_no_of_impossible_dates', with: 2
     fill_in 'proposal_type_organizer_description', with: 'A long text passage which describes organizers'
     fill_in 'proposal_type_participant_description', with: 'A long text paragraph which describes participants'
+    fill_in 'proposal_type_capacity', with: 42
     select Location.first.name
     click_button 'Create Proposal Type'
     updated_proposal_type = ProposalType.last

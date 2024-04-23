@@ -43,7 +43,8 @@ RSpec.describe "/proposal_types", type: :request do
           open_date: Time.current.to_date, closed_date: Time.current.to_date + 1.week, max_no_of_preferred_dates: 2,
           min_no_of_preferred_dates: 2, max_no_of_impossible_dates: 2, min_no_of_impossible_dates: 2,
           participant_description: 'some participants description',
-          organizer_description: 'some organizers description' }
+          organizer_description: 'some organizers description',
+          capacity: 42 }
       end
       it "creates a new proposal_type" do
         expect do
