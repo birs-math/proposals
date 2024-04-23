@@ -9,10 +9,56 @@ RSpec.describe "/profile", type: :request do
   end
 
   describe "GET /edit" do
-    before do
-      get profile_url
+    context 'when editing own profile' do
+      context 'with profile_edit_url' do
+        before do
+          get profile_edit_url
+        end
+
+        it { expect(response).to have_http_status(:ok) }
+      end
+
+      context 'with edit_profile_url' do
+        before do
+          get edit_profile_url(person)
+        end
+
+        it { expect(response).to have_http_status(:ok) }
+      end
     end
-    it { expect(response).to have_http_status(:ok) }
+
+    context 'when editing other profile' do
+      let(:other_person) { create(:person, firstname: 'Other name') }
+
+      context 'and user is not staff' do
+        before do
+          get edit_profile_url(other_person)
+        end
+
+        it { expect(response).to have_http_status(:ok) }
+
+        it 'show the edit page with the current user profile' do
+          expect(response.body).to include(person.firstname)
+        end
+
+        it 'does not show the edit page with the other person profile' do
+          expect(response.body).not_to include(other_person.firstname)
+        end
+      end
+
+      context 'when user is staff' do
+        before do
+          user.roles << create(:role, name: 'Staff')
+          get edit_profile_url(other_person)
+        end
+
+        it { expect(response).to have_http_status(:ok) }
+
+        it 'show the edit page with the other person profile' do
+          expect(response.body).to include(other_person.firstname)
+        end
+      end
+    end
   end
 
   describe "PATCH /update" do
@@ -23,30 +69,116 @@ RSpec.describe "/profile", type: :request do
     end
 
     context "with valid parameters" do
-      before do
-        patch update_url(person), params: { person: person_params }
+      context 'when editing own profile' do
+        let(:person) { create(:person) }
+
+        before do
+          patch profile_url(person), params: { person: person_params }
+        end
+
+        it "updates the requested Person" do
+          expect(person.reload.lastname).to eq('jhones')
+          expect(response).to redirect_to edit_profile_path(person)
+        end
       end
 
-      it "updates the requested Person" do
-        expect(person.reload.lastname).to eq('jhones')
-        expect(response).to redirect_to profile_path
+      context 'when editing other profile' do
+        let(:person) { create(:person) }
+
+        context 'and user is not staff' do
+          let(:other_person) { create(:person, firstname: 'Other name') }
+
+          before do
+            patch profile_url(other_person), params: { person: person_params }
+          end
+
+          it "does not update the requested Person" do
+            expect(response).to redirect_to edit_profile_path(person)
+          end
+
+          it 'updates current user profile' do
+            expect(person.reload.lastname).to eq('jhones')
+          end
+
+          it 'does not update other person profile' do
+            expect(other_person.reload.lastname).not_to eq('jhones')
+          end
+        end
+
+        context 'when user is staff' do
+          let(:other_person) { create(:person, firstname: 'Other name') }
+
+          before do
+            user.roles << create(:role, name: 'Staff')
+            patch profile_url(other_person), params: { person: person_params }
+          end
+
+          it 'redirects to edit profile path' do
+            expect(response).to redirect_to edit_profile_path(other_person)
+          end
+
+          it "updates the requested Person" do
+            expect(other_person.reload.lastname).to eq('jhones')
+          end
+
+          it 'does not update current user profile' do
+            expect(person.reload.lastname).not_to eq('jhones')
+          end
+        end
       end
     end
 
     context "with invalid parameters" do
       before do
         params = person_params.merge(firstname: '')
-        patch update_url(person), params: { person: params }
+        patch profile_url(person), params: { person: params }
       end
 
       it "does not update Person" do
-        expect(response).to redirect_to profile_path
+        expect(response).to redirect_to edit_profile_path(person)
       end
     end
   end
 
   describe "POST /demographic_data" do
-    context "with valid parameters" do
+    context 'when editing own profile' do
+      context "with valid parameters" do
+        let(:survey_params) do
+          {
+            "survey" => { "citizenships" => ["Åland Islands"], "indigenous_person" => "No",
+                          "ethnicity" => ["Arab"], "gender" => "Man",
+                          "community" => "No", "disability" => "No",
+                          "minorities" => "No", "stem" => "Yes", "underRepresented" => "Prefer not to answer" }
+          }
+        end
+        before do
+          post demographic_data_profile_url(person), params: { profile_survey: survey_params }
+        end
+
+        it "updates the person's demographic_data" do
+          expect(response).to redirect_to edit_profile_path(person)
+        end
+      end
+
+      context "with invalid parameters" do
+        let(:survey_params) do
+          {
+            "survey" => " "
+          }
+        end
+
+        before do
+          post demographic_data_profile_url(person), params: { profile_survey: 'survey_params' }
+        end
+
+        it "does not update person's demographic_data" do
+          expect(response).to redirect_to edit_profile_path(person)
+        end
+      end
+    end
+
+    context 'when editing other profile demographic data' do
+      let(:other_person) { create(:person, firstname: 'Other name') }
       let(:survey_params) do
         {
           "survey" => { "citizenships" => ["Åland Islands"], "indigenous_person" => "No",
@@ -55,28 +187,42 @@ RSpec.describe "/profile", type: :request do
                         "minorities" => "No", "stem" => "Yes", "underRepresented" => "Prefer not to answer" }
         }
       end
-      before do
-        post demographic_data_path(person), params: { profile_survey: survey_params }
+
+      context 'and user is not staff' do
+        before do
+          post demographic_data_profile_url(other_person), params: { profile_survey: survey_params }
+        end
+
+        it 'does not update the requested Person' do
+          expect(response).to redirect_to edit_profile_path(person)
+        end
+
+        it 'updates current user profile demographic data' do
+          expect(person.reload.demographic_data.result['survey']).to eq(survey_params['survey'])
+        end
+
+        it 'does not update other person profile' do
+          expect(other_person.reload.demographic_data.result['survey']).not_to eq(survey_params['survey'])
+        end
       end
 
-      it "updates the person's demographic_data" do
-        expect(response).to redirect_to profile_path
-      end
-    end
+      context 'when user is staff' do
+        before do
+          user.roles << create(:role, name: 'Staff')
+          post demographic_data_profile_url(other_person), params: { profile_survey: survey_params }
+        end
 
-    context "with invalid parameters" do
-      let(:survey_params) do
-        {
-          "survey" => " "
-        }
-      end
+        it 'redirects to edit profile path' do
+          expect(response).to redirect_to edit_profile_path(other_person)
+        end
 
-      before do
-        post demographic_data_path(person), params: { profile_survey: 'survey_params' }
-      end
+        it "updates the requested Person" do
+          expect(other_person.reload.demographic_data.result['survey']).to eq(survey_params['survey'])
+        end
 
-      it "does not update person's demographic_data" do
-        expect(response).to redirect_to profile_path
+        it 'does not update current user profile' do
+          expect(person.reload.demographic_data.result['survey']).not_to eq(survey_params['survey'])
+        end
       end
     end
   end
