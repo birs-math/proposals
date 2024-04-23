@@ -10,10 +10,9 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_07_18_074420) do
+ActiveRecord::Schema.define(version: 2024_03_08_114004) do
 
   # These are extensions that must be enabled in order to support this database
-  enable_extension "pgcrypto"
   enable_extension "plpgsql"
 
   create_table "action_text_rich_texts", force: :cascade do |t|
@@ -310,8 +309,8 @@ ActiveRecord::Schema.define(version: 2023_07_18_074420) do
     t.bigint "created_by_id"
     t.bigint "updated_by_id"
     t.string "title"
-    t.text "introduction"
     t.integer "version", default: 0
+    t.text "introduction"
     t.text "introduction2"
     t.text "introduction3"
     t.text "introduction_charts"
@@ -367,6 +366,7 @@ ActiveRecord::Schema.define(version: 2023_07_18_074420) do
     t.integer "min_no_of_preferred_dates"
     t.integer "max_no_of_impossible_dates"
     t.integer "min_no_of_impossible_dates"
+    t.integer "capacity"
     t.index ["code"], name: "index_proposal_types_on_code", unique: true
   end
 
@@ -462,10 +462,11 @@ ActiveRecord::Schema.define(version: 2023_07_18_074420) do
     t.integer "cases"
     t.integer "aborted"
     t.integer "year"
-    t.integer "location_id"
+    t.bigint "location_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.boolean "test_mode", default: false
+    t.index ["location_id"], name: "index_schedule_runs_on_location_id"
   end
 
   create_table "schedules", force: :cascade do |t|
@@ -613,6 +614,7 @@ ActiveRecord::Schema.define(version: 2023_07_18_074420) do
   add_foreign_key "reviews", "people"
   add_foreign_key "reviews", "proposals"
   add_foreign_key "role_privileges", "roles"
+  add_foreign_key "schedule_runs", "locations"
   add_foreign_key "schedules", "schedule_runs"
   add_foreign_key "staff_discussions", "proposals"
   add_foreign_key "subject_area_categories", "subject_categories"

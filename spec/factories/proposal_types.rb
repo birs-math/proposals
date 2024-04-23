@@ -13,5 +13,6 @@ FactoryBot.define do
     min_no_of_preferred_dates { 2 }
     max_no_of_impossible_dates { 2 }
     min_no_of_impossible_dates { 2 }
+    capacity { 42 }
   end
 end
