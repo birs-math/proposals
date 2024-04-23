@@ -23,8 +23,8 @@ export default class extends Controller {
     if (this.organizerValue < this.maxOrganizerValue) {
       this.targetTarget.insertAdjacentHTML('beforebegin', content)
       this.organizerValue += 1
-      if($('#organizer_deadline').val())
-      {
+
+      if($('#organizer_deadline').val()) {
         $('.organizer-deadline-date').last().val($('#organizer_deadline').val())
       }
     } else {
@@ -39,10 +39,10 @@ export default class extends Controller {
     if (this.participantValue < this.maxParticipantValue) {
       this.targetOneTarget.insertAdjacentHTML('beforebegin', contentOne)
       this.participantValue += 1
-      if($('#participant_deadline').val())
-      {
-        $('.participant-deadline-date').last().val($('#participant_deadline').val())
-      }
+
+      if($('#participant_deadline').val()) {
+          $('.participant-deadline-date').last().val($('#participant_deadline').val())
+        }
     } else {
       toastr.error("You can't add more because the maximum number of Participant invitations has been sent.")
     }
