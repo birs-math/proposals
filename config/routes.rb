@@ -148,9 +148,13 @@ Rails.application.routes.draw do
     end
   end
 
-  get 'profile/' => 'profile#edit'
-  patch 'update' => 'profile#update'
-  post 'demographic_data' => 'profile#demographic_data'
+  resources :profiles, only: %i[edit index update] do
+    member do
+      post :demographic_data
+    end
+  end
+
+  get 'profile/edit', to: 'profiles#edit'
 
   resources :roles do
     member do
@@ -178,11 +182,10 @@ Rails.application.routes.draw do
   mount ActionCable.server => '/cable'
 
   Rails.application.routes.draw do
-  if Rails.env.test?
-    namespace :test do
-      resource :session, only: %i[create]
+    if Rails.env.test?
+      namespace :test do
+        resource :session, only: %i[create]
+      end
     end
   end
-end
-
 end

@@ -1,5 +1,5 @@
 <div data-controller="survey">
-  <%= form_for :profile_survey, url: {controller: "profile", action: "demographic_data"}, method: :post do |f| %>
+  <%= form_for :profile_survey, url: {controller: "profiles", action: "demographic_data", id: @person.id}, method: :post do |f| %>
     <div class="col-lg-8">
       <div class="mb-3"> 
         <div>
@@ -9,7 +9,7 @@
         </div>
         <div class="hidden" data-survey-target="otherCitizenship">
           <%= f.label 'Other: ', class: 'required mt-3'%>
-          <%= f.text_field :citizenships_other, id: 'citizenship_other', class: 'form-control', value: @result["citizenships"][1] == "Other" ? @result["citizenships_other"] : nil %>
+          <%= f.text_field :citizenships_other, id: 'citizenship_other', class: 'form-control', value: @result.dig("citizenships", 1) == "Other" ? @result["citizenships_other"] : nil %>
         </div>
       </div>
     </div>
@@ -41,7 +41,7 @@
         </div>
         <div class="hidden" data-survey-target="otherEthnicity">
           <%= f.label 'Other: ', class: 'required mt-3 '%>
-          <%= f.text_field :ethnicity_other, id: 'ethnicity_other', class: 'form-control', value: @result["ethnicity"][1] == "Other" ? @result["ethnicity_other"] : nil %>
+          <%= f.text_field :ethnicity_other, id: 'ethnicity_other', class: 'form-control', value: @result.dig("ethnicity", 1) == "Other" ? @result["ethnicity_other"] : nil %>
         </div>
       </div>
       
@@ -126,13 +126,13 @@
               <%= link_to "FAQs", faqs_survey_index_path, target: "_blank" %>.
               </em>
             </label>
-          <div>
-            <%= f.radio_button :underRepresented, "Yes", checked: under_represented_radio_option(@result, "Yes") %> Yes <br />
-            <%= f.radio_button :underRepresented, "No", checked: under_represented_radio_option(@result, "No")%> No <br />
-            <%= f.radio_button :underRepresented, "Prefer not to answer", checked: under_represented_radio_option(@result, "Prefer not to answer") %> Prefer not to answer <br />
-          </div>
+            <div>
+              <%= f.radio_button :underRepresented, "Yes", checked: under_represented_radio_option(@result, "Yes") %> Yes <br />
+              <%= f.radio_button :underRepresented, "No", checked: under_represented_radio_option(@result, "No")%> No <br />
+              <%= f.radio_button :underRepresented, "Prefer not to answer", checked: under_represented_radio_option(@result, "Prefer not to answer") %> Prefer not to answer <br />
+            </div>
+        </div>
       </div>
-
       <div class="mb-3">
         <%= f.submit :Submit, class: "btn btn-primary" %>
       </div>

@@ -1,0 +1,66 @@
+<main class="content">
+  <div class="container-fluid">
+    <div class="header">
+      <h1 class="header-title">
+        Profiles
+      </h1>
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><%= link_to "Dashboard", dashboards_path %></li>
+          <li class="breadcrumb-item active" aria-current="page">Profiles</li>
+        </ol>
+      </nav>
+    </div>
+    <div class="row">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-actions float-right">
+              <%= form_with url: profiles_path, method: :get, local: true do |form| %>
+                <div class="row">
+                  <div class="col">
+                    <%= form.text_field :email, value: params[:email], class: 'form-control',  placeholder: 'Search by email' %>
+                  </div>
+                  <div class="col-auto">
+                    <%= form.submit 'Search', class: 'btn btn-primary' %>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+          </div>
+          <table class="table">
+            <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Affiliation</th>
+              <th>Country</th>
+              <th>Department</th>
+              <th>Academic Status</th>
+              <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <% @profiles.each do |profile|%>
+              <tr>
+                <td> <%= profile.fullname %> </td>
+                <td> <%= profile.email %> </td>
+                <td> <%= profile.affiliation %> </td>
+                <td> <%= profile.country %> </td>
+                <td> <%= profile.department %> </td>
+                <td> <%= profile.academic_status %> </td>
+                <td class="table-action">
+                  <%= link_to '<i class="align-middle fas fa-fw fa-pen" data-toggle="tooltip" title="Edit"></i>Edit'.html_safe, edit_profile_path(profile) %>
+                </td>
+              </tr>
+            <% end %>
+            </tbody>
+          </table>
+          <div class="card-footer d-flex justify-content-center align-items-center">
+            <%== pagy_bootstrap_nav(@pagy) if @pagy.pages > 1 %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>

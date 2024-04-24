@@ -70,7 +70,7 @@ class ProposalTypesController < ApplicationController
   def proposal_type_params
     params.require(:proposal_type).permit(:name, :year, :co_organizer, :participant, :code, :open_date, :closed_date,
                                           :organizer_description, :participant_description, :max_no_of_preferred_dates,
-                                          :min_no_of_preferred_dates, :max_no_of_impossible_dates,
+                                          :min_no_of_preferred_dates, :max_no_of_impossible_dates, :capacity,
                                           :min_no_of_impossible_dates, :length, location_ids: [])
   end
 

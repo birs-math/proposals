@@ -147,7 +147,7 @@ class ProposalPdfService
   end
 
   def proposal_organizers_count
-    confirmed_orgs = (confirmed_organizers&.count || 0) + 1
+    confirmed_orgs = confirmed_organizers&.count || 0
     @text << "\\noindent #{confirmed_orgs} confirmed /
               #{proposal.max_supporting_organizers + 1}
               maximum organizers\n\n".squish

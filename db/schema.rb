@@ -367,6 +367,7 @@ ActiveRecord::Schema.define(version: 2024_04_18_152154) do
     t.integer "min_no_of_preferred_dates"
     t.integer "max_no_of_impossible_dates"
     t.integer "min_no_of_impossible_dates"
+    t.integer "capacity"
     t.index ["code"], name: "index_proposal_types_on_code", unique: true
   end
 
@@ -614,6 +615,7 @@ ActiveRecord::Schema.define(version: 2024_04_18_152154) do
   add_foreign_key "reviews", "people"
   add_foreign_key "reviews", "proposals"
   add_foreign_key "role_privileges", "roles"
+  add_foreign_key "schedule_runs", "locations"
   add_foreign_key "schedules", "schedule_runs"
   add_foreign_key "staff_discussions", "proposals"
   add_foreign_key "subject_area_categories", "subject_categories"
