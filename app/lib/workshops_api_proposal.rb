@@ -28,7 +28,8 @@ class WorkshopsApiProposal
       location: @proposal.safe_assigned_location.code,
       press_release: proposal_press_release,
       description: proposal_objective,
-      subjects: proposal_subjects
+      subjects: proposal_subjects,
+      custom_fields_attributes: custom_fields_data
     }
   end
 
@@ -106,5 +107,24 @@ class WorkshopsApiProposal
     end
 
     members
+  end
+
+  def custom_fields_data
+    if custom_export_fields.any?
+      custom_export_fields.map do |field|
+        {
+          title: field.statement,
+          description: field.description,
+          position: field.position,
+          value: proposal.answers.find_by(proposal_field: field)&.answer
+        }
+      end
+    else
+      []
+    end
+  end
+
+  def custom_export_fields
+    @proposal.proposal_form.proposal_fields.export
   end
 end
