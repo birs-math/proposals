@@ -122,14 +122,7 @@ class InvitesController < ApplicationController
   end
 
   def set_invite_status
-    case response_params
-    when 'no'
-      :cancelled
-    when 'maybe'
-      :pending
-    when 'yes'
-      :confirmed
-    end
+    { 'yes' => 'confirmed', 'no' => 'declined', 'maybe' => 'pending' }[response_params]
   end
 
   def set_invite_proposal
@@ -137,7 +130,7 @@ class InvitesController < ApplicationController
   end
 
   def response_params
-    params.require(:commit)&.downcase
+    params.require(:commit).downcase
   end
 
   def invalid_response?
