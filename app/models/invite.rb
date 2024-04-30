@@ -24,7 +24,7 @@ class Invite < ApplicationRecord
   scope :organizer, -> { where(invited_as: 'Organizer') }
   scope :participant, -> { where(invited_as: 'Participant') }
 
-  enum status: { pending: 0, confirmed: 1, cancelled: 2 }
+  enum status: { pending: 0, confirmed: 1, cancelled: 2, declined: 3 }
   enum response: { yes: 0, maybe: 1, no: 2 }
 
   class << self
