@@ -60,6 +60,12 @@ RSpec.describe "/proposals/:proposal_id/invites", type: :request do
 
         invite_response
       end
+
+      it 'update invite status' do
+        invite_response
+
+        expect(invite.reload.status).to eq('declined')
+      end
     end
 
     context 'when response is maybe' do
@@ -100,6 +106,12 @@ RSpec.describe "/proposals/:proposal_id/invites", type: :request do
         expect(InviteMailer).to receive_message_chain(:with, :invite_acceptance, :deliver_later)
 
         invite_response
+      end
+
+      it 'updates invite status' do
+        invite_response
+
+        expect(invite.reload.status).to eq('confirmed')
       end
 
       context 'when invited as Organizer' do
