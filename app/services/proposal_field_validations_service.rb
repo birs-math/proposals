@@ -19,25 +19,25 @@ class ProposalFieldValidationsService
     validations.each do |val|
       case val.validation_type
       when 'mandatory'
-        @errors << val.error_message if @answer.blank?
+        @errors << error_message(val) if @answer.blank?
       when 'less than (integer matcher)'
-        @errors << val.error_message unless @answer.to_i < val.value.to_i
+        @errors << error_message(val) unless @answer.to_i < val.value.to_i
       when 'less than (float matcher)'
-        @errors << val.error_message unless @answer.to_f < val.value.to_f
+        @errors << error_message(val) unless @answer.to_f < val.value.to_f
       when 'greater than (integer matcher)'
-        @errors << val.error_message unless @answer.to_i > val.value.to_i
+        @errors << error_message(val) unless @answer.to_i > val.value.to_i
       when 'greater than (float matcher)'
-        @errors << val.error_message unless @answer.to_f > val.value.to_f
+        @errors << error_message(val) unless @answer.to_f > val.value.to_f
       when 'equal (string matcher)'
-        @errors << val.error_message unless @answer == val.value
+        @errors << error_message(val) unless @answer == val.value
       when 'equal (integer matcher)'
-        @errors << val.error_message unless @answer.to_i == val.value.to_i
+        @errors << error_message(val) unless @answer.to_i == val.value.to_i
       when 'equal (float matcher)'
-        @errors << val.error_message unless @answer.to_f == val.value.to_f
+        @errors << error_message(val) unless @answer.to_f == val.value.to_f
       when 'words limit'
         texcount = `echo "#{@answer}" | texcount -total -`
         word_count = texcount.match(/Words in text: (\d+)/)[1]
-        @errors << val.error_message unless word_count.to_i <= val.value.to_i
+        @errors << error_message(val) unless word_count.to_i <= val.value.to_i
       when '5-day workshop preferred/Impossible dates'
         preferred_impossible_dates_validation
       end
@@ -71,5 +71,9 @@ class ProposalFieldValidationsService
   end
   def attached_file
     !Answer.find_by(proposal_field_id: field.id, proposal_id: proposal.id)&.file&.attached?
+  end
+
+  def error_message(validation)
+    validation.error_message.prepend("##{validation.proposal_field.position} ")
   end
 end
