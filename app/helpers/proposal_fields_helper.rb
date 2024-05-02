@@ -67,7 +67,7 @@ module ProposalFieldsHelper
   def validations(field, proposal)
     return [] if field.location_id && proposal.locations.exclude?(field.location)
 
-    ProposalFieldValidationsService.new(field, proposal).validations
+    ProposalFieldValidationsService.new(field, proposal, answer(field, proposal)).validations
   end
 
   def proposal_field_partial(field)
@@ -147,7 +147,7 @@ module ProposalFieldsHelper
   def tab_two(proposal)
     errors = []
     proposal.proposal_form.proposal_fields.where(location_id: nil).each do |field|
-      errors << ProposalFieldValidationsService.new(field, proposal).validations
+      errors << ProposalFieldValidationsService.new(field, proposal, answer(field, proposal)).validations
 
       return true if errors.flatten.count == 1
     end
@@ -159,7 +159,7 @@ module ProposalFieldsHelper
 
     errors = []
     proposal.proposal_form.proposal_fields.where(location_id: proposal.location_ids).each do |field|
-      errors << ProposalFieldValidationsService.new(field, proposal).validations
+      errors << ProposalFieldValidationsService.new(field, proposal, answer(field, proposal)).validations
       return true if errors.flatten.count == 1
     end
     false
