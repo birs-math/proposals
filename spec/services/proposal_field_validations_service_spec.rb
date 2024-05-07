@@ -267,8 +267,8 @@ RSpec.describe ProposalFieldValidationsService, type: :service do
         end
 
         it 'adds error message to @errors' do
-          expect(service.instance_variable_get(:@errors)).to include("You have to choose atleast #{proposal.proposal_type.min_no_of_preferred_dates} preferred dates")
-          expect(service.instance_variable_get(:@errors)).to include("You have to choose atleast #{proposal.proposal_type.min_no_of_impossible_dates} impossible dates")
+          expect(service.instance_variable_get(:@errors)).to include(service.dates_error_message("You have to choose atleast #{proposal.proposal_type.min_no_of_preferred_dates} preferred dates", validation))
+          expect(service.instance_variable_get(:@errors)).to include(service.dates_error_message("You have to choose atleast #{proposal.proposal_type.min_no_of_impossible_dates} impossible dates", validation))
         end
       end
 
@@ -280,7 +280,7 @@ RSpec.describe ProposalFieldValidationsService, type: :service do
         end
 
         it 'adds error message to @errors' do
-          expect(service.instance_variable_get(:@errors)).to include("You can't select the same date twice")
+          expect(service.instance_variable_get(:@errors)).to include(service.dates_error_message("You can't select the same date twice", validation))
         end
       end
     end
