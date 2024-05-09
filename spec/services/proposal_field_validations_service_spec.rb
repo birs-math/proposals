@@ -164,7 +164,7 @@ RSpec.describe ProposalFieldValidationsService, type: :service do
     context 'when validation type is equal (string matcher)' do
       let!(:validation) do
         create(:validation, validation_type: 'equal (string matcher)', proposal_field: proposal_field, value: 'string')
-      end do
+      end
 
       context 'when answer is equal to validation value' do
         let(:answer) { create(:answer, proposal: proposal, proposal_field: proposal_field, answer: 'string') }
