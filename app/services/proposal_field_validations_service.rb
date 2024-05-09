@@ -34,64 +34,37 @@ class ProposalFieldValidationsService
     end
   end
 
-  def preferred_impossible_dates(val)
+  def preferred_impossible_dates(_val)
     if value.nil?
-      @errors << dates_error_message("You have to choose atleast #{proposal.proposal_type.min_no_of_preferred_dates} preferred dates", val)
-      @errors << dates_error_message("You have to choose atleast #{proposal.proposal_type.min_no_of_impossible_dates} impossible dates", val)
+      @errors << "You have to choose atleast #{proposal.proposal_type.min_no_of_preferred_dates} preferred dates"
+      @errors << "You have to choose atleast #{proposal.proposal_type.min_no_of_impossible_dates} impossible dates"
       return
     end
-
-    preferred_dates, impossible_dates = parse_and_filter_dates
-    uniq_dates = (preferred_dates + impossible_dates).uniq
-
-    @errors << dates_error_message("You can't select the same date twice", val) unless uniq_dates.count == (preferred_dates + impossible_dates).count
-
-    check_preferred_dates_count(preferred_dates, val)
-    check_impossible_dates_count(impossible_dates, val)
+    preferred = JSON.parse(value)&.first(5)
+    impossible = JSON.parse(value)&.last(2)
+    preferred_dates = preferred.reject { |date| date == '' }
+    impossible_dates = impossible.reject { |date| date == '' }
+    uniq_dates = JSON.parse(value).reject { |date| date == '' }
+    @errors << "You can't select the same date twice" unless uniq_dates.uniq.count == uniq_dates.count
+    if preferred_dates.count > proposal.proposal_type.max_no_of_preferred_dates
+      @errors << "You can choose maximum #{proposal.proposal_type.max_no_of_preferred_dates} preferred dates"
+    end
+    if preferred_dates.count < proposal.proposal_type.min_no_of_preferred_dates
+      @errors << "You have to choose atleast #{proposal.proposal_type.min_no_of_preferred_dates} preferred dates"
+    end
+    if impossible_dates.count > proposal.proposal_type.max_no_of_impossible_dates
+      @errors << "You can choose maximum #{proposal.proposal_type.max_no_of_impossible_dates} impossible dates"
+    end
+    if impossible_dates.count < proposal.proposal_type.min_no_of_impossible_dates
+      @errors << "You have to choose atleast #{proposal.proposal_type.min_no_of_impossible_dates} impossible dates"
+    end
   end
 
   def error_message(validation)
     validation.error_message.prepend("Step 2 ##{validation.proposal_field.position} ")
   end
 
-  def dates_error_message(message, validation)
-    message.prepend("Step 2 ##{validation.proposal_field.position} #{message}")
-  end
-
   private
-
-  def parse_and_filter_dates
-    preferred, impossible = if value.is_a?(Array)
-                              [value.first(5), value.last(2)]
-                            else
-                              [JSON.parse(value)&.first(5), JSON.parse(value)&.last(2)]
-                            end
-
-    preferred_dates = preferred.reject { |date| date == '' }
-    impossible_dates = impossible.reject { |date| date == '' }
-
-    [preferred_dates, impossible_dates]
-  end
-
-  def check_preferred_dates_count(preferred_dates, val)
-    if preferred_dates.count > proposal.proposal_type.max_no_of_preferred_dates
-      @errors << dates_error_message("You can choose maximum #{proposal.proposal_type.max_no_of_preferred_dates} preferred dates", val)
-    end
-
-    if preferred_dates.count < proposal.proposal_type.min_no_of_preferred_dates
-      @errors << dates_error_message("You have to choose at least #{proposal.proposal_type.min_no_of_preferred_dates} preferred dates", val)
-    end
-  end
-
-  def check_impossible_dates_count(impossible_dates, val)
-    if impossible_dates.count > proposal.proposal_type.max_no_of_impossible_dates
-      @errors << dates_error_message("You can choose maximum #{proposal.proposal_type.max_no_of_impossible_dates} impossible dates", val)
-    end
-
-    if impossible_dates.count < proposal.proposal_type.min_no_of_impossible_dates
-      @errors << dates_error_message("You have to choose at least #{proposal.proposal_type.min_no_of_impossible_dates} impossible dates", val)
-    end
-  end
 
   def mandatory(val)
     @errors << error_message(val) if value.blank?
