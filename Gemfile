@@ -31,13 +31,14 @@ gem 'redis', '~> 4.0', '>= 4.5.1'
 gem 'rest-client'
 gem 'rollbar'
 gem 'sass-rails', '>= 6'
+gem 'sucker_punch', '~> 3.0'
 gem 'tinymce-rails', '5.10.2'
 gem 'turbo-rails', '~> 1.4'
 gem 'webpacker', '~> 5.0'
-gem 'sucker_punch', '~> 3.0'
 
 group :development, :test do
   gem 'byebug'
+  gem 'rspec-rails'
   gem 'rubocop-performance'
   gem 'rubocop-rspec'
 end
@@ -47,7 +48,6 @@ group :test do
   gem 'factory_bot_rails', require: false
   gem 'faker'
   gem 'rails-controller-testing'
-  gem 'rspec-rails', '~> 4.1.0'
   gem 'selenium-webdriver'
   gem 'shoulda-matchers', '~> 4.0'
   gem 'simplecov'

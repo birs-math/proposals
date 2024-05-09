@@ -7,7 +7,7 @@ RSpec.describe InvitesHelper, type: :helper do
   let(:invite2) { create(:invite, proposal: proposal, invited_as: "Organizer", status: :confirmed) }
 
   describe '#invite_statuses' do
-    let(:statuses) { [%w[Pending pending], %w[Confirmed confirmed], %w[Cancelled cancelled]] }
+    let(:statuses) { [%w[Pending pending], %w[Confirmed confirmed], %w[Cancelled cancelled], %w[Declined declined]] }
     it 'returns invite statuses' do
       expect(invite_statuses).to eq(statuses)
     end
