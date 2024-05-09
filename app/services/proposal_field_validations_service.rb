@@ -61,10 +61,12 @@ class ProposalFieldValidationsService
     preferred_dates = preferred.reject { |date| date == '' }
     impossible_dates = impossible.reject { |date| date == '' }
     uniq_dates = JSON.parse(@answer).reject { |date| date == '' }
-    @errors << date_error_message(
-      val,
-      "You can't select the same date twice"
-    ) unless uniq_dates.uniq.count == uniq_dates.count
+    if uniq_dates.uniq.count != uniq_dates.count 
+      @errors << date_error_message(
+        val,
+        "You can't select the same date twice"
+      )
+    end
     if preferred_dates.count > proposal.proposal_type.max_no_of_preferred_dates
       @errors << date_error_message(
         val,
