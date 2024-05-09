@@ -66,9 +66,9 @@ RSpec.describe ProposalFieldValidationsService, type: :service do
     end
 
     context 'when validation type is less than (float matcher)' do
-      let!(:validation) {
+      let!(:validation) do
         create(:validation, validation_type: 'less than (float matcher)', proposal_field: proposal_field, value: 5.0)
-      }
+      end do
 
       context 'when answer is less than validation value' do
         let(:answer) { create(:answer, proposal: proposal, proposal_field: proposal_field, answer: '4.0') }
@@ -292,7 +292,7 @@ RSpec.describe ProposalFieldValidationsService, type: :service do
     context 'when validation type is 5-day workshop preferred/Impossible dates' do
       let!(:validation) do
         create(
-          :validation, 
+          :validation,
           validation_type: '5-day workshop preferred/Impossible dates',
           proposal_field: proposal_field
         )
@@ -308,12 +308,16 @@ RSpec.describe ProposalFieldValidationsService, type: :service do
 
         it 'adds error message to @errors' do
           expect(service.instance_variable_get(:@errors)).to include(
-            service.date_error_message(validation, 
-            "You have to choose atleast #{proposal.proposal_type.min_no_of_preferred_dates} preferred dates")
+            service.date_error_message(
+              validation,
+              "You have to choose atleast #{proposal.proposal_type.min_no_of_preferred_dates} preferred dates"
+            )
           )
           expect(service.instance_variable_get(:@errors)).to include(
-            service.date_error_message(validation,
-            "You have to choose atleast #{proposal.proposal_type.min_no_of_impossible_dates} impossible dates")
+            service.date_error_message(
+              validation,
+              "You have to choose atleast #{proposal.proposal_type.min_no_of_impossible_dates} impossible dates"
+            )
           )
         end
       end
