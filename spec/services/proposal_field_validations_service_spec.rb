@@ -34,7 +34,9 @@ RSpec.describe ProposalFieldValidationsService, type: :service do
     end
 
     context 'when validation type is less than (integer matcher)' do
-      let!(:validation) { create(:validation, validation_type: 'less than (integer matcher)', proposal_field: proposal_field, value: 5) }
+      let!(:validation) do
+        create(:validation, validation_type: 'less than (integer matcher)', proposal_field: proposal_field, value: 5)
+      end
 
       context 'when answer is less than validation value' do
         let(:answer) { create(:answer, proposal: proposal, proposal_field: proposal_field, answer: '4') }
@@ -64,7 +66,9 @@ RSpec.describe ProposalFieldValidationsService, type: :service do
     end
 
     context 'when validation type is less than (float matcher)' do
-      let!(:validation) { create(:validation, validation_type: 'less than (float matcher)', proposal_field: proposal_field, value: 5.0) }
+      let!(:validation) do
+        create(:validation, validation_type: 'less than (float matcher)', proposal_field: proposal_field, value: 5.0)
+      end
 
       context 'when answer is less than validation value' do
         let(:answer) { create(:answer, proposal: proposal, proposal_field: proposal_field, answer: '4.0') }
@@ -94,7 +98,9 @@ RSpec.describe ProposalFieldValidationsService, type: :service do
     end
 
     context 'when validation type is greater than (integer matcher)' do
-      let!(:validation) { create(:validation, validation_type: 'greater than (integer matcher)', proposal_field: proposal_field, value: 5) }
+      let!(:validation) do
+        create(:validation, validation_type: 'greater than (integer matcher)', proposal_field: proposal_field, value: 5)
+      end
 
       context 'when answer is greater than validation value' do
         let(:answer) { create(:answer, proposal: proposal, proposal_field: proposal_field, answer: '6') }
@@ -124,7 +130,9 @@ RSpec.describe ProposalFieldValidationsService, type: :service do
     end
 
     context 'when validation type is greater than (float matcher)' do
-      let!(:validation) { create(:validation, validation_type: 'greater than (float matcher)', proposal_field: proposal_field, value: 5.0) }
+      let!(:validation) do
+        create(:validation, validation_type: 'greater than (float matcher)', proposal_field: proposal_field, value: 5.0)
+      end
 
       context 'when answer is greater than validation value' do
         let(:answer) { create(:answer, proposal: proposal, proposal_field: proposal_field, answer: '6.0') }
@@ -154,7 +162,9 @@ RSpec.describe ProposalFieldValidationsService, type: :service do
     end
 
     context 'when validation type is equal (string matcher)' do
-      let!(:validation) { create(:validation, validation_type: 'equal (string matcher)', proposal_field: proposal_field, value: 'string') }
+      let!(:validation) do
+        create(:validation, validation_type: 'equal (string matcher)', proposal_field: proposal_field, value: 'string')
+      end
 
       context 'when answer is equal to validation value' do
         let(:answer) { create(:answer, proposal: proposal, proposal_field: proposal_field, answer: 'string') }
@@ -184,7 +194,9 @@ RSpec.describe ProposalFieldValidationsService, type: :service do
     end
 
     context 'when validation type is equal (integer matcher)' do
-      let!(:validation) { create(:validation, validation_type: 'equal (integer matcher)', proposal_field: proposal_field, value: 5) }
+      let!(:validation) do
+        create(:validation, validation_type: 'equal (integer matcher)', proposal_field: proposal_field, value: 5)
+      end
 
       context 'when answer is equal to validation value' do
         let(:answer) { create(:answer, proposal: proposal, proposal_field: proposal_field, answer: '5') }
@@ -214,7 +226,9 @@ RSpec.describe ProposalFieldValidationsService, type: :service do
     end
 
     context 'when validation type is equal (float matcher)' do
-      let!(:validation) { create(:validation, validation_type: 'equal (float matcher)', proposal_field: proposal_field, value: 5.0) }
+      let!(:validation) do
+        create(:validation, validation_type: 'equal (float matcher)', proposal_field: proposal_field, value: 5.0)
+      end
 
       context 'when answer is equal to validation value' do
         let(:answer) { create(:answer, proposal: proposal, proposal_field: proposal_field, answer: '5.0') }
@@ -260,7 +274,9 @@ RSpec.describe ProposalFieldValidationsService, type: :service do
       end
 
       context 'when answer has more words than validation value' do
-        let(:answer) { create(:answer, proposal: proposal, proposal_field: proposal_field, answer: 'word word word word word') }
+        let(:answer) do
+          create(:answer, proposal: proposal, proposal_field: proposal_field, answer: 'word word word word word')
+        end
 
         before do
           allow(Answer).to receive(:find_by).and_return(answer)
@@ -274,7 +290,13 @@ RSpec.describe ProposalFieldValidationsService, type: :service do
     end
 
     context 'when validation type is 5-day workshop preferred/Impossible dates' do
-      let!(:validation) { create(:validation, validation_type: '5-day workshop preferred/Impossible dates', proposal_field: proposal_field) }
+      let!(:validation) do
+        create(
+          :validation,
+          validation_type: '5-day workshop preferred/Impossible dates',
+          proposal_field: proposal_field
+        )
+      end
 
       context 'when answer is nil' do
         let(:answer) { nil }
@@ -285,8 +307,18 @@ RSpec.describe ProposalFieldValidationsService, type: :service do
         end
 
         it 'adds error message to @errors' do
-          expect(service.instance_variable_get(:@errors)).to include(service.date_error_message(validation, "You have to choose atleast #{proposal.proposal_type.min_no_of_preferred_dates} preferred dates"))
-          expect(service.instance_variable_get(:@errors)).to include(service.date_error_message(validation,"You have to choose atleast #{proposal.proposal_type.min_no_of_impossible_dates} impossible dates"))
+          expect(service.instance_variable_get(:@errors)).to include(
+            service.date_error_message(
+              validation,
+              "You have to choose atleast #{proposal.proposal_type.min_no_of_preferred_dates} preferred dates"
+            )
+          )
+          expect(service.instance_variable_get(:@errors)).to include(
+            service.date_error_message(
+              validation,
+              "You have to choose atleast #{proposal.proposal_type.min_no_of_impossible_dates} impossible dates"
+            )
+          )
         end
       end
 
@@ -299,7 +331,9 @@ RSpec.describe ProposalFieldValidationsService, type: :service do
         end
 
         it 'adds error message to @errors' do
-          expect(service.instance_variable_get(:@errors)).to include(service.date_error_message(validation, "You can't select the same date twice"))
+          expect(service.instance_variable_get(:@errors)).to include(
+            service.date_error_message(validation, "You can't select the same date twice")
+          )
         end
       end
     end
