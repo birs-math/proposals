@@ -162,9 +162,9 @@ RSpec.describe ProposalFieldValidationsService, type: :service do
     end
 
     context 'when validation type is equal (string matcher)' do
-      let!(:validation) {
+      let!(:validation) do
         create(:validation, validation_type: 'equal (string matcher)', proposal_field: proposal_field, value: 'string')
-      }
+      end do
 
       context 'when answer is equal to validation value' do
         let(:answer) { create(:answer, proposal: proposal, proposal_field: proposal_field, answer: 'string') }
@@ -194,9 +194,9 @@ RSpec.describe ProposalFieldValidationsService, type: :service do
     end
 
     context 'when validation type is equal (integer matcher)' do
-      let!(:validation) {
+      let!(:validation) do
         create(:validation, validation_type: 'equal (integer matcher)', proposal_field: proposal_field, value: 5)
-      }
+      end
 
       context 'when answer is equal to validation value' do
         let(:answer) { create(:answer, proposal: proposal, proposal_field: proposal_field, answer: '5') }
@@ -226,9 +226,9 @@ RSpec.describe ProposalFieldValidationsService, type: :service do
     end
 
     context 'when validation type is equal (float matcher)' do
-      let!(:validation) {
+      let!(:validation) do
         create(:validation, validation_type: 'equal (float matcher)', proposal_field: proposal_field, value: 5.0)
-      }
+      end
 
       context 'when answer is equal to validation value' do
         let(:answer) { create(:answer, proposal: proposal, proposal_field: proposal_field, answer: '5.0') }
