@@ -303,13 +303,12 @@ RSpec.describe ProposalFieldValidationsService, type: :service do
         end
 
         it 'adds error message to @errors' do
-          expect(service.instance_variable_get(:@errors)).to
-            include(service.date_error_message(validation, 
-              "You have to choose atleast #{proposal.proposal_type.min_no_of_preferred_dates} preferred dates")
-            )
-          expect(service.instance_variable_get(:@errors)).to
-            include(service.date_error_message(validation,
-              "You have to choose atleast #{proposal.proposal_type.min_no_of_impossible_dates} impossible dates"))
+          expect(service.instance_variable_get(:@errors)).to include(service.date_error_message(validation, 
+            "You have to choose atleast #{proposal.proposal_type.min_no_of_preferred_dates} preferred dates")
+          )
+          expect(service.instance_variable_get(:@errors)).to include(service.date_error_message(validation,
+            "You have to choose atleast #{proposal.proposal_type.min_no_of_impossible_dates} impossible dates")
+          )
         end
       end
 
