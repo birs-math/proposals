@@ -35,28 +35,10 @@ class SubmitProposalService
   private
 
   def create_or_update(id, value)
-    value = nil if value.instance_of?(Array) && value&.all?(&:blank?)
-    old_errors_count = @errors.flatten.count
-    check_field_validations(id, value)
-    return if any_new_errors?(old_errors_count)
+    check_field_validations(id)
 
-    save_response(id, value)
-  end
-
-  def proposal_locations
-    proposal.locations = Location.where(id: params[:location_ids])
-  end
-
-  def check_field_validations(id, value)
-    field = ProposalField.find(id)
-    return if field.location_id && @proposal.locations.exclude?(field.location)
-
-    @errors << ProposalFieldValidationsService.new(field, proposal, value).validations
-  end
-
-  def save_response(id, value)
     answer = Answer.find_by(proposal_field_id: id, proposal: proposal)
-
+    value = nil if value.instance_of?(Array) && value&.all?(&:blank?)
     if answer
       answer.update(answer: value)
     else
@@ -64,7 +46,16 @@ class SubmitProposalService
     end
   end
 
-  def any_new_errors?(old_errors_count)
-    @errors.flatten.count > old_errors_count
+  def proposal_locations
+    proposal.locations = Location.where(id: params[:location_ids])
+  end
+
+  def check_field_validations(id)
+    return unless @errors.flatten.count.zero?
+
+    field = ProposalField.find(id)
+    return if field.location_id && @proposal.locations.exclude?(field.location)
+
+    @errors << ProposalFieldValidationsService.new(field, proposal).validations
   end
 end
