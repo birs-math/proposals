@@ -130,9 +130,9 @@ RSpec.describe ProposalFieldValidationsService, type: :service do
     end
 
     context 'when validation type is greater than (float matcher)' do
-      let!(:validation) {
+      let!(:validation) do
         create(:validation, validation_type: 'greater than (float matcher)', proposal_field: proposal_field, value: 5.0)
-      }
+      end
 
       context 'when answer is greater than validation value' do
         let(:answer) { create(:answer, proposal: proposal, proposal_field: proposal_field, answer: '6.0') }
