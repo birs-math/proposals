@@ -167,6 +167,8 @@ RSpec.describe ProposalsHelper, type: :helper do
   describe "#confirmed_participants" do
     let(:proposal) { create(:proposal) }
     let(:invites) { create_list(:invite, 2, proposal_id: proposal.id, invited_as: "Organizer", status: "confirmed") }
+    let(:cancelled_invite) { create(:invite, proposal_id: proposal.id, invited_as: "Organizer", status: "cancelled") }
+    let(:declined_invite) { create(:invite, proposal_id: proposal.id, invited_as: "Organizer", status: "declined") }
     it "returns confirmed participants" do
       expect(confirmed_participants(proposal.id, "Organizer")).to eq(invites)
     end

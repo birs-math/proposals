@@ -455,7 +455,7 @@ DEPENDENCIES
   redis (~> 4.0, >= 4.5.1)
   rest-client
   rollbar
-  rspec-rails (~> 4.1.0)
+  rspec-rails
   rubocop-performance
   rubocop-rails
   rubocop-rspec
