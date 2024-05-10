@@ -46,8 +46,14 @@ class ProposalFieldValidationsService
 
   def preferred_impossible_dates_validation(val)
     if @answer.nil?
-      @errors << date_error_message(val, "You have to choose atleast #{proposal.proposal_type.min_no_of_preferred_dates} preferred dates")
-      @errors << date_error_message(val, "You have to choose atleast #{proposal.proposal_type.min_no_of_impossible_dates} impossible dates")
+      @errors << date_error_message(
+        val,
+        "You have to choose atleast #{proposal.proposal_type.min_no_of_preferred_dates} preferred dates"
+      )
+      @errors << date_error_message(
+        val,
+        "You have to choose atleast #{proposal.proposal_type.min_no_of_impossible_dates} impossible dates"
+      )
       return
     end
     preferred = JSON.parse(@answer)&.first(5)
@@ -55,18 +61,35 @@ class ProposalFieldValidationsService
     preferred_dates = preferred.reject { |date| date == '' }
     impossible_dates = impossible.reject { |date| date == '' }
     uniq_dates = JSON.parse(@answer).reject { |date| date == '' }
-    @errors << date_error_message(val, "You can't select the same date twice") unless uniq_dates.uniq.count == uniq_dates.count
+    if uniq_dates.uniq.count != uniq_dates.count
+      @errors << date_error_message(
+        val,
+        "You can't select the same date twice"
+      )
+    end
     if preferred_dates.count > proposal.proposal_type.max_no_of_preferred_dates
-      @errors << date_error_message(val, "You can choose maximum #{proposal.proposal_type.max_no_of_preferred_dates} preferred dates")
+      @errors << date_error_message(
+        val,
+        "You can choose maximum #{proposal.proposal_type.max_no_of_preferred_dates} preferred dates"
+      )
     end
     if preferred_dates.count < proposal.proposal_type.min_no_of_preferred_dates
-      @errors << date_error_message(val, "You have to choose atleast #{proposal.proposal_type.min_no_of_preferred_dates} preferred dates")
+      @errors << date_error_message(
+        val,
+        "You have to choose atleast #{proposal.proposal_type.min_no_of_preferred_dates} preferred dates"
+      )
     end
     if impossible_dates.count > proposal.proposal_type.max_no_of_impossible_dates
-      @errors << date_error_message(val, "You can choose maximum #{proposal.proposal_type.max_no_of_impossible_dates} impossible dates")
+      @errors << date_error_message(
+        val,
+        "You can choose maximum #{proposal.proposal_type.max_no_of_impossible_dates} impossible dates"
+      )
     end
     if impossible_dates.count < proposal.proposal_type.min_no_of_impossible_dates
-      @errors << date_error_message(val, "You have to choose atleast #{proposal.proposal_type.min_no_of_impossible_dates} impossible dates")
+      @errors << date_error_message(
+        val,
+        "You have to choose atleast #{proposal.proposal_type.min_no_of_impossible_dates} impossible dates"
+      )
     end
   end
   def attached_file
