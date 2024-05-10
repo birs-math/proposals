@@ -136,6 +136,26 @@ RSpec.describe ProposalFiltersQuery do
       end
     end
 
+    describe '#proposal_type_id' do
+      context 'when 5 Day Workshop' do
+        let(:params) { { proposal_type_id: five_day_workshop.id } }
+
+        it { expect(query.count).to eq(4) }
+      end
+
+      context 'when 2 Day Workshop' do
+        let(:params) { { proposal_type_id: two_day_workshop.id } }
+
+        it { expect(query.count).to eq(2) }
+      end
+
+      context 'when empty' do
+        let(:params) { { proposal_type_id: '' } }
+
+        it { expect(query.count).to eq(Proposal.count) }
+      end
+    end
+
     describe '#subject_area' do
       context 'when first subject' do
         let(:params) { { subject_area: [first_subject.id] } }
