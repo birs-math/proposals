@@ -35,7 +35,7 @@ class SubmitProposalService
   private
 
   def create_or_update(id, value)
-    check_field_validations(id)
+    check_field_validations(id) if final?
 
     answer = Answer.find_by(proposal_field_id: id, proposal: proposal)
     value = nil if value.instance_of?(Array) && value&.all?(&:blank?)
