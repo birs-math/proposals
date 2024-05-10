@@ -258,10 +258,14 @@ RSpec.describe ProposalFieldValidationsService, type: :service do
     end
 
     context 'when validation type is words limit' do
-      let!(:validation) { create(:validation, validation_type: 'words limit', proposal_field: proposal_field, value: 4) }
+      let!(:validation) do
+        create(:validation, validation_type: 'words limit', proposal_field: proposal_field, value: 4)
+      end
 
       context 'when answer has less words than validation value' do
-        let(:answer) { create(:answer, proposal: proposal, proposal_field: proposal_field, answer: 'word word word word') }
+        let(:answer) do
+          create(:answer, proposal: proposal, proposal_field: proposal_field, answer: 'word word word word')
+        end
 
         before do
           allow(Answer).to receive(:find_by).and_return(answer)
@@ -323,7 +327,9 @@ RSpec.describe ProposalFieldValidationsService, type: :service do
       end
 
       context 'when answer is not nil' do
-        let(:answer) { create(:answer, proposal: proposal, proposal_field: proposal_field, answer: '["date1", "date1"]') }
+        let(:answer) do
+          create(:answer, proposal: proposal, proposal_field: proposal_field, answer: '["date1", "date1"]')
+        end
 
         before do
           allow(Answer).to receive(:find_by).and_return(answer)
