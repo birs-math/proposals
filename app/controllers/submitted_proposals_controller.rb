@@ -261,7 +261,8 @@ class SubmittedProposalsController < ApplicationController
   end
 
   def query_params
-    params.permit(:workshop_year, :keywords, :proposal_type, :location, :outcome, status: [], subject_area: [])
+    params.permit(:workshop_year, :keywords, :proposal_type_id, :proposal_type, :location, :outcome,
+                  status: [], subject_area: [])
   end
 
   def demographic_data_params

@@ -12,6 +12,7 @@ class ProposalFiltersQuery
     @result = filter_by_workshop_year(params[:workshop_year])
     @result = filter_by_subject_area(params[:subject_area])
     @result = filter_by_proposal_type(params[:proposal_type])
+    @result = filter_by_proposal_type_id(params[:proposal_type_id])
     @result = filter_by_status(params[:status])
     @result = filter_by_location(params[:location])
     @result = filter_by_outcome(params[:outcome])
@@ -49,6 +50,12 @@ class ProposalFiltersQuery
     end
 
     @result.joins(:proposal_type).where(proposal_type: { name: proposal_type })
+  end
+
+  def filter_by_proposal_type_id(proposal_type_id)
+    return @result if proposal_type_id.blank?
+
+    @result.where(proposal_type_id: proposal_type_id)
   end
 
   def filter_by_status(statuses)
