@@ -46,6 +46,10 @@
                   <label class="form-label">Outcome</label><br>
                   <%= select_tag "outcome", options_for_select(proposal_outcome, params[:outcome]), { include_blank: '', class: 'form-select p-1' }%>
                 </div>
+                <div class="col-xs-6 col-lg-3">
+                  <label class="form-label">Proposal type</label><br>
+                  <%= select_tag :proposal_type_id, options_for_select(all_proposal_types, params[:proposal_type_id]), { include_blank: '', class: 'form-select p-1', multiple: false } %>
+                </div>
               </div>
             </form>
           </div>
