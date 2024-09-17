@@ -194,8 +194,8 @@ class ProposalsController < ApplicationController
 
   def generate_file
     @year = @proposal&.year || (Date.current.year.to_i + 2)
-    #version = @proposal.answers.maximum(:version).to_i
-    #@proposal_pdf = ProposalPdfService.new(@proposal.id, latex_temp_file, 'all', current_user, version)
+    # version = @proposal.answers.maximum(:version).to_i
+    # @proposal_pdf = ProposalPdfService.new(@proposal.id, latex_temp_file, 'all', current_user, version)
     @proposal_pdf = ProposalPdfService.new(@proposal.id, latex_temp_file, 'all', current_user)
                                       .generate_latex_file
     @latex_infile = @proposal_pdf.to_s
