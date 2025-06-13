@@ -23,6 +23,7 @@ class Invite < ApplicationRecord
   default_scope { order(created_at: :asc) }
   scope :organizer, -> { where(invited_as: 'Organizer') }
   scope :participant, -> { where(invited_as: 'Participant') }
+  scope :active, -> { where(status: ['pending', 'confirmed']) }
 
   enum status: { pending: 0, confirmed: 1, cancelled: 2, declined: 3 }
   enum response: { yes: 0, maybe: 1, no: 2 }

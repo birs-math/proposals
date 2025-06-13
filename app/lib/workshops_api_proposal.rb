@@ -97,7 +97,7 @@ class WorkshopsApiProposal
       person: person_data(@proposal.lead_organizer)
     }]
 
-    @proposal.invites.confirmed.find_each do |invite|
+    @proposal.invites.active.find_each do |invite|
       next if invite.person.blank?
 
       members << {
