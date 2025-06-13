@@ -50,9 +50,9 @@ RUN /usr/local/rvm/bin/rvm-exec 2.7.7 gem install bundler -v 2.4.22
 RUN bundle install --jobs=3 --retry=3
 RUN chown app:app -R /usr/local/rvm/gems
 
-RUN yarn install
-RUN chown app:app -R /home/app/proposals/node_modules
-RUN chmod -R 755 /home/app/proposals/node_modules
+# RUN yarn install --network-timeout 100000 --network-concurrency 1
+# RUN chown app:app -R /home/app/proposals/node_modules
+# RUN chmod -R 755 /home/app/proposals/node_modules
 
 RUN echo "disable-ipv6" >> ~/.gnupg/dirmngr.conf
 EXPOSE 80 443
