@@ -80,4 +80,19 @@ module SubmittedProposalsHelper
     @scientific_reviews_count ||= Review.unscoped.scientific.where(proposal: @proposals).group(:proposal_id).count
     @scientific_reviews_count[proposal_id] || 0
   end
+
+  def invite_status_color(status)
+    case status.to_s.downcase
+    when 'pending'
+      'warning'
+    when 'confirmed'
+      'success'
+    when 'declined'
+      'danger'
+    when 'cancelled'
+      'secondary'
+    else
+      'light'
+    end
+  end
 end

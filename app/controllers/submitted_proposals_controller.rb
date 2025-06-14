@@ -254,6 +254,43 @@ class SubmittedProposalsController < ApplicationController
     )
   end
 
+  def bulk_manage_invitations
+    @proposal_ids = params[:ids]&.split(',') || []
+    @proposals = Proposal.where(id: @proposal_ids).includes(:invites)
+    
+    # Get all invites for selected proposals
+    @invites = Invite.joins(:proposal)
+                    .where(proposal_id: @proposal_ids)
+                    .includes(:proposal, :person)
+                    .order('proposals.code, people.family_name, people.given_name')
+  end
+
+  def bulk_update_invitations
+    return head :unprocessable_entity if params[:invite_ids].blank?
+
+    invite_ids = params[:invite_ids].split(',')
+    action = params[:bulk_action]
+
+    case action
+    when 'confirm'
+      Invite.where(id: invite_ids).each(&:confirm!)
+      message = "#{invite_ids.count} invitations confirmed successfully"
+    when 'decline'
+      Invite.where(id: invite_ids).each(&:decline!)
+      message = "#{invite_ids.count} invitations declined successfully"
+    when 'cancel'
+      Invite.where(id: invite_ids).each(&:cancel!)
+      message = "#{invite_ids.count} invitations cancelled successfully"
+    else
+      return head :unprocessable_entity
+    end
+
+    respond_to do |format|
+      format.json { render json: { message: message } }
+      format.html { redirect_to submitted_proposals_path, notice: message }
+    end
+  end
+
   private
 
   def proposals_query_with_filters(params = query_params)

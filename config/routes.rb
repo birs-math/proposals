@@ -34,6 +34,8 @@ Rails.application.routes.draw do
       get :reviews_excel_booklet
       post :proposal_outcome_location
       get :demographic_data
+      get :bulk_manage_invitations
+      post :bulk_update_invitations
     end
     member do
       post :update_status
