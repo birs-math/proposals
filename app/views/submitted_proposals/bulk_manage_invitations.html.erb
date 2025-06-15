@@ -184,28 +184,42 @@
                     </div>
                     <div class="card-body">
                       <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-8">
                           <div class="form-group">
-                            <%= form.label :bulk_action, "Action to perform:", class: "form-label" %>
-                            <%= form.select :bulk_action, [
-                              ['Confirm Selected Invitations', 'confirm'],
-                              ['Decline Selected Invitations', 'decline'],
-                              ['Cancel Selected Invitations', 'cancel']
-                            ], { prompt: 'Select an action...' }, { class: "form-select", required: true } %>
+                            <label class="form-label">Choose action for selected invitations:</label>
+                            <div class="btn-group-vertical d-grid gap-2 mt-2" role="group">
+                              <input type="radio" class="btn-check" name="bulk_action" id="confirm_action" value="confirm" autocomplete="off">
+                              <label class="btn btn-outline-success text-start" for="confirm_action">
+                                <i class="fas fa-check me-2"></i> Confirm Selected Invitations
+                              </label>
+                              
+                              <input type="radio" class="btn-check" name="bulk_action" id="decline_action" value="decline" autocomplete="off">
+                              <label class="btn btn-outline-danger text-start" for="decline_action">
+                                <i class="fas fa-times me-2"></i> Decline Selected Invitations
+                              </label>
+                              
+                              <input type="radio" class="btn-check" name="bulk_action" id="cancel_action" value="cancel" autocomplete="off">
+                              <label class="btn btn-outline-secondary text-start" for="cancel_action">
+                                <i class="fas fa-ban me-2"></i> Cancel Selected Invitations
+                              </label>
+                            </div>
                           </div>
                         </div>
-                        <div class="col-md-6 d-flex align-items-end">
-                          <div class="btn-group w-100">
-                            <%= form.submit "Apply Action", class: "btn btn-primary", 
-                                onclick: "return confirmBulkAction()", disabled: true, id: "apply-action-btn" %>
-                            <%= link_to "Cancel", submitted_proposals_path, class: "btn btn-secondary" %>
+                        <div class="col-md-4 d-flex align-items-center">
+                          <div class="d-grid gap-2 w-100">
+                            <button type="submit" class="btn btn-primary btn-lg" disabled id="apply-action-btn" onclick="return confirmBulkAction()">
+                              <i class="fas fa-play me-2"></i> Apply Action
+                            </button>
+                            <%= link_to submitted_proposals_path, class: "btn btn-outline-secondary" do %>
+                              <i class="fas fa-arrow-left me-2"></i> Back to Proposals
+                            <% end %>
                           </div>
                         </div>
                       </div>
                       
                       <div class="alert alert-info mt-3">
                         <i class="fas fa-info-circle"></i>
-                        <strong>Note:</strong> Select invitations using the checkboxes above, then choose an action to apply to all selected invitations.
+                        <strong>Quick Actions:</strong> Select invitations above, choose an action with one click, then apply.
                       </div>
                     </div>
                   </div>
@@ -252,7 +266,10 @@ function updateSelection() {
   
   document.getElementById('selected-invite-ids').value = selectedIds.join(',');
   document.getElementById('selection-count').textContent = count + ' selected';
-  document.getElementById('apply-action-btn').disabled = count === 0;
+  
+  // Enable apply button only if both invitations are selected AND an action is chosen
+  const selectedAction = document.querySelector('input[name="bulk_action"]:checked');
+  document.getElementById('apply-action-btn').disabled = count === 0 || !selectedAction;
   
   // Update select all checkbox state
   const allCheckboxes = document.querySelectorAll('.invite-checkbox');
@@ -316,7 +333,7 @@ function selectDeclined() {
 
 function confirmBulkAction() {
   const selectedCount = document.querySelectorAll('.invite-checkbox:checked').length;
-  const actionElement = document.getElementById('bulk_action');
+  const actionElement = document.querySelector('input[name="bulk_action"]:checked');
   const action = actionElement ? actionElement.value : null;
   
   if (selectedCount === 0) {
@@ -329,12 +346,19 @@ function confirmBulkAction() {
     return false;
   }
   
-  return confirm(`Are you sure you want to ${action} ${selectedCount} invitation(s)?`);
+  const actionText = actionElement.nextElementSibling.textContent.trim().replace(/.*?\s/, '');
+  return confirm(`Are you sure you want to ${actionText.toLowerCase()}?\n\nThis will affect ${selectedCount} invitation(s).`);
 }
 
 // Initialize selection state on page load
 document.addEventListener('DOMContentLoaded', function() {
   updateSelection();
+  
+  // Add event listeners to radio buttons to enable/disable apply button
+  const radioButtons = document.querySelectorAll('input[name="bulk_action"]');
+  radioButtons.forEach(radio => {
+    radio.addEventListener('change', updateSelection);
+  });
   
   // Handle AJAX form submission
   const form = document.getElementById('bulk-invitations-form');
