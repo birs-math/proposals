@@ -270,6 +270,9 @@ class SubmittedProposalsController < ApplicationController
 
     invite_ids = params[:invite_ids].split(',')
     action = params[:bulk_action]
+    
+    # Get proposal IDs for redirect
+    @proposal_ids = Invite.where(id: invite_ids).pluck(:proposal_id).uniq
 
     case action
     when 'confirm'
@@ -295,8 +298,8 @@ class SubmittedProposalsController < ApplicationController
     end
 
     respond_to do |format|
-      format.json { render json: { message: message } }
-      format.html { redirect_to submitted_proposals_path, notice: message }
+      format.json { render json: { message: message, status: 'success' } }
+      format.html { redirect_to bulk_manage_invitations_submitted_proposals_path(ids: @proposal_ids.join(',')), notice: message }
     end
   end
 

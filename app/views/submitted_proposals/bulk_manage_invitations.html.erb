@@ -67,7 +67,7 @@
               </div>
             </div>
 
-            <%= form_with url: bulk_update_invitations_submitted_proposals_path, method: :post, local: true, id: "bulk-invitations-form" do |form| %>
+            <%= form_with url: bulk_update_invitations_submitted_proposals_path, method: :post, local: false, id: "bulk-invitations-form" do |form| %>
               <%= form.hidden_field :invite_ids, id: "selected-invite-ids" %>
               
               <!-- Smart Bulk Actions -->
@@ -289,6 +289,28 @@ function confirmBulkAction() {
 // Initialize selection state on page load
 document.addEventListener('DOMContentLoaded', function() {
   updateSelection();
+  
+  // Handle AJAX form submission
+  const form = document.getElementById('bulk-invitations-form');
+  if (form) {
+    form.addEventListener('ajax:success', function(event) {
+      const response = event.detail[0];
+      if (response.message) {
+        // Show success message
+        toastr.success(response.message);
+        
+        // Refresh the page content to show updated statuses
+        setTimeout(function() {
+          window.location.reload();
+        }, 1500);
+      }
+    });
+    
+    form.addEventListener('ajax:error', function(event) {
+      const response = event.detail[0];
+      toastr.error('Error updating invitations: ' + (response.message || 'Unknown error'));
+    });
+  }
 });
 </script>
 
