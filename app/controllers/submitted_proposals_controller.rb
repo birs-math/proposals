@@ -273,13 +273,22 @@ class SubmittedProposalsController < ApplicationController
 
     case action
     when 'confirm'
-      Invite.where(id: invite_ids).each(&:confirmed!)
+      Invite.where(id: invite_ids).each do |invite|
+        invite.skip_deadline_validation = true
+        invite.confirmed!
+      end
       message = "#{invite_ids.count} invitations confirmed successfully"
     when 'decline'
-      Invite.where(id: invite_ids).each(&:declined!)
+      Invite.where(id: invite_ids).each do |invite|
+        invite.skip_deadline_validation = true
+        invite.declined!
+      end
       message = "#{invite_ids.count} invitations declined successfully"
     when 'cancel'
-      Invite.where(id: invite_ids).each(&:cancelled!)
+      Invite.where(id: invite_ids).each do |invite|
+        invite.skip_deadline_validation = true
+        invite.cancelled!
+      end
       message = "#{invite_ids.count} invitations cancelled successfully"
     else
       return head :unprocessable_entity

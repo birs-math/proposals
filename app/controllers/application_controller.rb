@@ -39,7 +39,7 @@ class ApplicationController < ActionController::Base
   def record_invalid
     respond_to do |format|
       format.js { render json: { errors: [I18n.t('errors.messages.something_went_wrong')] }, status: 404 }
-      format.html { redirect_to :back, alert: I18n.t('errors.messages.something_went_wrong') }
+      format.html { redirect_back(fallback_location: root_path, alert: I18n.t('errors.messages.something_went_wrong')) }
     end
   end
 end
