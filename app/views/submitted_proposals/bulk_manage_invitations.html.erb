@@ -50,27 +50,27 @@
                   </li>
                   <li class="nav-item" role="presentation">
                     <button class="nav-link" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending-invites" type="button" role="tab">
-                      <span class="badge bg-warning">Pending</span> (<%= @invites.pending.count %>)
+                      <span class="badge bg-warning text-dark">Pending</span> (<%= @invites.pending.count %>)
                     </button>
                   </li>
                   <li class="nav-item" role="presentation">
                     <button class="nav-link" id="confirmed-tab" data-bs-toggle="tab" data-bs-target="#confirmed-invites" type="button" role="tab">
-                      <span class="badge bg-success">Confirmed</span> (<%= @invites.confirmed.count %>)
+                      <span class="badge bg-success text-white">Confirmed</span> (<%= @invites.confirmed.count %>)
                     </button>
                   </li>
                   <li class="nav-item" role="presentation">
                     <button class="nav-link" id="cancelled-tab" data-bs-toggle="tab" data-bs-target="#cancelled-invites" type="button" role="tab">
-                      <span class="badge bg-secondary">Cancelled</span> (<%= @invites.cancelled.count %>)
+                      <span class="badge bg-secondary text-white">Cancelled</span> (<%= @invites.cancelled.count %>)
                     </button>
                   </li>
                   <li class="nav-item" role="presentation">
                     <button class="nav-link" id="declined-tab" data-bs-toggle="tab" data-bs-target="#declined-invites" type="button" role="tab">
-                      <span class="badge bg-dark">Declined</span> (<%= @invites.declined.count %>)
+                      <span class="badge bg-danger text-white">Declined</span> (<%= @invites.declined.count %>)
                     </button>
                   </li>
                   <li class="nav-item" role="presentation">
                     <button class="nav-link" id="expired-tab" data-bs-toggle="tab" data-bs-target="#expired-invites" type="button" role="tab">
-                      <span class="badge bg-danger">Expired</span> (<%= @invites.where('invites.deadline_date < ? AND invites.status = ?', Date.current, 0).count %>)
+                      <span class="badge bg-dark text-white">Expired</span> (<%= @invites.where('invites.deadline_date < ? AND invites.status = ?', Date.current, 0).count %>)
                     </button>
                   </li>
                 </ul>
@@ -92,10 +92,7 @@
                     </button>
                   </div>
                   <div class="btn-group" role="group">
-                    <button type="button" class="btn btn-sm btn-warning" onclick="selectExpired()">
-                      <i class="fas fa-clock"></i> Select Expired
-                    </button>
-                    <button type="button" class="btn btn-sm btn-info" onclick="selectPending()">
+                    <button type="button" class="btn btn-sm btn-warning text-dark" onclick="selectPending()">
                       <i class="fas fa-hourglass-half"></i> Select Pending
                     </button>
                     <button type="button" class="btn btn-sm btn-success" onclick="selectConfirmed()">
@@ -104,8 +101,11 @@
                     <button type="button" class="btn btn-sm btn-secondary" onclick="selectCancelled()">
                       <i class="fas fa-ban"></i> Select Cancelled
                     </button>
-                    <button type="button" class="btn btn-sm btn-dark" onclick="selectDeclined()">
+                    <button type="button" class="btn btn-sm btn-danger" onclick="selectDeclined()">
                       <i class="fas fa-times"></i> Select Declined
+                    </button>
+                    <button type="button" class="btn btn-sm btn-dark" onclick="selectExpired()">
+                      <i class="fas fa-clock"></i> Select Expired
                     </button>
                   </div>
                 </div>
@@ -361,6 +361,23 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <style>
+/* Ensure consistent text colors for badges */
+.badge.bg-warning { 
+  color: #000 !important; /* Dark text on yellow background */
+}
+.badge.bg-success,
+.badge.bg-secondary, 
+.badge.bg-danger,
+.badge.bg-dark {
+  color: #fff !important; /* White text on dark backgrounds */
+}
+
+/* Expired invitation rows */
+.table-danger {
+  background-color: rgba(220, 53, 69, 0.1) !important;
+}
+
+/* Status-specific row highlighting */
 .invite-status-pending { background-color: #ffc107; }
 .invite-status-confirmed { background-color: #28a745; }
 .invite-status-declined { background-color: #dc3545; }

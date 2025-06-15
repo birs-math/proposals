@@ -87,10 +87,10 @@ module SubmittedProposalsHelper
       'warning'
     when 'confirmed'
       'success'
-    when 'declined'
-      'danger'
     when 'cancelled'
       'secondary'
+    when 'declined'
+      'danger'
     else
       'light'
     end
