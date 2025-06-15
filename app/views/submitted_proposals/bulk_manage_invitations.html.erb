@@ -50,17 +50,17 @@
                   </li>
                   <li class="nav-item" role="presentation">
                     <button class="nav-link" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending-invites" type="button" role="tab">
-                      <span class="badge bg-warning">Pending</span> (<%= @invites.where(status: 'pending').count %>)
+                      <span class="badge bg-warning">Pending</span> (<%= @invites.where('invites.status = ?', 'pending').count %>)
                     </button>
                   </li>
                   <li class="nav-item" role="presentation">
                     <button class="nav-link" id="confirmed-tab" data-bs-toggle="tab" data-bs-target="#confirmed-invites" type="button" role="tab">
-                      <span class="badge bg-success">Confirmed</span> (<%= @invites.where(status: 'confirmed').count %>)
+                      <span class="badge bg-success">Confirmed</span> (<%= @invites.where('invites.status = ?', 'confirmed').count %>)
                     </button>
                   </li>
                   <li class="nav-item" role="presentation">
                     <button class="nav-link" id="expired-tab" data-bs-toggle="tab" data-bs-target="#expired-invites" type="button" role="tab">
-                      <span class="badge bg-danger">Expired</span> (<%= @invites.where('deadline_date < ? AND status = ?', Date.current, 'pending').count %>)
+                      <span class="badge bg-danger">Expired</span> (<%= @invites.where('invites.deadline_date < ? AND invites.status = ?', Date.current, 'pending').count %>)
                     </button>
                   </li>
                 </ul>
