@@ -59,6 +59,16 @@
                     </button>
                   </li>
                   <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="cancelled-tab" data-bs-toggle="tab" data-bs-target="#cancelled-invites" type="button" role="tab">
+                      <span class="badge bg-secondary">Cancelled</span> (<%= @invites.cancelled.count %>)
+                    </button>
+                  </li>
+                  <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="declined-tab" data-bs-toggle="tab" data-bs-target="#declined-invites" type="button" role="tab">
+                      <span class="badge bg-dark">Declined</span> (<%= @invites.declined.count %>)
+                    </button>
+                  </li>
+                  <li class="nav-item" role="presentation">
                     <button class="nav-link" id="expired-tab" data-bs-toggle="tab" data-bs-target="#expired-invites" type="button" role="tab">
                       <span class="badge bg-danger">Expired</span> (<%= @invites.where('invites.deadline_date < ? AND invites.status = ?', Date.current, 0).count %>)
                     </button>
@@ -87,6 +97,15 @@
                     </button>
                     <button type="button" class="btn btn-sm btn-info" onclick="selectPending()">
                       <i class="fas fa-hourglass-half"></i> Select Pending
+                    </button>
+                    <button type="button" class="btn btn-sm btn-success" onclick="selectConfirmed()">
+                      <i class="fas fa-check"></i> Select Confirmed
+                    </button>
+                    <button type="button" class="btn btn-sm btn-secondary" onclick="selectCancelled()">
+                      <i class="fas fa-ban"></i> Select Cancelled
+                    </button>
+                    <button type="button" class="btn btn-sm btn-dark" onclick="selectDeclined()">
+                      <i class="fas fa-times"></i> Select Declined
                     </button>
                   </div>
                 </div>
@@ -262,6 +281,33 @@ function selectExpired() {
 function selectPending() {
   const pendingRows = document.querySelectorAll('tr[data-status="pending"]');
   pendingRows.forEach(row => {
+    const checkbox = row.querySelector('.invite-checkbox');
+    if (checkbox) checkbox.checked = true;
+  });
+  updateSelection();
+}
+
+function selectConfirmed() {
+  const confirmedRows = document.querySelectorAll('tr[data-status="confirmed"]');
+  confirmedRows.forEach(row => {
+    const checkbox = row.querySelector('.invite-checkbox');
+    if (checkbox) checkbox.checked = true;
+  });
+  updateSelection();
+}
+
+function selectCancelled() {
+  const cancelledRows = document.querySelectorAll('tr[data-status="cancelled"]');
+  cancelledRows.forEach(row => {
+    const checkbox = row.querySelector('.invite-checkbox');
+    if (checkbox) checkbox.checked = true;
+  });
+  updateSelection();
+}
+
+function selectDeclined() {
+  const declinedRows = document.querySelectorAll('tr[data-status="declined"]');
+  declinedRows.forEach(row => {
     const checkbox = row.querySelector('.invite-checkbox');
     if (checkbox) checkbox.checked = true;
   });
