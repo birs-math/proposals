@@ -273,13 +273,13 @@ class SubmittedProposalsController < ApplicationController
 
     case action
     when 'confirm'
-      Invite.where(id: invite_ids).each(&:confirm!)
+      Invite.where(id: invite_ids).each(&:confirmed!)
       message = "#{invite_ids.count} invitations confirmed successfully"
     when 'decline'
-      Invite.where(id: invite_ids).each(&:decline!)
+      Invite.where(id: invite_ids).each(&:declined!)
       message = "#{invite_ids.count} invitations declined successfully"
     when 'cancel'
-      Invite.where(id: invite_ids).each(&:cancel!)
+      Invite.where(id: invite_ids).each(&:cancelled!)
       message = "#{invite_ids.count} invitations cancelled successfully"
     else
       return head :unprocessable_entity
