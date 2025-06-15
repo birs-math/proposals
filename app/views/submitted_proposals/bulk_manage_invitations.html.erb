@@ -270,7 +270,8 @@ function selectPending() {
 
 function confirmBulkAction() {
   const selectedCount = document.querySelectorAll('.invite-checkbox:checked').length;
-  const action = document.getElementById('bulk_manage_invitations_bulk_action').value;
+  const actionElement = document.getElementById('bulk_action');
+  const action = actionElement ? actionElement.value : null;
   
   if (selectedCount === 0) {
     alert('Please select at least one invitation.');
