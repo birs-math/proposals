@@ -18,17 +18,19 @@ export default class extends Controller {
   }
 
   proposalsByTypeCheckbox() {
-    return $(`input[data-type="${event.currentTarget.dataset.type}"]:checkbox`)
+    const type = event.currentTarget.dataset.type;
+    return document.querySelectorAll(`input[data-type="${type}"][type="checkbox"]`);
   }
 
   proposalsByTypeCheckboxChecked(type = event.currentTarget.dataset.type) {
-    return $(`input[data-type="${type}"]:checked`)
+    return document.querySelectorAll(`input[data-type="${type}"][type="checkbox"]:checked`);
   }
 
   editFlow() {
     var proposalIds = [];
-    this.proposalsByTypeCheckboxChecked().each(function() {
-      proposalIds.push(this.dataset.value);
+    const checkboxes = this.proposalsByTypeCheckboxChecked();
+    checkboxes.forEach(function(checkbox) {
+      proposalIds.push(checkbox.dataset.value);
     });
     if(typeof proposalIds[0] === "undefined")
     {
@@ -76,8 +78,9 @@ export default class extends Controller {
     event.preventDefault()
 
     var proposalIds = [];
-    this.proposalsByTypeCheckboxChecked().each(function() {
-      proposalIds.push(this.dataset.value);
+    const checkboxes = this.proposalsByTypeCheckboxChecked();
+    checkboxes.forEach(function(checkbox) {
+      proposalIds.push(checkbox.dataset.value);
     });
     if(typeof proposalIds[0] === "undefined")
     {
@@ -153,8 +156,9 @@ export default class extends Controller {
       this.tocTarget.checked = true;
     }
     var proposalIds = [];
-    this.proposalsByTypeCheckboxChecked().each(function() {
-      proposalIds.push(this.dataset.value);
+    const checkboxes = this.proposalsByTypeCheckboxChecked();
+    checkboxes.forEach(function(checkbox) {
+      proposalIds.push(checkbox.dataset.value);
     });
     if(typeof proposalIds[0] === "undefined")
     {
@@ -256,25 +260,22 @@ export default class extends Controller {
   }
 
   selectAllProposals() {
-    let getId = ''
-    this.proposalsByTypeCheckbox().each(function(){
-      getId = document.getElementById(this.id)
-      getId.checked = true
+    const checkboxes = this.proposalsByTypeCheckbox();
+    checkboxes.forEach(function(checkbox){
+      checkbox.checked = true;
     });
   }
 
   unselectAllProposals() {
-    let getId = ''
-    this.proposalsByTypeCheckbox().each(function(){
-      getId = document.getElementById(this.id)
-      getId.checked = false
+    const checkboxes = this.proposalsByTypeCheckbox();
+    checkboxes.forEach(function(checkbox){
+      checkbox.checked = false;
     });
   }
 
   invertSelectedProposals() {
-    let checkbox = ''
-    this.proposalsByTypeCheckbox().each(function(){
-      checkbox = document.getElementById(this.id)
+    const checkboxes = this.proposalsByTypeCheckbox();
+    checkboxes.forEach(function(checkbox){
       if(checkbox.checked) {
         checkbox.checked = false
       } else {
@@ -285,8 +286,9 @@ export default class extends Controller {
 
   downloadCSV() {
     var proposalIds = [];
-    this.proposalsByTypeCheckboxChecked().each(function() {
-      proposalIds.push(this.dataset.value);
+    const checkboxes = this.proposalsByTypeCheckboxChecked();
+    checkboxes.forEach(function(checkbox) {
+      proposalIds.push(checkbox.dataset.value);
     });
     if(typeof proposalIds[0] === "undefined")
     {
@@ -300,8 +302,9 @@ export default class extends Controller {
 
   workshop() {
     var proposalIds = [];
-    this.proposalsByTypeCheckboxChecked().each(function() {
-      proposalIds.push(this.dataset.value);
+    const checkboxes = this.proposalsByTypeCheckboxChecked();
+    checkboxes.forEach(function(checkbox) {
+      proposalIds.push(checkbox.dataset.value);
     });
     if(typeof proposalIds[0] === "undefined")
     {
@@ -325,8 +328,9 @@ export default class extends Controller {
 
   importReviews() {
     var proposalIds = [];
-    this.proposalsByTypeCheckboxChecked().each(function() {
-      proposalIds.push(this.dataset.value);
+    const checkboxes = this.proposalsByTypeCheckboxChecked();
+    checkboxes.forEach(function(checkbox) {
+      proposalIds.push(checkbox.dataset.value);
     });
     if(typeof proposalIds[0] === "undefined")
     {
@@ -348,8 +352,9 @@ export default class extends Controller {
       this.reviewTocTarget.checked = true;
     }
     var proposalIds = [];
-    this.proposalsByTypeCheckboxChecked().each(function() {
-      proposalIds.push(this.dataset.value);
+    const checkboxes = this.proposalsByTypeCheckboxChecked();
+    checkboxes.forEach(function(checkbox) {
+      proposalIds.push(checkbox.dataset.value);
     });
     if(typeof proposalIds[0] === "undefined")
     {
@@ -446,8 +451,9 @@ export default class extends Controller {
 
   reviewsExcelBooklet() {
     var proposalIds = [];
-    this.proposalsByTypeCheckboxChecked().each(function() {
-      proposalIds.push(this.dataset.value);
+    const checkboxes = this.proposalsByTypeCheckboxChecked();
+    checkboxes.forEach(function(checkbox) {
+      proposalIds.push(checkbox.dataset.value);
     });
     if(typeof proposalIds[0] === "undefined")
     {
@@ -482,8 +488,9 @@ export default class extends Controller {
 
   outcomeLocationModal() {
    var proposalIds = [];
-    this.proposalsByTypeCheckboxChecked().each(function() {
-      proposalIds.push(this.dataset.value);
+    const checkboxes = this.proposalsByTypeCheckboxChecked();
+    checkboxes.forEach(function(checkbox) {
+      proposalIds.push(checkbox.dataset.value);
     });
     if(typeof proposalIds[0] === "undefined")
     {
@@ -497,8 +504,9 @@ export default class extends Controller {
 
   bulkManageInvitations() {
     var proposalIds = [];
-    this.proposalsByTypeCheckboxChecked().each(function() {
-      proposalIds.push(this.dataset.value);
+    const checkboxes = this.proposalsByTypeCheckboxChecked();
+    checkboxes.forEach(function(checkbox) {
+      proposalIds.push(checkbox.dataset.value);
     });
     if(typeof proposalIds[0] === "undefined")
     {
