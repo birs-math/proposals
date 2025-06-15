@@ -1,6 +1,7 @@
 <% content_for :title, "Bulk Manage Invitations" %>
 
 <div class="container-fluid">
+  <!-- Blue Header Section -->
   <div class="row">
     <div class="col-12">
       <div class="card">
@@ -15,9 +16,16 @@
             <% end %>
           </p>
         </div>
-        
-        <div class="card-body">
-          <!-- Flash Messages Section - In White Card Body Area -->
+      </div>
+    </div>
+  </div>
+
+  <!-- White Content Area - Moved 100px down -->
+  <div class="row" style="margin-top: 100px;">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body bg-white">
+          <!-- Flash Messages Section - In White Content Area -->
           <% if notice %>
             <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
               <i class="fas fa-check-circle"></i> <%= notice %>
