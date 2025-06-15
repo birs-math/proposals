@@ -6,13 +6,13 @@
     <div class="col-12">
       <div class="card">
         <div class="card-header bg-primary text-white">
-          <h4 class="card-title mb-0">
+          <h4 class="card-title mb-0 text-white">
             <i class="fas fa-users-cog"></i> Bulk Manage Invitations
           </h4>
-          <p class="card-subtitle mb-0 mt-2">
+          <p class="card-subtitle mb-0 mt-2 text-white">
             Manage invitations for <%= pluralize(@proposals.count, 'proposal') %>
             <% if @proposals.any? %>
-              - Codes: <%= @proposals.limit(3).pluck(:code).join(', ') %><%= ', ...' if @proposals.count > 3 %>
+              - Codes: <%= @proposals.distinct.limit(3).pluck(:code).join(', ') %><%= ', ...' if @proposals.count > 3 %>
             <% end %>
           </p>
         </div>
