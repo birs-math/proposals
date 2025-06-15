@@ -259,10 +259,10 @@ class SubmittedProposalsController < ApplicationController
     @proposals = Proposal.where(id: @proposal_ids).includes(:invites)
     
     # Get all invites for selected proposals
-    @invites = Invite.joins(:proposal)
+    @invites = Invite.joins(:proposal, :person)
                     .where(proposal_id: @proposal_ids)
                     .includes(:proposal, :person)
-                    .order('proposals.code, people.family_name, people.given_name')
+                    .order('proposals.code, people.lastname, people.firstname')
   end
 
   def bulk_update_invitations
