@@ -495,6 +495,21 @@ export default class extends Controller {
     }
   }
 
+  bulkManageInvitations() {
+    var proposalIds = [];
+    this.proposalsByTypeCheckboxChecked().each(function() {
+      proposalIds.push(this.dataset.value);
+    });
+    if(typeof proposalIds[0] === "undefined")
+    {
+      toastr.error("Please select any checkbox!")
+    }
+    else {
+      let selectedProposals = proposalIds.filter((x) => typeof x !== "undefined")
+      window.location = `/submitted_proposals/bulk_manage_invitations?ids=${selectedProposals.join(',')}`
+    }
+  }
+
   outcomeLocation() {
     let proposalIds = [];
     let proposalType = $("span#outcome-location-size").text()

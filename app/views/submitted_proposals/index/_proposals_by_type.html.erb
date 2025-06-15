@@ -16,6 +16,7 @@
       <button data-action="click->submitted-proposals#downloadCSV" class="btn btn-sm btn-primary mb-2" data-type="<%= type %>">Download CSV</button>
       <span data-action="click->submitted-proposals#emailModal" class="btn btn-sm btn-primary mb-2" data-type="<%= type %>">Send Decision Email</span>
       <span data-action="click->submitted-proposals#outcomeLocationModal" id="decline" class="btn btn-sm btn-primary mb-2" data-type="<%= type %>">Set Outcome/Location</span>
+      <span data-action="click->submitted-proposals#bulkManageInvitations" class="btn btn-sm btn-success mb-2" data-type="<%= type %>">Manage Invitations</span>
       <% if check_review_privilege %>
         <span data-action="click->submitted-proposals#reviewsExcelBooklet" class="btn btn-sm btn-primary mb-2" data-type="<%= type %>">Create Reviews Excel Booklet</span>
         <span data-action="click->submitted-proposals#reviewsContent" class="btn btn-sm btn-primary reviews-booklet-btn mb-2" data-type="<%= type %>">Create Reviews Booklet</span>

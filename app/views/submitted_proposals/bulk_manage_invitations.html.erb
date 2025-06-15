@@ -4,23 +4,86 @@
   <div class="row">
     <div class="col-12">
       <div class="card">
-        <div class="card-header">
-          <h4 class="card-title">Bulk Manage Invitations</h4>
-          <p class="card-subtitle">Manage invitations for <%= pluralize(@proposals.count, 'proposal') %></p>
+        <div class="card-header bg-primary text-white">
+          <h4 class="card-title mb-0">
+            <i class="fas fa-users-cog"></i> Bulk Manage Invitations
+          </h4>
+          <p class="card-subtitle mb-0 mt-2">
+            Manage invitations for <%= pluralize(@proposals.count, 'proposal') %>
+            <% if @proposals.any? %>
+              - Codes: <%= @proposals.limit(3).pluck(:code).join(', ') %><%= ', ...' if @proposals.count > 3 %>
+            <% end %>
+          </p>
         </div>
         
         <div class="card-body">
+          <!-- Flash Messages Section - In White Card Body Area -->
+          <% if notice %>
+            <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+              <i class="fas fa-check-circle"></i> <%= notice %>
+              <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+          <% end %>
+          <% if alert %>
+            <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+              <i class="fas fa-exclamation-triangle"></i> <%= alert %>
+              <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+          <% end %>
           <% if @invites.any? %>
+            <!-- Category Filtering Tabs -->
+            <div class="row mb-4">
+              <div class="col-12">
+                <ul class="nav nav-tabs" id="inviteCategories" role="tablist">
+                  <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="all-tab" data-bs-toggle="tab" data-bs-target="#all-invites" type="button" role="tab">
+                      All Invitations (<%= @invites.count %>)
+                    </button>
+                  </li>
+                  <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending-invites" type="button" role="tab">
+                      <span class="badge bg-warning">Pending</span> (<%= @invites.where(status: 'pending').count %>)
+                    </button>
+                  </li>
+                  <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="confirmed-tab" data-bs-toggle="tab" data-bs-target="#confirmed-invites" type="button" role="tab">
+                      <span class="badge bg-success">Confirmed</span> (<%= @invites.where(status: 'confirmed').count %>)
+                    </button>
+                  </li>
+                  <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="expired-tab" data-bs-toggle="tab" data-bs-target="#expired-invites" type="button" role="tab">
+                      <span class="badge bg-danger">Expired</span> (<%= @invites.where('deadline_date < ? AND status = ?', Date.current, 'pending').count %>)
+                    </button>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
             <%= form_with url: bulk_update_invitations_submitted_proposals_path, method: :post, local: true, id: "bulk-invitations-form" do |form| %>
               <%= form.hidden_field :invite_ids, id: "selected-invite-ids" %>
               
+              <!-- Smart Bulk Actions -->
               <div class="row mb-3">
-                <div class="col-md-12">
-                  <div class="btn-group" role="group">
-                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="selectAll()">Select All</button>
-                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="clearSelection()">Clear Selection</button>
+                <div class="col-md-8">
+                  <div class="btn-group me-3" role="group">
+                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="selectAll()">
+                      <i class="fas fa-check-square"></i> Select All
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="clearSelection()">
+                      <i class="fas fa-square"></i> Clear Selection
+                    </button>
                   </div>
-                  <span id="selection-count" class="ms-3 text-muted">0 selected</span>
+                  <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-sm btn-warning" onclick="selectExpired()">
+                      <i class="fas fa-clock"></i> Select Expired
+                    </button>
+                    <button type="button" class="btn btn-sm btn-info" onclick="selectPending()">
+                      <i class="fas fa-hourglass-half"></i> Select Pending
+                    </button>
+                  </div>
+                </div>
+                <div class="col-md-4 text-end">
+                  <span id="selection-count" class="text-muted">0 selected</span>
                 </div>
               </div>
 
@@ -37,12 +100,17 @@
                       <th>Email</th>
                       <th>Role</th>
                       <th>Status</th>
+                      <th>Deadline</th>
                       <th>Invited Date</th>
                     </tr>
                   </thead>
                   <tbody>
                     <% @invites.each do |invite| %>
-                      <tr>
+                      <% 
+                        is_expired = invite.deadline_date && invite.deadline_date < Date.current && invite.status == 'pending'
+                        row_class = is_expired ? 'table-danger' : ''
+                      %>
+                      <tr class="<%= row_class %>" data-status="<%= invite.status %>" data-expired="<%= is_expired %>">
                         <td>
                           <input type="checkbox" class="invite-checkbox" value="<%= invite.id %>" 
                                  onchange="updateSelection()">
@@ -57,7 +125,22 @@
                         <td>
                           <span class="badge bg-<%= invite_status_color(invite.status) %>">
                             <%= invite.status.humanize %>
+                            <% if is_expired %>
+                              <i class="fas fa-clock ms-1" title="Expired"></i>
+                            <% end %>
                           </span>
+                        </td>
+                        <td>
+                          <% if invite.deadline_date %>
+                            <%= invite.deadline_date.strftime("%Y-%m-%d") %>
+                            <% if is_expired %>
+                              <small class="text-danger d-block">
+                                <i class="fas fa-exclamation-triangle"></i> Expired
+                              </small>
+                            <% end %>
+                          <% else %>
+                            <span class="text-muted">No deadline</span>
+                          <% end %>
                         </td>
                         <td><%= invite.created_at.strftime("%Y-%m-%d") %></td>
                       </tr>
@@ -157,6 +240,24 @@ function updateSelection() {
   } else {
     selectAllCheckbox.indeterminate = true;
   }
+}
+
+function selectExpired() {
+  const expiredRows = document.querySelectorAll('tr[data-expired="true"]');
+  expiredRows.forEach(row => {
+    const checkbox = row.querySelector('.invite-checkbox');
+    if (checkbox) checkbox.checked = true;
+  });
+  updateSelection();
+}
+
+function selectPending() {
+  const pendingRows = document.querySelectorAll('tr[data-status="pending"]');
+  pendingRows.forEach(row => {
+    const checkbox = row.querySelector('.invite-checkbox');
+    if (checkbox) checkbox.checked = true;
+  });
+  updateSelection();
 }
 
 function confirmBulkAction() {
