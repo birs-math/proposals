@@ -207,7 +207,7 @@
                         </div>
                         <div class="col-md-4 d-flex align-items-center">
                           <div class="d-grid gap-2 w-100">
-                            <button type="submit" class="btn btn-primary btn-lg" disabled id="apply-action-btn" onclick="return confirmBulkAction()">
+                            <button type="submit" class="btn btn-primary btn-lg" disabled id="apply-action-btn">
                               <i class="fas fa-play me-2"></i> Apply Action
                             </button>
                             <%= link_to submitted_proposals_path, class: "btn btn-outline-secondary" do %>
@@ -331,24 +331,6 @@ function selectDeclined() {
   updateSelection();
 }
 
-function confirmBulkAction() {
-  const selectedCount = document.querySelectorAll('.invite-checkbox:checked').length;
-  const actionElement = document.querySelector('input[name="bulk_action"]:checked');
-  const action = actionElement ? actionElement.value : null;
-  
-  if (selectedCount === 0) {
-    alert('Please select at least one invitation.');
-    return false;
-  }
-  
-  if (!action) {
-    alert('Please select an action to perform.');
-    return false;
-  }
-  
-  const actionText = actionElement.nextElementSibling.textContent.trim().replace(/.*?\s/, '');
-  return confirm(`Are you sure you want to ${actionText.toLowerCase()}?\n\nThis will affect ${selectedCount} invitation(s).`);
-}
 
 // Initialize selection state on page load
 document.addEventListener('DOMContentLoaded', function() {
