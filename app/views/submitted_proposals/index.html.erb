@@ -60,7 +60,9 @@
                 <ul class="nav nav-tabs" role="tablist">
                   <li class="nav-item col-6"><a class="nav-link active" href="#tab-1" data-bs-toggle="tab" role="tab">Submitted Proposals</a></li>
 
-                  <li class="nav-item col-6"><a class="nav-link" href="#tab-2" data-bs-toggle="tab" role="tab">Demographic Data Graphs and charts</a></li>
+                  <% if can?(:view, :demographic_data) %>
+                    <li class="nav-item col-6"><a class="nav-link" href="#tab-2" data-bs-toggle="tab" role="tab">Demographic Data Graphs and charts</a></li>
+                  <% end %>
                 </ul>
 
                 <div class="tab-content">
@@ -79,9 +81,11 @@
                     <% end %>
                   </div>
 
-                  <div class="tab-pane" id="tab-2" role="tabpanel">
-                    <%= turbo_frame_tag "proposals_demographic_data", src: demographic_data_submitted_proposals_path(format: :turbo_stream, **@search_params.slice(:workshop_year)), loading: :lazy %>
-                  </div>
+                  <% if can?(:view, :demographic_data) %>
+                    <div class="tab-pane" id="tab-2" role="tabpanel">
+                      <%= turbo_frame_tag "proposals_demographic_data", src: demographic_data_submitted_proposals_path(format: :turbo_stream, **@search_params.slice(:workshop_year)), loading: :lazy %>
+                    </div>
+                  <% end %>
                 </div>
               </div>
             </div>

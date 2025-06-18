@@ -2,11 +2,12 @@ class SubmittedProposalsController < ApplicationController
   before_action :authenticate_user!
   before_action :authorize_user, except: %i[booklet_log download_log_file]
   before_action :set_proposal, except: %i[index download_csv import_reviews
-                                          reviews_booklet reviews_excel_booklet booklet_log]
+                                          reviews_booklet reviews_excel_booklet booklet_log demographic_data]
   before_action :template_params, only: %i[approve_decline_proposals]
   before_action :check_reviews_permissions, only: %i[import_reviews
                                                      reviews_booklet
                                                      reviews_excel_booklet]
+  before_action :check_demographic_permissions, only: [:demographic_data]
 
   def index
     @current_year = Time.zone.today.year
@@ -610,6 +611,10 @@ class SubmittedProposalsController < ApplicationController
 
   def check_reviews_permissions
     raise CanCan::AccessDenied unless @ability.can?(:manage, Review)
+  end
+
+  def check_demographic_permissions
+    raise CanCan::AccessDenied unless @ability.can?(:view, :demographic_data)
   end
 
   def selected_year_pagination
