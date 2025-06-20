@@ -79,9 +79,9 @@ class ProposalPdfService
 
     if @user.staff_member?
       @text << "\\pagebreak"
-      proposal_organizing_committee
+      # proposal_organizing_committee  # Commented out to remove sensitive personal info
       @text << "\\pagebreak"
-      participant_demographics
+      # participant_demographics  # Commented out to remove sensitive demographic data
     end
 
     if proposal.files.attached?

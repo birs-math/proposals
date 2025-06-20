@@ -59,9 +59,11 @@
                       <li class="nav-item col-3" data-target='submit-proposals.tabs'>
                         <a class="nav-link <%= active_tab(@proposal, 'three', params[:tab]) %>" href="#tab-3" data-target='submit-proposals.tabs' data-bs-toggle="tab" role="tab">Step 3</a>
                       </li>
-                      <li class="nav-item col-3" data-target='submit-proposals.tabs'>
-                        <a class="nav-link" href="#tab-4" data-target='submit-proposals.tabs' data-bs-toggle="tab" role="tab">Demographic Charts</a>
-                      </li>
+                      <% if can?(:view, :demographic_data) %>
+                        <li class="nav-item col-3" data-target='submit-proposals.tabs'>
+                          <a class="nav-link" href="#tab-4" data-target='submit-proposals.tabs' data-bs-toggle="tab" role="tab">Demographic Charts</a>
+                        </li>
+                      <% end %>
                     </ul>
                     <div class="tab-content">
                       <div class="tab-pane <%= active_tab(@proposal, 'one', params[:tab]) %>" id="tab-1" role="tabpanel">
@@ -240,19 +242,21 @@
                         </div>
                       </div>
 
-                      <div class="tab-pane" id="tab-4" role="tabpanel">
-                        <div class="mb-3">
-                          <p><%= @proposal.proposal_form.introduction_charts&.html_safe %></p>
+                      <% if can?(:view, :demographic_data) %>
+                        <div class="tab-pane" id="tab-4" role="tabpanel">
+                          <div class="mb-3">
+                            <p><%= @proposal.proposal_form.introduction_charts&.html_safe %></p>
+                          </div>
+                          <% if confirmed_minimum_participants(@proposal) %>
+                            <%= render partial: 'submitted_proposals/demographic_charts' %>
+                          <% end %>
+                          <div class="row mt-20">&nbsp;</div>
+                          <div class="d-flex">
+                            <%= link_to "Print Proposal", rendered_proposal_proposal_path(@proposal.id, :format => :pdf), target: '_blank', class: 'p-2 mx-2 btn btn-primary' %>
+                            <button class="ms-auto p-2 btn btn-primary" id="changeTab" data-action='click->submit-proposals#previousTab'>Back</button>
+                          </div>
                         </div>
-                        <% if confirmed_minimum_participants(@proposal) %>
-                          <%= render partial: 'submitted_proposals/demographic_charts' %>
-                        <% end %>
-                        <div class="row mt-20">&nbsp;</div>
-                        <div class="d-flex">
-                          <%= link_to "Print Proposal", rendered_proposal_proposal_path(@proposal.id, :format => :pdf), target: '_blank', class: 'p-2 mx-2 btn btn-primary' %>
-                          <button class="ms-auto p-2 btn btn-primary" id="changeTab" data-action='click->submit-proposals#previousTab'>Back</button>
-                        </div>
-                      </div>
+                      <% end %>
                     </div>
                   </div>
                 </div>
