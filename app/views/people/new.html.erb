@@ -43,8 +43,8 @@
                     <%= f.select :first_phd_year, phd_year_options, {include_blank: true}, class:'form-select' %>
                   </div>
                   <div>
-                    <% if @person.lead_organizer? %>
-                      <h3>Mailing Address:</h3>
+                    <% if @person.lead_organizer? and not @person.city? %>
+                      <h3>Institutional Mailing Address:</h3>
                       <div class="form-group mb-2">
                         <%= f.label :street_1, "Street 1" , class: 'form-label required' %>
                         <%= f.text_field :street_1, class:'form-control'%>
