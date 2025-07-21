@@ -348,26 +348,26 @@ class Proposal < ApplicationRecord
 
   def create_code
     return if code.present?
-    
+
     max_attempts = 5
     attempt = 0
-    
+
     begin
       attempt += 1
-      
+
       Proposal.transaction do
         tc = proposal_type.code || 'xx'
         proposed_code = year.to_s[-2..] + tc + next_number
-        
+
         if Proposal.lock.exists?(code: proposed_code)
-          raise ActiveRecord::RecordNotUnique.new("Code #{proposed_code} already exists")
+          raise ActiveRecord::RecordNotUnique, "Code #{proposed_code} already exists"
         end
-        
+
         self.code = proposed_code
       end
-    rescue ActiveRecord::RecordNotUnique => e
+    rescue ActiveRecord::RecordNotUnique
       if attempt < max_attempts
-        sleep(0.05 * attempt + rand * 0.05)
+        sleep((0.05 * attempt) + (rand * 0.05))
         retry
       else
         Rails.logger.error "Failed to generate unique code after #{max_attempts} attempts"
