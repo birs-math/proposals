@@ -340,21 +340,22 @@ class Proposal < ApplicationRecord
   def next_number
     tc = proposal_type.code || 'xx'
     year_code = year.to_s[-2..]
-    
+
     # Get all existing codes for this year and type, sorted numerically
     existing_codes = Proposal.where("code LIKE ?", "#{year_code}#{tc}%")
-                            .where.not(id: id) # Exclude current record if updating
-                            .pluck(:code)
-                            .map { |code| code[-3..].to_i } # Extract numeric part
-                            .sort
-    
+                             .where.not(id: id) # Exclude current record if updating
+                             .pluck(:code)
+                             .map { |code| code[-3..].to_i } # Extract numeric part
+                             .sort
+
     # Find the first gap in the sequence, or the next number after the highest
     next_number = 1
     existing_codes.each do |existing_num|
       break if next_number < existing_num
+
       next_number = existing_num + 1
     end
-    
+
     next_number.to_s.rjust(3, '0')
   end
 
@@ -381,22 +382,22 @@ class Proposal < ApplicationRecord
       end
       
       Rails.logger.info "Successfully generated code: #{code} after #{attempt} attempt(s)"
-      
+
     rescue ActiveRecord::RecordNotUnique => e
       Rails.logger.warn "Code generation attempt #{attempt} failed: #{e.message}"
-      
+
       if attempt < max_attempts
         # Exponential backoff with jitter to reduce collision probability
-        sleep_time = (0.1 * (2 ** (attempt - 1))) + (rand * 0.1)
+        sleep_time = (0.1 * (2**(attempt - 1))) + (rand * 0.1)
         Rails.logger.info "Retrying code generation in #{sleep_time.round(3)} seconds..."
         sleep(sleep_time)
         retry
       else
         Rails.logger.error "Failed to generate unique code after #{max_attempts} attempts for proposal #{id}"
-        
+
         # Instead of raising an exception, add a validation error
         errors.add(:code, "Unable to generate unique code after #{max_attempts} attempts. Please try again.")
-        raise ActiveRecord::RecordInvalid.new(self)
+        raise ActiveRecord::RecordInvalid, "Code generation failed"
       end
     rescue StandardError => e
       Rails.logger.error "Unexpected error during code generation: #{e.message}"
