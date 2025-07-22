@@ -380,9 +380,8 @@ class Proposal < ApplicationRecord
 
         self.code = proposed_code
       end
-      
-      Rails.logger.info "Successfully generated code: #{code} after #{attempt} attempt(s)"
 
+      Rails.logger.info "Successfully generated code: #{code} after #{attempt} attempt(s)"
     rescue ActiveRecord::RecordNotUnique => e
       Rails.logger.warn "Code generation attempt #{attempt} failed: #{e.message}"
 
