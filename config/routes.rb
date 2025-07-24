@@ -87,6 +87,7 @@ Rails.application.routes.draw do
         post :inviter_response
         post :invite_reminder
         post :new_invite
+        post :resend
       end
       collection do
         get :thanks

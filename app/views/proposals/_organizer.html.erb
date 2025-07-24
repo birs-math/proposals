@@ -16,7 +16,7 @@
       </thead>
       <% invites.each do |invite| %>
         <tbody>
-          <tr>
+          <tr data-invite-status="<%= invite.status %>">
             <td><%= invite_first_name(invite) %></td>
             <td><%= invite_last_name(invite) %></td>
             <td><%= invite.email %></td>
@@ -35,7 +35,21 @@
             <td><%= invite.deadline_date.to_date %></td>
 
             <div>
-              <% if invite.pending? && params[:action] == 'edit' %>
+              <% if invite.expired? && params[:action] == 'edit' %>
+                <td>
+                  <% if current_user.staff_member? || current_user.person == invite.proposal.lead_organizer %>
+                    <%= form_with url: resend_proposal_invite_path(invite.proposal, invite), method: :post, local: true, class: "d-inline-block" do |f| %>
+                      <%= f.date_field :deadline_date, value: 2.weeks.from_now.to_date, min: Date.tomorrow, class: "form-control d-inline-block", style: "width: 150px;" %>
+                      <%= f.submit "Resend", class: "btn btn-sm btn-outline-primary" %>
+                    <% end %>
+                    <% if current_user.staff_member? %>
+                      <%= link_to 'Cancel', cancel_url(code: invite.code), class: 'btn btn-sm btn-outline-danger', method: :post, confirm: 'Are you sure?' %>
+                    <% end %>
+                  <% else %>
+                    <span class="text-muted">Contact staff to resend</span>
+                  <% end %>
+                </td>
+              <% elsif invite.pending? && params[:action] == 'edit' %>
                 <td>
                   <% if current_user.staff_member? %>
                     <%= link_to '<i class="align-middle"></i>Cancel Invite'.html_safe, cancel_url(code: invite.code), class: 'btn', method: :post %>

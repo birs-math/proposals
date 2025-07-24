@@ -29,3 +29,22 @@
   border: 1px solid black;
   border-collapse: collapse;
 }
+
+// Expired invite styling
+.invitation-table tr[data-invite-status="expired"] {
+  background-color: #fff3cd;
+}
+
+.expired-invite {
+  opacity: 0.8;
+}
+
+.badge-warning {
+  background-color: #ffc107;
+  color: #212529;
+}
+
+// Status color for expired invites
+.text-warning {
+  color: #856404 !important;
+}

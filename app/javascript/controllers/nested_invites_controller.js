@@ -132,4 +132,30 @@ export default class extends Controller {
       }
     });
   }
+  
+  connect() {
+    this.updateInviteStatus()
+  }
+  
+  updateInviteStatus() {
+    document.querySelectorAll('.invitation-table tr[data-invite-status]').forEach((row) => {
+      const status = row.dataset.inviteStatus;
+      
+      if (status === 'expired') {
+        row.classList.add('expired-invite');
+        
+        // Disable any accept buttons if they exist
+        const acceptButton = row.querySelector('.accept-button');
+        if (acceptButton) {
+          acceptButton.setAttribute('disabled', true);
+        }
+        
+        // Show resend button for authorized users
+        const resendButton = row.querySelector('.resend-button');
+        if (resendButton && row.dataset.canManage === 'true') {
+          resendButton.style.display = 'inline-block';
+        }
+      }
+    });
+  }
 }

@@ -4,12 +4,18 @@ class InvitesController < ApplicationController
   before_action :set_invite,
                 only: %i[show inviter_response invite_reminder]
   before_action :set_invite_proposal, only: %i[show]
-  before_action :unsafe_set_invite, only: %i[cancel new_invite cancel_confirmed_invite]
+  before_action :unsafe_set_invite, only: %i[cancel new_invite cancel_confirmed_invite resend]
   before_action :authorize_user, only: %i[cancel cancel_confirmed_invite]
+  before_action :authorize_user_for_resend, only: %i[resend]
 
   def show
     redirect_to root_path and return if @invite.confirmed?
     redirect_to cancelled_path and return if @invite.cancelled?
+    
+    if @invite.expired?
+      render 'expired', layout: 'devise'
+      return
+    end
 
     render layout: 'devise'
   end
@@ -93,7 +99,11 @@ class InvitesController < ApplicationController
     @invite.skip_deadline_validation = true if @invite.deadline_date < Date.current
     @invite.update(status: 'cancelled')
 
-    redirect_to edit_submitted_proposal_url(@invite.proposal), notice: t('invites.cancel.success')
+    redirect_path = current_user.staff_member? ? 
+                    edit_submitted_proposal_url(@invite.proposal) :
+                    edit_proposal_path(@invite.proposal)
+                    
+    redirect_to redirect_path, notice: t('invites.cancel.success')
   end
 
   def cancel_confirmed_invite
@@ -113,6 +123,29 @@ class InvitesController < ApplicationController
     else
       redirect_to edit_proposal_path(@invite.proposal), notice: t('invites.new_invite.success')
     end
+  end
+  
+  def resend
+    new_deadline = params[:deadline_date] || 2.weeks.from_now
+    
+    ActiveRecord::Base.transaction do
+      @invite.update!(
+        status: :pending,
+        deadline_date: new_deadline,
+        code: SecureRandom.urlsafe_base64(37)
+      )
+      
+      @invite.send_invite_email
+    end
+
+    redirect_path = current_user.staff_member? ? 
+                    edit_submitted_proposal_url(@invite.proposal) :
+                    edit_proposal_path(@invite.proposal)
+                    
+    redirect_to redirect_path, notice: "Invitation resent to #{@invite.email}."
+  rescue ActiveRecord::RecordInvalid => e
+    redirect_back fallback_location: root_path, 
+                  alert: "Could not resend invitation: #{e.message}"
   end
 
   private
@@ -186,6 +219,14 @@ class InvitesController < ApplicationController
     return if current_user.staff_member?
 
     redirect_back fallback_location: edit_proposal_path(@invite.proposal),
+                  alert: I18n.t('errors.messages.not_authorized')
+  end
+  
+  def authorize_user_for_resend
+    return if current_user.staff_member?
+    return if current_user.person == @invite.proposal.lead_organizer
+    
+    redirect_back fallback_location: root_path,
                   alert: I18n.t('errors.messages.not_authorized')
   end
 end

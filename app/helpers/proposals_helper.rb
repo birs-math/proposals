@@ -9,7 +9,7 @@ module ProposalsHelper
 
   def confirmed_participants(id, invited_as)
     Invite.where('invited_as = ? AND proposal_id = ?', invited_as, id)
-          .where.not(status: %w[cancelled declined])
+          .where.not(status: %w[cancelled declined expired])
   end
 
   def proposal_type_year(proposal_type = nil)
@@ -94,6 +94,7 @@ module ProposalsHelper
 
   def invite_status(response, status)
     return "Invite has been cancelled" if status == 'cancelled'
+    return "Invite has expired" if status == 'expired'
 
     case response
     when "yes"
@@ -132,6 +133,7 @@ module ProposalsHelper
 
   def invite_response_color(response, status)
     return 'text-danger' if status == 'cancelled'
+    return 'text-warning' if status == 'expired'
 
     case response
     when "yes"

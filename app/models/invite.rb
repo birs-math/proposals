@@ -23,15 +23,17 @@ class Invite < ApplicationRecord
   default_scope { order(created_at: :asc) }
   scope :organizer, -> { where(invited_as: 'Organizer') }
   scope :participant, -> { where(invited_as: 'Participant') }
+  scope :active, -> { where.not(status: [:cancelled, :declined, :expired]) }
+  scope :not_cancelled, -> { where.not(status: [:cancelled, :expired]) }
 
-  enum status: { pending: 0, confirmed: 1, cancelled: 2, declined: 3 }
+  enum status: { pending: 0, confirmed: 1, cancelled: 2, declined: 3, expired: 4 }
   enum response: { yes: 0, maybe: 1, no: 2 }
 
   class << self
     def safe_find(code:)
       return unless code
 
-      invite = not_cancelled.find_by(code: code)
+      invite = where.not(status: [:cancelled, :expired]).find_by(code: code)
 
       invite if invite&.code_valid?
     end
@@ -83,6 +85,18 @@ class Invite < ApplicationRecord
     deadline_date >= DateTime.current.beginning_of_day
   end
 
+  def expired?
+    status == 'expired' || (pending? && deadline_date < DateTime.current.beginning_of_day)
+  end
+
+  def can_be_resent?
+    expired? || (pending? && code_expired?)
+  end
+
+  def slots_consumed?
+    confirmed? || pending?
+  end
+
   def send_invite_email
     InviteMailer.with(invite: self, lead_organizer_copy: false).invite_email.deliver_later
     InviteMailer.with(invite: self, lead_organizer_copy: true).invite_email.deliver_later
@@ -109,7 +123,7 @@ class Invite < ApplicationRecord
 
   def one_invite_per_person
     return if proposal.nil? || proposal.invites.where(email: email&.downcase)
-                                       .where.not(status: %w[cancelled declined]).empty?
+                                       .where.not(status: %w[cancelled declined expired]).empty?
 
     errors.add('Duplicate:', "Same email cannot be used to invite already
                               invited organizers or participants.".squish)
