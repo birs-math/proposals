@@ -73,55 +73,6 @@ jobs:
             cd /home/app/proposals
             bundle exec rspec
             bash <(curl -Ls https://coverage.codacy.com/get.sh) report -l ruby -p "Proposals" -r coverage/lcov/proposals.lcov
-  deploy_to_staging:
-    docker:
-      - image: birs/proposals:latest
-        environment:
-          PG_HOST: localhost
-          PG_USER: $DB_USER
-          RAILS_ENV: development
-          RACK_ENV: development
-      - image: 'circleci/postgres:12.1-alpine-ram'
-        environment:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: $POSTGRES_PASSWORD
-    steps:
-      - checkout
-      - add_ssh_keys:
-          fingerprints:
-            - "9f:15:4c:07:65:8b:14:ca:f3:68:01:0a:cf:dd:67:95"
-      - run:
-          name: Run Capistrano
-          command: |
-            tar cvf - --exclude=".git" . | tar xf - -C /home/app/proposals/
-            chown -R app:app /home/app/proposals
-            cd /home/app/proposals
-            bundle install
-            bundle exec cap staging deploy
-
-  deploy_to_production:
-    docker:
-      - image: birs/proposals:latest
-        environment:
-          PG_HOST: localhost
-          PG_USER: $DB_USER
-          RAILS_ENV: production
-          RACK_ENV: production
-      - image: 'circleci/postgres:12.1-alpine-ram'
-        environment:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: $POSTGRES_PASSWORD
-    steps:
-      - checkout
-      - run:
-          name: Bundle install
-          command: bundle install
-      - add_ssh_keys:
-          fingerprints:
-            - "11:dc:ba:15:ec:d0:88:66:a5:fc:f3:11:bb:3e:7b:46"
-      - run:
-          name: Run Capistrano
-          command: bundle exec cap production deploy:remote
 
 workflows:
   build_new_image:
@@ -129,7 +80,7 @@ workflows:
       - build_image:
           filters:
             branches:
-              only: new_image
+              only: releases
 
   run_the_tests:
     jobs:
@@ -137,17 +88,3 @@ workflows:
           filters:
             branches:
               ignore: /main|releases|new_image/
-
-  deploy_to_staging:
-    jobs:
-      - deploy_to_staging:
-          filters:
-            branches:
-              only: main
-
-  deploy_to_production:
-    jobs:
-      - deploy_to_production:
-          filters:
-            branches:
-              only: releases
