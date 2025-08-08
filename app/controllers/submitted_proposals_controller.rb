@@ -31,6 +31,16 @@ class SubmittedProposalsController < ApplicationController
     @proposal_ids = proposals_query_with_filters(demographic_data_params).pluck(:id)
   end
 
+  def expired_invitations
+    @expired_invitations = Invite.where(status: 'expired')
+                                 .includes(:proposal, :person, :proposal_type)
+                                 .order(expired_at: :desc)
+    
+    respond_to do |format|
+      format.turbo_stream
+    end
+  end
+
   def show
     @proposal.review! if @proposal.may_review?
     @proposal_ids = [@proposal.id]

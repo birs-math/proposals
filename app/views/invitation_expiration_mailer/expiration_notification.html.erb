@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Invitations Expired</title>
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+  <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+    <h2 style="color: #d32f2f;">Invitations Expired</h2>
+    
+    <p>Dear <%= @lead_organizer.fullname %>,</p>
+    
+    <p>Some invitations for your proposal "<strong><%= @proposal.title %></strong>" have expired and have been automatically cancelled. This frees up spots for new invitations.</p>
+    
+    <div style="background-color: #f5f5f5; padding: 15px; margin: 20px 0; border-left: 4px solid #d32f2f;">
+      <h3 style="margin-top: 0; color: #d32f2f;">Expired Invitations Summary</h3>
+      
+      <% if @expired_organizers.any? %>
+        <h4>Supporting Organizers (<%= @expired_organizers.count %> expired):</h4>
+        <ul>
+          <% @expired_organizers.each do |invite| %>
+            <li><%= invite.firstname %> <%= invite.lastname %> (<%= invite.email %>)</li>
+          <% end %>
+        </ul>
+      <% end %>
+      
+      <% if @expired_participants.any? %>
+        <h4>Participants (<%= @expired_participants.count %> expired):</h4>
+        <ul>
+          <% @expired_participants.each do |invite| %>
+            <li><%= invite.firstname %> <%= invite.lastname %> (<%= invite.email %>)</li>
+          <% end %>
+        </ul>
+      <% end %>
+    </div>
+    
+    <div style="background-color: #e8f5e8; padding: 15px; margin: 20px 0; border-left: 4px solid #4caf50;">
+      <h3 style="margin-top: 0; color: #2e7d32;">Available Spots</h3>
+      <p><strong>Supporting Organizers:</strong> <%= @available_organizer_slots %> spots available</p>
+      <p><strong>Participants:</strong> <%= @available_participant_slots %> spots available</p>
+    </div>
+    
+    <p>You can now send new invitations to fill these spots. The expired invitations have been automatically removed from your proposal's capacity count.</p>
+    
+    <p>If you need to resend invitations to the same people, you can do so from your proposal management page.</p>
+    
+    <p>Best regards,<br>
+    The BIRS Team</p>
+  </div>
+</body>
+</html>

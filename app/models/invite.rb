@@ -23,8 +23,10 @@ class Invite < ApplicationRecord
   default_scope { order(created_at: :asc) }
   scope :organizer, -> { where(invited_as: 'Organizer') }
   scope :participant, -> { where(invited_as: 'Participant') }
+  scope :active, -> { where.not(status: %w[cancelled declined expired]) }
+  scope :expired, -> { where('deadline_date < ? AND status = ?', DateTime.current.beginning_of_day, 'pending') }
 
-  enum status: { pending: 0, confirmed: 1, cancelled: 2, declined: 3 }
+  enum status: { pending: 0, confirmed: 1, cancelled: 2, declined: 3, expired: 4 }
   enum response: { yes: 0, maybe: 1, no: 2 }
 
   class << self
@@ -34,6 +36,19 @@ class Invite < ApplicationRecord
       invite = not_cancelled.find_by(code: code)
 
       invite if invite&.code_valid?
+    end
+
+    def expire_overdue_invitations
+      expired_invitations = expired.includes(:proposal, :person)
+      
+      expired_invitations.find_each do |invite|
+        invite.update!(
+          status: 'expired',
+          expired_at: DateTime.current
+        )
+      end
+      
+      expired_invitations
     end
   end
 
@@ -83,6 +98,10 @@ class Invite < ApplicationRecord
     deadline_date >= DateTime.current.beginning_of_day
   end
 
+  def expired?
+    status == 'expired' || (pending? && deadline_date < DateTime.current.beginning_of_day)
+  end
+
   def send_invite_email
     InviteMailer.with(invite: self, lead_organizer_copy: false).invite_email.deliver_later
     InviteMailer.with(invite: self, lead_organizer_copy: true).invite_email.deliver_later
@@ -109,7 +128,7 @@ class Invite < ApplicationRecord
 
   def one_invite_per_person
     return if proposal.nil? || proposal.invites.where(email: email&.downcase)
-                                       .where.not(status: %w[cancelled declined]).empty?
+                                       .where.not(status: %w[cancelled declined expired]).empty?
 
     errors.add('Duplicate:', "Same email cannot be used to invite already
                               invited organizers or participants.".squish)

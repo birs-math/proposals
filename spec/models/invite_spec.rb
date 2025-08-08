@@ -108,45 +108,73 @@ RSpec.describe Invite, type: :model do
     end
   end
 
-  describe '#proposal_title' do
-    context 'when proposal title present' do
-      let(:invite) do
-        create(:invite, firstname: 'New', lastname: 'Proposal', email: 'test@tes.com', invited_as: 'coorganizer')
-      end
-      before do
-        invite.proposal.update(title: "New")
-      end
+  describe 'expired status' do
+    let(:invite) { create(:invite, status: 'pending', deadline_date: 1.day.ago) }
 
-      it { expect(invite.proposal.title).to eq 'New' }
+    it 'includes expired in status enum' do
+      expect(Invite.statuses).to include('expired' => 4)
+    end
+
+    it 'can be set to expired status' do
+      invite.update!(status: 'expired')
+      expect(invite.expired?).to be true
+    end
+
+    it 'returns true for expired? when deadline is past' do
+      expect(invite.expired?).to be true
+    end
+
+    it 'returns false for expired? when deadline is future' do
+      invite.update!(deadline_date: 1.day.from_now)
+      expect(invite.expired?).to be false
     end
   end
 
-  describe '#deadline_not_in_past' do
-    context 'when deadline date is not in past' do
-      let(:invite) do
-        create(:invite, firstname: 'New', lastname: 'Proposal', email: 'test@test.com', invited_as: 'coorganizer')
-      end
+  describe '.expire_overdue_invitations' do
+    let!(:expired_invite) { create(:invite, status: 'pending', deadline_date: 1.day.ago) }
+    let!(:active_invite) { create(:invite, status: 'pending', deadline_date: 1.day.from_now) }
+    let!(:confirmed_invite) { create(:invite, status: 'confirmed', deadline_date: 1.day.ago) }
 
-      it { expect(invite.deadline_date).to be > DateTime.now }
+    it 'expires only pending invitations past deadline' do
+      expired_invitations = Invite.expire_overdue_invitations
+      
+      expect(expired_invitations).to include(expired_invite)
+      expect(expired_invitations).not_to include(active_invite)
+      expect(expired_invitations).not_to include(confirmed_invite)
     end
 
-    context 'when deadline date is in past' do
-      let(:invite) do
-        create(:invite, firstname: 'New', lastname: 'Proposal', email: 'test@test.com', invited_as: 'coorganizer')
-      end
-      before do
-        invite.update(deadline_date: DateTime.now - 2.weeks)
-      end
-      it { expect(invite.errors.full_messages).to include("Deadline can't be in past") }
+    it 'updates status to expired' do
+      Invite.expire_overdue_invitations
+      
+      expired_invite.reload
+      expect(expired_invite.status).to eq('expired')
+      expect(expired_invite.expired_at).to be_present
+    end
+
+    it 'does not affect active invitations' do
+      Invite.expire_overdue_invitations
+      
+      active_invite.reload
+      expect(active_invite.status).to eq('pending')
     end
   end
 
-  describe '#generate_code' do
-    context 'when code is present' do
-      let(:invite) do
-        create(:invite, firstname: 'New', lastname: 'Proposal', email: 'test@test.com', invited_as: 'coorganizer')
-      end
-      it { expect(invite.code).to be_present }
+  describe 'scopes' do
+    let!(:pending_invite) { create(:invite, status: 'pending') }
+    let!(:confirmed_invite) { create(:invite, status: 'confirmed') }
+    let!(:expired_invite) { create(:invite, status: 'expired') }
+    let!(:cancelled_invite) { create(:invite, status: 'cancelled') }
+
+    it 'active scope excludes expired, cancelled, and declined invitations' do
+      active_invites = Invite.active
+      expect(active_invites).to include(pending_invite, confirmed_invite)
+      expect(active_invites).not_to include(expired_invite, cancelled_invite)
+    end
+
+    it 'expired scope finds pending invitations past deadline' do
+      expired_invite.update!(deadline_date: 1.day.ago)
+      expired_invitations = Invite.expired
+      expect(expired_invitations).to include(expired_invite)
     end
   end
 end

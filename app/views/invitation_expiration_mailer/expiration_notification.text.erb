@@ -1,0 +1,32 @@
+INVITATIONS EXPIRED
+
+Dear <%= @lead_organizer.fullname %>,
+
+Some invitations for your proposal "<%= @proposal.title %>" have expired and have been automatically cancelled. This frees up spots for new invitations.
+
+EXPIRED INVITATIONS SUMMARY:
+
+<% if @expired_organizers.any? %>
+Supporting Organizers (<%= @expired_organizers.count %> expired):
+<% @expired_organizers.each do |invite| %>
+- <%= invite.firstname %> <%= invite.lastname %> (<%= invite.email %>)
+<% end %>
+
+<% end %>
+<% if @expired_participants.any? %>
+Participants (<%= @expired_participants.count %> expired):
+<% @expired_participants.each do |invite| %>
+- <%= invite.firstname %> <%= invite.lastname %> (<%= invite.email %>)
+<% end %>
+
+<% end %>
+AVAILABLE SPOTS:
+- Supporting Organizers: <%= @available_organizer_slots %> spots available
+- Participants: <%= @available_participant_slots %> spots available
+
+You can now send new invitations to fill these spots. The expired invitations have been automatically removed from your proposal's capacity count.
+
+If you need to resend invitations to the same people, you can do so from your proposal management page.
+
+Best regards,
+The BIRS Team
