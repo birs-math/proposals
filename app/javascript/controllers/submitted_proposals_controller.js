@@ -530,4 +530,38 @@ export default class extends Controller {
       })
     }
   }
+
+  resendInvitation() {
+    let inviteId = event.currentTarget.dataset.inviteId
+    let proposalId = event.currentTarget.dataset.proposalId
+    
+    if (!inviteId || !proposalId) {
+      toastr.error("Missing invitation or proposal ID")
+      return
+    }
+    
+    // Disable button to prevent double-clicks
+    event.currentTarget.disabled = true
+    event.currentTarget.innerText = "Sending..."
+    
+    $.ajax({
+      url: `/proposals/${proposalId}/invites/${inviteId}/invite_reminder`,
+      type: "POST",
+      headers: {
+        "X-CSRF-Token": $('meta[name="csrf-token"]').attr("content")
+      },
+      success: () => {
+        toastr.success("Invitation has been resent!")
+        setTimeout(() => {
+          window.location.reload()
+        }, 2000)
+      },
+      error: (xhr) => {
+        toastr.error("Failed to resend invitation: " + (xhr.responseJSON?.error || "Unknown error"))
+        // Re-enable button on error
+        event.currentTarget.disabled = false
+        event.currentTarget.innerText = "Resend Invitation"
+      }
+    })
+  }
 }
