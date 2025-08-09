@@ -56,13 +56,29 @@ class InviteMailer < ApplicationMailer
   end
 
   def invite_reminder
-    template = EmailTemplate.invite_reminder.first
     invite = params[:invite]
+    
+    # Try to find a specific reminder template first
+    template = EmailTemplate.invite_reminder.first
+    
+    # If no reminder template, use the original invitation template
+    if template.nil?
+      template = case invite.invited_as&.downcase
+                 when 'organizer'
+                   EmailTemplate.organizer_invitation_type.first
+                 when 'participant'
+                   EmailTemplate.participant_invitation_type.first
+                 else
+                   nil
+                 end
+    end
 
     if template
       liquid_email(template)
+      # Modify subject to indicate it's a reminder
+      @subject = "Reminder: #{@subject}" unless @subject.downcase.include?('reminder')
     else
-      # Fallback when no template exists
+      # Ultimate fallback when no templates exist (should be rare in production)
       @subject = "Reminder: Invitation to #{invite.proposal.title}"
       @body = "Dear #{invite.person.fullname},\n\n" +
               "This is a reminder that you have been invited to participate in:\n\n" +

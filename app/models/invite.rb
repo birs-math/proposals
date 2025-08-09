@@ -42,8 +42,8 @@ class Invite < ApplicationRecord
       expired_invitations = expired.includes(:proposal, :person)
       
       expired_invitations.find_each do |invite|
-        invite.update!(
-          status: 'expired',
+        invite.update_columns(
+          status: 4, # expired
           expired_at: DateTime.current
         )
       end
