@@ -58,37 +58,21 @@ class InviteMailer < ApplicationMailer
   def invite_reminder
     invite = params[:invite]
     
-    # Try to find a specific reminder template first
-    template = EmailTemplate.invite_reminder.first
+    # Set up instance variables for the .erb template
+    @invite = invite
+    @proposal = invite.proposal
+    @person = invite.person
     
-    # If no reminder template, use the original invitation template
-    if template.nil?
-      template = case invite.invited_as&.downcase
-                 when 'organizer'
-                   EmailTemplate.organizer_invitation_type.first
-                 when 'participant'
-                   EmailTemplate.participant_invitation_type.first
-                 else
-                   nil
-                 end
-    end
+    # Create reminder email body (similar to original invitation)
+    @subject = "Reminder: Invitation to #{@proposal.title}"
+    @body = "Dear #{@person.fullname},\n\n" +
+            "This is a reminder that you have been invited to participate #{invited_as_text(invite)} " +
+            "#{@proposal.title}.\n\n" +
+            "Proposal Code: #{@proposal.code}\n\n" +
+            "Please respond to your invitation by visiting: #{invite_url(invite, host: ENV['APPLICATION_HOST'])}\n\n" +
+            "Best regards,\nBIRS Team"
 
-    if template
-      liquid_email(template)
-      # Modify subject to indicate it's a reminder
-      @subject = "Reminder: #{@subject}" unless @subject.downcase.include?('reminder')
-    else
-      # Ultimate fallback when no templates exist (should be rare in production)
-      @subject = "Reminder: Invitation to #{invite.proposal.title}"
-      @body = "Dear #{invite.person.fullname},\n\n" +
-              "This is a reminder that you have been invited to participate in:\n\n" +
-              "#{invite.proposal.title}\n" +
-              "Code: #{invite.proposal.code}\n\n" +
-              "Please respond to your invitation by visiting: #{invite_url(invite, host: ENV['APPLICATION_HOST'])}\n\n" +
-              "Best regards,\nBIRS Team"
-    end
-
-    mail(to: invite.email, subject: @subject, body: @body)
+    mail(to: invite.email, subject: @subject)
   end
 
   private
