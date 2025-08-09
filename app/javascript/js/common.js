@@ -26,9 +26,12 @@ $(document).ready(function() {
   // Show value of slider bar for shedule run
   var slider = document.getElementById("slider");
   var slider_value = document.getElementById("slider-val");
-  slider_value.innerHTML = slider.value;
+  
+  if (slider && slider_value) {
+    slider_value.innerHTML = slider.value;
 
-  slider.oninput = function() {
-    slider_value.innerHTML = this.value;
+    slider.oninput = function() {
+      slider_value.innerHTML = this.value;
+    }
   }
 });
