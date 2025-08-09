@@ -57,12 +57,22 @@ class InviteMailer < ApplicationMailer
 
   def invite_reminder
     template = EmailTemplate.invite_reminder.first
-
     invite = params[:invite]
 
-    liquid_email(template)
+    if template
+      liquid_email(template)
+    else
+      # Fallback when no template exists
+      @subject = "Reminder: Invitation to #{invite.proposal.title}"
+      @body = "Dear #{invite.person.fullname},\n\n" +
+              "This is a reminder that you have been invited to participate in:\n\n" +
+              "#{invite.proposal.title}\n" +
+              "Code: #{invite.proposal.code}\n\n" +
+              "Please respond to your invitation by visiting: #{invite_url(invite, host: ENV['APPLICATION_HOST'])}\n\n" +
+              "Best regards,\nBIRS Team"
+    end
 
-    mail(to: invite.email, subject: @subject)
+    mail(to: invite.email, subject: @subject, body: @body)
   end
 
   private
