@@ -33,7 +33,7 @@ class SubmittedProposalsController < ApplicationController
 
   def expired_invitations
     @expired_invitations = Invite.where(status: 'expired')
-                                 .includes(:proposal, :person, :proposal_type)
+                                 .includes(:proposal, :person)
                                  .order(expired_at: :desc)
     
     respond_to do |format|
