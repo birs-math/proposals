@@ -547,17 +547,25 @@ export default class extends Controller {
     $.ajax({
       url: `/proposals/${proposalId}/invites/${inviteId}/invite_reminder`,
       type: "POST",
+      dataType: "json",
       headers: {
-        "X-CSRF-Token": $('meta[name="csrf-token"]').attr("content")
+        "X-CSRF-Token": $('meta[name="csrf-token"]').attr("content"),
+        "Accept": "application/json"
       },
-      success: () => {
-        toastr.success("Invitation has been resent!")
+      success: (response) => {
+        toastr.success(response.message || "Invitation has been resent!")
         setTimeout(() => {
           window.location.reload()
         }, 2000)
       },
       error: (xhr) => {
-        toastr.error("Failed to resend invitation: " + (xhr.responseJSON?.error || "Unknown error"))
+        let errorMsg = "Unknown error"
+        if (xhr.responseJSON && xhr.responseJSON.message) {
+          errorMsg = xhr.responseJSON.message
+        } else if (xhr.responseText) {
+          errorMsg = xhr.responseText
+        }
+        toastr.error("Failed to resend invitation: " + errorMsg)
         // Re-enable button on error
         event.currentTarget.disabled = false
         event.currentTarget.innerText = "Resend Invitation"
