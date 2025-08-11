@@ -24,11 +24,15 @@ class Invite < ApplicationRecord
   scope :organizer, -> { where(invited_as: 'Organizer') }
   scope :participant, -> { where(invited_as: 'Participant') }
   scope :active, -> { where.not(status: %w[cancelled declined expired]) }
-  scope :expired, -> { 
+  # Alternative implementation to bypass cache issues
+  def self.expired_invitations
     joins(:proposal)
       .where('invites.deadline_date < ? AND invites.status = ? AND (proposals.assigned_date IS NULL OR proposals.assigned_date > ?)', 
              DateTime.current.beginning_of_day, 0, Date.current)
-  }
+  end
+
+  # Original scope kept for compatibility but overridden
+  scope :expired, -> { expired_invitations }
 
   enum status: { pending: 0, confirmed: 1, cancelled: 2, declined: 3, expired: 4 }
   enum response: { yes: 0, maybe: 1, no: 2 }
@@ -43,16 +47,16 @@ class Invite < ApplicationRecord
     end
 
     def expire_overdue_invitations
-      expired_invitations = expired.includes(:proposal, :person)
+      expired_invites = expired_invitations.includes(:proposal, :person)
       
-      expired_invitations.find_each do |invite|
+      expired_invites.find_each do |invite|
         invite.update_columns(
           status: 4, # expired
           expired_at: DateTime.current
         )
       end
       
-      expired_invitations
+      expired_invites
     end
   end
 
