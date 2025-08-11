@@ -24,14 +24,15 @@ class Invite < ApplicationRecord
   scope :organizer, -> { where(invited_as: 'Organizer') }
   scope :participant, -> { where(invited_as: 'Participant') }
   scope :active, -> { where.not(status: %w[cancelled declined expired]) }
-  # Alternative implementation to bypass cache issues
+  # Year-based expiration logic - respects arbitrary deadlines for current year only
   def self.expired_invitations
+    current_year_code = "#{Date.current.year - 2000}w%"  # e.g., "25w%"
     joins(:proposal)
-      .where('invites.deadline_date < ? AND invites.status = ? AND proposals.assigned_date IS NOT NULL AND proposals.assigned_date > ?', 
-             DateTime.current.beginning_of_day, 0, Date.current)
+      .where('invites.deadline_date < ? AND invites.status = ? AND proposals.code LIKE ?', 
+             DateTime.current.beginning_of_day, 0, current_year_code)
   end
 
-  # Original scope kept for compatibility but overridden
+  # Updated scope to use new logic
   scope :expired, -> { expired_invitations }
 
   enum status: { pending: 0, confirmed: 1, cancelled: 2, declined: 3, expired: 4 }
