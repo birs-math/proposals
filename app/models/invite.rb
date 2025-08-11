@@ -24,7 +24,11 @@ class Invite < ApplicationRecord
   scope :organizer, -> { where(invited_as: 'Organizer') }
   scope :participant, -> { where(invited_as: 'Participant') }
   scope :active, -> { where.not(status: %w[cancelled declined expired]) }
-  scope :expired, -> { where('deadline_date < ? AND status = ?', DateTime.current.beginning_of_day, 'pending') }
+  scope :expired, -> { 
+    joins(:proposal)
+      .where('invites.deadline_date < ? AND invites.status = ? AND (proposals.assigned_date IS NULL OR proposals.assigned_date > ?)', 
+             DateTime.current.beginning_of_day, 0, Date.current)
+  }
 
   enum status: { pending: 0, confirmed: 1, cancelled: 2, declined: 3, expired: 4 }
   enum response: { yes: 0, maybe: 1, no: 2 }
