@@ -27,8 +27,8 @@ class Invite < ApplicationRecord
   # Alternative implementation to bypass cache issues
   def self.expired_invitations
     joins(:proposal)
-      .where('invites.deadline_date < ? AND invites.status = ? AND proposals.assigned_date IS NOT NULL AND proposals.assigned_date > ?', 
-             DateTime.current.beginning_of_day, 0, Date.current)
+      .where('invites.deadline_date < ? AND invites.status = ? AND proposals.assigned_date IS NOT NULL AND proposals.assigned_date > ? AND proposals.code NOT LIKE ? AND proposals.code NOT LIKE ? AND proposals.code NOT LIKE ?', 
+             DateTime.current.beginning_of_day, 0, Date.current, '23w%', '24w%', '25w%')
   end
 
   # Original scope kept for compatibility but overridden
