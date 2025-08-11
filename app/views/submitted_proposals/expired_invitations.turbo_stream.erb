@@ -7,6 +7,91 @@
       </div>
     </div>
 
+    <!-- Filter Controls -->
+    <div class="row mb-4">
+      <div class="col">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Filters</h5>
+            <%= form_with url: expired_invitations_submitted_proposals_path, 
+                method: :get, 
+                data: { turbo_frame: 'expired_invitations' },
+                class: 'row g-3' do |form| %>
+              
+              <div class="col-md-3">
+                <%= form.label :workshop_code, "Workshop Code", class: "form-label" %>
+                <div class="input-group">
+                  <%= form.text_field :workshop_code, 
+                      value: params[:workshop_code],
+                      placeholder: "e.g. 25w5500",
+                      class: "form-control" %>
+                  <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    Popular
+                  </button>
+                  <ul class="dropdown-menu">
+                    <% @workshop_codes.first(10).each do |code| %>
+                      <li><a class="dropdown-item" href="#" onclick="document.getElementById('workshop_code').value='<%= code %>'"><%= code %></a></li>
+                    <% end %>
+                  </ul>
+                </div>
+              </div>
+              
+              <div class="col-md-2">
+                <%= form.label :invited_as, "Role", class: "form-label" %>
+                <%= form.select :invited_as,
+                    options_for_select([
+                      ['All Roles', 'all'],
+                      ['Organizers', 'Organizer'],
+                      ['Participants', 'Participant']
+                    ], params[:invited_as] || 'all'),
+                    {},
+                    { class: "form-select" } %>
+              </div>
+              
+              <div class="col-md-2">
+                <%= form.label :expired_after, "Expired After", class: "form-label" %>
+                <%= form.date_field :expired_after, 
+                    value: params[:expired_after],
+                    class: "form-control" %>
+              </div>
+              
+              <div class="col-md-2">
+                <%= form.label :expired_before, "Expired Before", class: "form-label" %>
+                <%= form.date_field :expired_before, 
+                    value: params[:expired_before],
+                    class: "form-control" %>
+              </div>
+              
+              <div class="col-md-2">
+                <%= form.label :limit, "Show", class: "form-label" %>
+                <%= form.select :limit,
+                    options_for_select([
+                      ['50 results', 50],
+                      ['100 results', 100],
+                      ['250 results', 250],
+                      ['500 results', 500],
+                      ['All results', 10000]
+                    ], params[:limit] || 100),
+                    {},
+                    { class: "form-select" } %>
+              </div>
+              
+              <div class="col-md-1">
+                <label class="form-label">&nbsp;</label>
+                <div class="d-grid gap-1">
+                  <%= form.submit "Filter", class: "btn btn-primary btn-sm" %>
+                  <%= link_to "Clear", expired_invitations_submitted_proposals_path, 
+                      class: "btn btn-outline-secondary btn-sm",
+                      data: { turbo_frame: 'expired_invitations' } %>
+                </div>
+              </div>
+              
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <% if @expired_invitations.any? %>
       <div class="table-responsive">
         <table class="table table-striped">
@@ -61,8 +146,20 @@
         <div class="col">
           <div class="alert alert-info">
             <strong>Summary:</strong> 
-            <%= @expired_invitations.count %> expired invitations across 
+            Showing <%= @expired_invitations.count %> expired invitations across 
             <%= @expired_invitations.map(&:proposal).uniq.count %> proposals
+            <% if params[:workshop_code].present? %>
+              <br><small>Filtered by workshop: <strong><%= params[:workshop_code] %></strong></small>
+            <% end %>
+            <% if params[:invited_as].present? && params[:invited_as] != 'all' %>
+              <br><small>Role filter: <strong><%= params[:invited_as] %></strong></small>
+            <% end %>
+            <% if params[:expired_after].present? || params[:expired_before].present? %>
+              <br><small>Date range: 
+                <%= params[:expired_after] ? "After #{params[:expired_after]}" : "Beginning" %> - 
+                <%= params[:expired_before] ? "Before #{params[:expired_before]}" : "Present" %>
+              </small>
+            <% end %>
           </div>
         </div>
       </div>
