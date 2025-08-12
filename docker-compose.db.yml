@@ -1,0 +1,35 @@
+services:
+  db:
+    image: postgres:13.1
+    container_name: proposals_db
+    volumes:
+      - ./db/pg-init:/docker-entrypoint-initdb.d
+      - proposals_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=dev_password_123
+      - PSQL_TRUST_LOCALNET=true
+      - DB_PORT=5433
+      - DB_NAME=proposals_production,proposals_development,proposals_test
+      - DB_USER=propuser
+      - DB_PASS=dev_password_123
+    ports:
+      - "5434:5432"
+    networks:
+      - proposals_default
+
+  redis:
+    image: 'redis:6.2.6'
+    container_name: proposals_redis
+    command: redis-server --requirepass dev_password_123
+    ports:
+      - "6380:6379"
+    networks:
+      - proposals_default
+
+volumes:
+  proposals_data:
+
+networks:
+  proposals_default:
+    external: false

@@ -83,7 +83,7 @@
                   </div>
 
                   <div class="tab-pane" id="tab-3" role="tabpanel">
-                    <%= turbo_frame_tag "expired_invitations", src: expired_invitations_submitted_proposals_path(format: :turbo_stream, **@search_params.slice(:workshop_year)), loading: :lazy %>
+                    <%= turbo_frame_tag "expired_invitations", src: expired_invitations_submitted_proposals_path, loading: :lazy %>
                   </div>
 
                   <% if can?(:view, :demographic_data) %>

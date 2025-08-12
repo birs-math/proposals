@@ -34,45 +34,11 @@ class SubmittedProposalsController < ApplicationController
   def expired_invitations
     @expired_invitations = Invite.where(status: 'expired')
                                  .includes(:proposal, :person)
-
-    # Apply workshop code filter if provided
-    if params[:workshop_code].present?
-      @expired_invitations = @expired_invitations.joins(:proposal)
-                                                 .where('proposals.code ILIKE ?', "%#{params[:workshop_code]}%")
-    end
-
-    # Apply workshop year filter if provided
-    if params[:workshop_year].present?
-      @expired_invitations = @expired_invitations.joins(:proposal)
-                                                 .where('proposals.code LIKE ?', "#{params[:workshop_year]}%")
-    end
-
-    # Apply date range filters
-    if params[:expired_after].present?
-      @expired_invitations = @expired_invitations.where('expired_at >= ?', Date.parse(params[:expired_after]))
-    end
-    
-    if params[:expired_before].present?
-      @expired_invitations = @expired_invitations.where('expired_at <= ?', Date.parse(params[:expired_before]).end_of_day)
-    end
-
-    # Apply role filter
-    if params[:invited_as].present? && params[:invited_as] != 'all'
-      @expired_invitations = @expired_invitations.where(invited_as: params[:invited_as])
-    end
-
-    @expired_invitations = @expired_invitations.order(expired_at: :desc)
-                                               .limit(params[:limit] || 100)
-    
-    # Get workshop codes for filter dropdown
-    @workshop_codes = Invite.joins(:proposal)
-                           .where(status: 'expired')
-                           .select('DISTINCT proposals.code')
-                           .order('proposals.code')
-                           .pluck('proposals.code')
+                                 .order(expired_at: :desc)
+                                 .limit(1000)
     
     respond_to do |format|
-      format.turbo_stream
+      format.html { render 'expired_invitations' }
     end
   end
 

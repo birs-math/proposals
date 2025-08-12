@@ -1,0 +1,76 @@
+<%= turbo_frame_tag "expired_invitations" do %>
+<div class="container-fluid">
+  <div class="row py-4">
+    <div class="col">
+      <h3>Expired Invitations</h3>
+      <p class="text-muted">Invitations that have been automatically expired and freed up capacity.</p>
+    </div>
+  </div>
+
+  <% if @expired_invitations.any? %>
+    <div class="table-responsive">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Proposal</th>
+            <th>Lead Organizer</th>
+            <th>Invited Person</th>
+            <th>Role</th>
+            <th>Deadline</th>
+            <th>Expired At</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @expired_invitations.each do |invite| %>
+            <tr>
+              <td>
+                <strong><%= invite.proposal.code %></strong><br>
+                <small><%= invite.proposal.title %></small>
+              </td>
+              <td><%= invite.proposal.lead_organizer&.fullname %></td>
+              <td>
+                <%= invite.firstname %> <%= invite.lastname %><br>
+                <small class="text-muted"><%= invite.email %></small>
+              </td>
+              <td>
+                <span class="badge <%= invite.invited_as == 'Organizer' ? 'bg-primary' : 'bg-success' %>">
+                  <%= invite.humanize_invited_as %>
+                </span>
+              </td>
+              <td><%= invite.deadline_date&.strftime('%Y-%m-%d') %></td>
+              <td><%= invite.expired_at&.strftime('%Y-%m-%d %H:%M') %></td>
+              <td>
+                <%= link_to 'View Proposal', submitted_proposal_path(invite.proposal), 
+                    class: 'btn btn-sm btn-outline-primary', target: '_blank' %>
+                <%= link_to 'Resend Invitation', '#', 
+                    class: 'btn btn-sm btn-outline-warning',
+                    data: { 
+                      action: 'click->submitted-proposals#resendInvitation',
+                      invite_id: invite.id,
+                      proposal_id: invite.proposal.id
+                    } %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="row mt-3">
+      <div class="col">
+        <div class="alert alert-info">
+          <strong>Summary:</strong> 
+          Showing <%= @expired_invitations.count %> expired invitations across 
+          <%= @expired_invitations.map(&:proposal).uniq.count %> proposals
+        </div>
+      </div>
+    </div>
+  <% else %>
+    <div class="alert alert-success">
+      <i class="fas fa-check-circle"></i>
+      No expired invitations found. All invitations are current or have been responded to.
+    </div>
+  <% end %>
+</div>
+<% end %>

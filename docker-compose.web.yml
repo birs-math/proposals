@@ -1,0 +1,59 @@
+services:
+  web:
+    build: .
+    container_name: proposals
+    command: /sbin/entrypoint.sh
+    ports:
+      - '3001:3000'
+    volumes:
+      - proposals_cache:/home/app/proposals/vendor/cache
+      - proposals_cache:/home/app/proposals/node_modules
+    environment:
+      - DB_USER=propuser
+      - DB_PASS=dev_password_123
+      - DB_HOST=proposals_db  # Connect to external db container
+      - RAILS_ENV=development
+      - YARN_ENV=development
+      - RAILS_SERVE_STATIC_FILES=true
+      - SECRET_KEY_BASE=dev_secret_key_base_12345678901234567890123456789012345678901234567890123456789012345
+      - SECRET_TOKEN=dev_secret_token_1234567890123456789012345678901234567890123456789012345678901234567890
+      - DEVISE_SECRET_KEY=dev_devise_secret_1234567890123456789012345678901234567890123456789012345678901234567890
+      - DEVISE_JWT_SECRET_KEY=dev_jwt_secret_1234567890123456789012345678901234567890123456789012345678901234567890
+      - DEVISE_PEPPER=dev_pepper_123456789012345678901234567890123456789012345678901234567890123456789012345
+      - DEVISE_EMAIL=webmaster@localhost
+      - APPLICATION_HOST=localhost
+      - APPLICATION_PROTOCOL=http
+      - ROLLBAR_ENV=development
+      - ROLLBAR_TOKEN=dev_rollbar_token
+      - EMAIL_SERVER=mail.localhost
+      - EMAIL_PORT=587
+      - EMAIL_STARTTLS=true
+      - WEBMASTER_EMAIL=webmaster@localhost
+      - BIRS_COORD=BIRS Program Coordinator
+      - BIRS_EMAIL=birs@localhost
+      - CMO_COORD=CMO Program Coordinator
+      - CMO_EMAIL=cmo@localhost
+      - IASM_COORD=IASM Program Coordinator
+      - IASM_EMAIL=iasm@localhost
+      - UBCO_COORD=UBCO Program Coordinator
+      - UBCO_EMAIL=ubco@localhost
+      - EDITFLOW_API_TOKEN=dev_editflow_token
+      - EDITFLOW_API_URL=http://localhost:8080
+      - REDIS_URL=redis://proposals_redis:6379/0  # Connect to external redis container
+      - HMC_ACCESS=dev_hmc_access
+      - HMC_SERVER=localhost
+      - HMC_PORT=2000
+      - SCHEDULE_API_KEY=dev_schedule_key
+      - WORKSHOPS_API_URL=http://localhost:8090
+      - WORKSHOPS_API_KEY=dev_workshops_key
+      - MAILHOG_HOST=localhost
+
+volumes:
+  proposals_cache:
+    name: "proposals_cache"
+    external: true
+
+networks:
+  default:
+    name: proposals_proposals_default
+    external: true

@@ -7,7 +7,7 @@
 #   Character.create(name: 'Luke', movie: movies.first)
 
 unless Person.find_by(email: 'john.doe@gmail.com')
-  Person.create!(first_name: 'John', last_name: 'Doe', email: 'john.doe@gmail.com', affiliation: 'BIRS',
+  Person.create!(firstname: 'John', lastname: 'Doe', email: 'john.doe@gmail.com', affiliation: 'BIRS',
                  deceased: false, retired: true, biography: 'Banff International Research Station')
 end
 
