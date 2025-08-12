@@ -41,6 +41,12 @@ class SubmittedProposalsController < ApplicationController
                                                  .where('proposals.code ILIKE ?', "%#{params[:workshop_code]}%")
     end
 
+    # Apply workshop year filter if provided
+    if params[:workshop_year].present?
+      @expired_invitations = @expired_invitations.joins(:proposal)
+                                                 .where('proposals.code LIKE ?', "#{params[:workshop_year]}%")
+    end
+
     # Apply date range filters
     if params[:expired_after].present?
       @expired_invitations = @expired_invitations.where('expired_at >= ?', Date.parse(params[:expired_after]))

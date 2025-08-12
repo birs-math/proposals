@@ -18,7 +18,7 @@
                 data: { turbo_frame: 'expired_invitations' },
                 class: 'row g-3' do |form| %>
               
-              <div class="col-md-3">
+              <div class="col-md-2">
                 <%= form.label :workshop_code, "Workshop Code", class: "form-label" %>
                 <div class="input-group">
                   <%= form.text_field :workshop_code, 
@@ -34,6 +34,22 @@
                     <% end %>
                   </ul>
                 </div>
+              </div>
+
+              <div class="col-md-2">
+                <%= form.label :workshop_year, "Workshop Year", class: "form-label" %>
+                <%= form.select :workshop_year,
+                    options_for_select([
+                      ['All Years', ''],
+                      ['2026 (26w*)', '26w'],
+                      ['2025 (25w*)', '25w'],
+                      ['2024 (24w*)', '24w'],
+                      ['2023 (23w*)', '23w'],
+                      ['2022 (22w*)', '22w'],
+                      ['2021 (21w*)', '21w']
+                    ], params[:workshop_year]),
+                    {},
+                    { class: "form-select" } %>
               </div>
               
               <div class="col-md-2">
@@ -62,7 +78,7 @@
                     class: "form-control" %>
               </div>
               
-              <div class="col-md-2">
+              <div class="col-md-1">
                 <%= form.label :limit, "Show", class: "form-label" %>
                 <%= form.select :limit,
                     options_for_select([
@@ -150,6 +166,9 @@
             <%= @expired_invitations.map(&:proposal).uniq.count %> proposals
             <% if params[:workshop_code].present? %>
               <br><small>Filtered by workshop: <strong><%= params[:workshop_code] %></strong></small>
+            <% end %>
+            <% if params[:workshop_year].present? %>
+              <br><small>Workshop year: <strong><%= params[:workshop_year] %>*</strong></small>
             <% end %>
             <% if params[:invited_as].present? && params[:invited_as] != 'all' %>
               <br><small>Role filter: <strong><%= params[:invited_as] %></strong></small>
