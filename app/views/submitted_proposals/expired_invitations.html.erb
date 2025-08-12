@@ -4,6 +4,24 @@
     <div class="col">
       <h3>Expired Invitations</h3>
       <p class="text-muted">Invitations that have been automatically expired and freed up capacity.</p>
+      
+      <!-- Year Filter Buttons -->
+      <div class="mb-3">
+        <div class="btn-group" role="group">
+          <%= link_to "2025", expired_invitations_submitted_proposals_path(year: '25w'), 
+              class: "btn #{'btn-primary' if params[:year] == '25w' || params[:year].blank?} #{'btn-outline-primary' unless params[:year] == '25w' || params[:year].blank?}" %>
+          <%= link_to "2024", expired_invitations_submitted_proposals_path(year: '24w'), 
+              class: "btn #{'btn-primary' if params[:year] == '24w'} #{'btn-outline-primary' unless params[:year] == '24w'}" %>
+          <%= link_to "2023", expired_invitations_submitted_proposals_path(year: '23w'), 
+              class: "btn #{'btn-primary' if params[:year] == '23w'} #{'btn-outline-primary' unless params[:year] == '23w'}" %>
+          <%= link_to "2022", expired_invitations_submitted_proposals_path(year: '22w'), 
+              class: "btn #{'btn-primary' if params[:year] == '22w'} #{'btn-outline-primary' unless params[:year] == '22w'}" %>
+          <%= link_to "2021", expired_invitations_submitted_proposals_path(year: '21w'), 
+              class: "btn #{'btn-primary' if params[:year] == '21w'} #{'btn-outline-primary' unless params[:year] == '21w'}" %>
+          <%= link_to "All", expired_invitations_submitted_proposals_path(year: 'all'), 
+              class: "btn #{'btn-primary' if params[:year] == 'all'} #{'btn-outline-primary' unless params[:year] == 'all'}" %>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -12,12 +30,11 @@
       <table class="table table-striped">
         <thead>
           <tr>
-            <th>Proposal</th>
-            <th>Lead Organizer</th>
-            <th>Invited Person</th>
+            <th>Workshop</th>
+            <th>Invitee</th>
+            <th>Email</th>
             <th>Role</th>
             <th>Deadline</th>
-            <th>Expired At</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -28,28 +45,26 @@
                 <strong><%= invite.proposal.code %></strong><br>
                 <small><%= invite.proposal.title %></small>
               </td>
-              <td><%= invite.proposal.lead_organizer&.fullname %></td>
               <td>
-                <%= invite.firstname %> <%= invite.lastname %><br>
-                <small class="text-muted"><%= invite.email %></small>
+                <%= invite.firstname %> <%= invite.lastname %>
+                <%= link_to 'Resend', '#', 
+                    class: 'btn btn-sm btn-outline-warning ms-2',
+                    data: { 
+                      action: 'click->submitted-proposals#resendInvitation',
+                      invite_id: invite.id,
+                      proposal_id: invite.proposal.id
+                    } %>
               </td>
+              <td><%= invite.email %></td>
               <td>
                 <span class="badge <%= invite.invited_as == 'Organizer' ? 'bg-primary' : 'bg-success' %>">
                   <%= invite.humanize_invited_as %>
                 </span>
               </td>
               <td><%= invite.deadline_date&.strftime('%Y-%m-%d') %></td>
-              <td><%= invite.expired_at&.strftime('%Y-%m-%d %H:%M') %></td>
               <td>
                 <%= link_to 'View Proposal', submitted_proposal_path(invite.proposal), 
                     class: 'btn btn-sm btn-outline-primary', target: '_blank' %>
-                <%= link_to 'Resend Invitation', '#', 
-                    class: 'btn btn-sm btn-outline-warning',
-                    data: { 
-                      action: 'click->submitted-proposals#resendInvitation',
-                      invite_id: invite.id,
-                      proposal_id: invite.proposal.id
-                    } %>
               </td>
             </tr>
           <% end %>
@@ -63,6 +78,10 @@
           <strong>Summary:</strong> 
           Showing <%= @expired_invitations.count %> expired invitations across 
           <%= @expired_invitations.map(&:proposal).uniq.count %> proposals
+          <% year_filter = params[:year] || '25w' %>
+          <% unless year_filter == 'all' %>
+            <br><small>Filtered by: <strong><%= year_filter %>*</strong> workshops</small>
+          <% end %>
         </div>
       </div>
     </div>

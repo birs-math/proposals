@@ -32,10 +32,20 @@ class SubmittedProposalsController < ApplicationController
   end
 
   def expired_invitations
-    @expired_invitations = Invite.where(status: 'expired')
+    # Filter by year, no pagination - show all results
+    year_filter = params[:year] || '25w'  # Default to current year
+    
+    @expired_invitations = Invite.joins(:proposal)
+                                 .where(status: 'expired')
                                  .includes(:proposal, :person)
-                                 .order(expired_at: :desc)
-                                 .limit(1000)
+    
+    # Apply year filter at database level
+    if year_filter.present? && year_filter != 'all'
+      @expired_invitations = @expired_invitations.where('proposals.code LIKE ?', "#{year_filter}%")
+    end
+    
+    # Order by proposal code to make 25w5500 easy to find
+    @expired_invitations = @expired_invitations.order('proposals.code ASC, expired_at DESC')
     
     respond_to do |format|
       format.html { render 'expired_invitations' }
