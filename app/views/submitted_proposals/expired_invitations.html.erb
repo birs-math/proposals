@@ -47,6 +47,9 @@
               </td>
               <td>
                 <%= invite.firstname %> <%= invite.lastname %>
+              </td>
+              <td>
+                <%= invite.email %>
                 <%= link_to 'Resend', '#', 
                     class: 'btn btn-sm btn-outline-warning ms-2',
                     data: { 
@@ -55,7 +58,6 @@
                       proposal_id: invite.proposal.id
                     } %>
               </td>
-              <td><%= invite.email %></td>
               <td>
                 <span class="badge <%= invite.invited_as == 'Organizer' ? 'bg-primary' : 'bg-success' %>">
                   <%= invite.humanize_invited_as %>
