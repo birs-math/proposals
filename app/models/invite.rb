@@ -24,12 +24,11 @@ class Invite < ApplicationRecord
   scope :organizer, -> { where(invited_as: 'Organizer') }
   scope :participant, -> { where(invited_as: 'Participant') }
   scope :active, -> { where.not(status: %w[cancelled declined expired]) }
-  # Year-based expiration logic - respects arbitrary deadlines for current year only
+  # Approval-based expiration logic - respects arbitrary deadlines for all approved workshops
   def self.expired_invitations
-    current_year_code = "#{Date.current.year - 2000}w%"  # e.g., "25w%"
     joins(:proposal)
-      .where('invites.deadline_date < ? AND invites.status = ? AND proposals.code LIKE ?', 
-             DateTime.current.beginning_of_day, 0, current_year_code)
+      .where('invites.deadline_date < ? AND invites.status = ? AND proposals.status >= ?', 
+             DateTime.current.beginning_of_day, 0, 7) # decision_email_sent or higher
   end
 
   # Updated scope to use new logic

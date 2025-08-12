@@ -5,21 +5,18 @@
       <h3>Expired Invitations</h3>
       <p class="text-muted">Invitations that have been automatically expired and freed up capacity.</p>
       
-      <!-- Year Filter Buttons -->
+      <!-- Dynamic Year Filter Buttons -->
       <div class="mb-3">
         <div class="btn-group" role="group">
-          <%= link_to "2025", expired_invitations_submitted_proposals_path(year: '25w'), 
-              class: "btn #{'btn-primary' if params[:year] == '25w' || params[:year].blank?} #{'btn-outline-primary' unless params[:year] == '25w' || params[:year].blank?}" %>
-          <%= link_to "2024", expired_invitations_submitted_proposals_path(year: '24w'), 
-              class: "btn #{'btn-primary' if params[:year] == '24w'} #{'btn-outline-primary' unless params[:year] == '24w'}" %>
-          <%= link_to "2023", expired_invitations_submitted_proposals_path(year: '23w'), 
-              class: "btn #{'btn-primary' if params[:year] == '23w'} #{'btn-outline-primary' unless params[:year] == '23w'}" %>
-          <%= link_to "2022", expired_invitations_submitted_proposals_path(year: '22w'), 
-              class: "btn #{'btn-primary' if params[:year] == '22w'} #{'btn-outline-primary' unless params[:year] == '22w'}" %>
-          <%= link_to "2021", expired_invitations_submitted_proposals_path(year: '21w'), 
-              class: "btn #{'btn-primary' if params[:year] == '21w'} #{'btn-outline-primary' unless params[:year] == '21w'}" %>
+          <% ['26w', '25w', '24w', '23w', '22w', '21w'].each do |year_code| %>
+            <% year_display = "20#{year_code[0..1]}" %>
+            <% is_active = params[:year] == year_code || (params[:year].blank? && year_code == '25w') %>
+            <%= link_to year_display, expired_invitations_submitted_proposals_path(year: year_code), 
+                class: "btn #{'btn-primary' if is_active} #{'btn-outline-primary' unless is_active}" %>
+          <% end %>
+          <% is_all_active = params[:year] == 'all' %>
           <%= link_to "All", expired_invitations_submitted_proposals_path(year: 'all'), 
-              class: "btn #{'btn-primary' if params[:year] == 'all'} #{'btn-outline-primary' unless params[:year] == 'all'}" %>
+              class: "btn #{'btn-primary' if is_all_active} #{'btn-outline-primary' unless is_all_active}" %>
         </div>
       </div>
     </div>

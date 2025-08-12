@@ -35,6 +35,18 @@ class SubmittedProposalsController < ApplicationController
     # Filter by year, no pagination - show all results
     year_filter = params[:year] || '25w'  # Default to current year
     
+    # Get available years dynamically from proposals with expired invitations
+    sql = "SELECT DISTINCT LEFT(proposals.code, 3) as year_code 
+           FROM invites 
+           JOIN proposals ON invites.proposal_id = proposals.id 
+           WHERE invites.status = #{Invite.statuses[:expired]} 
+           AND LEFT(proposals.code, 3) SIMILAR TO '[0-9]{2}w'
+           ORDER BY year_code DESC"
+    
+    @available_years = ActiveRecord::Base.connection.execute(sql)
+                                         .map { |row| row['year_code'] }
+                                         .compact
+    
     @expired_invitations = Invite.joins(:proposal)
                                  .where(status: 'expired')
                                  .includes(:proposal, :person)
