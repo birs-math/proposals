@@ -32,6 +32,12 @@ class SubmittedProposalsController < ApplicationController
   end
 
   def expired_invitations
+    # Ensure only staff can access personal data
+    unless current_user.staff_member?
+      redirect_to root_path, alert: 'Access denied. Staff only.'
+      return
+    end
+    
     # Filter by year, no pagination - show all results
     year_filter = params[:year] || '25w'  # Default to current year
     
