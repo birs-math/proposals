@@ -2,7 +2,8 @@ class InvitesController < ApplicationController
   before_action :authenticate_user!, except: %i[show inviter_response thanks cancelled]
   before_action :set_proposal, only: %i[invite_reminder new_invite]
   before_action :set_invite,
-                only: %i[show inviter_response invite_reminder]
+                only: %i[show inviter_response]
+  before_action :set_invite_for_reminder, only: %i[invite_reminder]
   before_action :set_invite_proposal, only: %i[show]
   before_action :unsafe_set_invite, only: %i[cancel new_invite cancel_confirmed_invite]
   before_action :authorize_user, only: %i[cancel cancel_confirmed_invite]
@@ -143,6 +144,22 @@ class InvitesController < ApplicationController
     if @invite.blank?
       @lead_organizer = Invite.find_by(code: params[:code])&.proposal&.lead_organizer
 
+      render 'invalid_code', layout: 'devise'
+    end
+  end
+
+  def set_invite_for_reminder
+    # Handle both ID and code parameters for invite_reminder action
+    if params[:id]
+      @invite = Invite.find(params[:id])
+    elsif params[:code]
+      @invite = Invite.safe_find(code: params[:code])
+      
+      if @invite.blank?
+        @lead_organizer = Invite.find_by(code: params[:code])&.proposal&.lead_organizer
+        render 'invalid_code', layout: 'devise'
+      end
+    else
       render 'invalid_code', layout: 'devise'
     end
   end
