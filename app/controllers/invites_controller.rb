@@ -76,9 +76,16 @@ class InvitesController < ApplicationController
   def invite_reminder
     if @invite.pending? || @invite.expired?
       InviteMailer.with(invite: @invite).invite_reminder.deliver_later
-      check_user
+      
+      respond_to do |format|
+        format.json { render json: { message: "Invite reminder has been sent to #{@invite.person.fullname}!" } }
+        format.html { check_user }
+      end
     else
-      redirect_to edit_proposal_path(@proposal), notice: t('invites.invite_reminder.success')
+      respond_to do |format|
+        format.json { render json: { message: "Invitation has already been responded to." } }
+        format.html { redirect_to edit_proposal_path(@proposal), notice: t('invites.invite_reminder.success') }
+      end
     end
   end
 
