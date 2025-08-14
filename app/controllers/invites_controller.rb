@@ -74,7 +74,7 @@ class InvitesController < ApplicationController
   end
 
   def invite_reminder
-    if @invite.pending?
+    if @invite.pending? || @invite.expired?
       InviteMailer.with(invite: @invite).invite_reminder.deliver_later
       check_user
     else
