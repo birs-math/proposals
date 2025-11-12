@@ -6,17 +6,34 @@ class Ability
   # Whitelist of allowed model names for privileges
   # Only these classes can be used in authorization rules
   ALLOWED_PRIVILEGES = %w[
-    Proposal
-    ProposalType
-    Location
-    Schedule
-    User
-    Role
+    AmsSubject
     Answer
+    DemographicData
     Email
-    Review
-    Subject
+    EmailTemplate
+    Faq
+    Feedback
+    Invite
+    Location
+    Option
+    PageContent
     Participant
+    Person
+    Proposal
+    ProposalField
+    ProposalForm
+    ProposalType
+    Review
+    Role
+    Schedule
+    SchedulesController
+    StaffDiscussion
+    Subject
+    SubjectCategory
+    SubmittedProposalsController
+    Survey
+    User
+    Validation
   ].freeze
 
   def initialize(user)
