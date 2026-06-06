@@ -16,6 +16,11 @@ RUN echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources
 RUN curl -sS https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
 
 # Needed packages
+# The phusion passenger apt repo's signing key (D870AB033FB45BD1) has rotated/expired, so
+# `apt-get update` fails ("NO_PUBKEY ... passenger focal Release is not signed") on any
+# from-scratch build. Passenger is baked into the base image and never apt-installed here, so
+# drop the broken repo. (Pre-existing infra rot, not related to the Ruby/Rails bump.)
+RUN rm -f /etc/apt/sources.list.d/passenger.list
 RUN apt-get update
 RUN apt-get install --yes --fix-missing pkg-config apt-utils build-essential \
               cmake automake tzdata locales curl git gnupg ca-certificates \
