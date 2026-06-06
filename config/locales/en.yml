@@ -57,7 +57,7 @@ en:
       new_organizers_invite: Click here to send out additional organizer invitation
       invite_participants: Invite Participant(s)
       invite_organizers: Invite Organizer(s)
-      fill_in_title: Please, fill in title and save before proceeding
+      fill_in_title: Please fill in title and save before proceeding
       preamble: LaTeX Preamble
       preamble_note: If you need to use custom LaTeX macros, enter them here to add them to the document preamble.
       bibliography: Bibliography
