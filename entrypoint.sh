@@ -23,14 +23,14 @@ rm /etc/timezone
 rm /etc/localtime
 dpkg-reconfigure --frontend noninteractive tzdata
 
-if [ ! -e /usr/local/rvm/gems/ruby-2.7.7 ]; then
+if [ ! -e /usr/local/rvm/gems/ruby-2.7.8 ]; then
   echo
   echo "Create gemset..."
   gpg --keyserver keys.openpgp.org --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB
   /usr/bin/curl -sSL https://get.rvm.io | bash -s stable
-  bash -lc 'rvm --default use ruby-2.7.7'
-  /usr/local/rvm/bin/rvm gemset create ruby-2.7.7
-  /usr/local/rvm/bin/rvm gemset use ruby-2.7.7@global
+  bash -lc 'rvm --default use ruby-2.7.8'
+  /usr/local/rvm/bin/rvm gemset create ruby-2.7.8
+  /usr/local/rvm/bin/rvm gemset use ruby-2.7.8@global
   /usr/local/rvm/bin/rvm cleanup all
   /usr/local/rvm/bin/rvm reload
 fi
@@ -49,7 +49,7 @@ yarn --version
 
 echo
 echo "Installing bundler..."
-/usr/local/rvm/bin/rvm-exec 2.7.7 gem install bundler -v 2.4.22
+/usr/local/rvm/bin/rvm-exec 2.7.8 gem install bundler -v 2.4.22
 
 if [ ! -e /home/app/proposals/bin ]; then
   echo
