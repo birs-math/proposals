@@ -45,8 +45,10 @@ ENV APP_HOME /home/app/proposals
 COPY --chown=app . $APP_HOME
 WORKDIR $APP_HOME
 
-RUN /usr/local/rvm/bin/rvm --default use 2.7.7
-RUN /usr/local/rvm/bin/rvm-exec 2.7.7 gem install bundler -v 2.4.22
+# Base image ships only Ruby 2.7.7; install 2.7.8 on the proven 2.4.1 base
+# (minimal change vs swapping the whole base image — same idiom as workshops).
+RUN /bin/bash -lc "rvm install 2.7.8 && rvm --default use 2.7.8 && rvm cleanup all"
+RUN /usr/local/rvm/bin/rvm-exec 2.7.8 gem install bundler -v 2.4.22
 RUN bundle install --jobs=3 --retry=3
 RUN chown app:app -R /usr/local/rvm/gems
 
@@ -60,8 +62,8 @@ COPY entrypoint.sh /sbin/
 RUN chmod 755 /sbin/entrypoint.sh
 RUN mkdir -p /etc/my_init.d
 RUN ln -s /sbin/entrypoint.sh /etc/my_init.d/entrypoint.sh
-RUN echo 'export PATH=./bin:$PATH:/usr/local/rvm/rubies/ruby-2.7.7/bin' >> /root/.bashrc
-RUN echo 'export PATH=./bin:$PATH:/usr/local/rvm/rubies/ruby-2.7.7/bin' >> /home/app/.bashrc
+RUN echo 'export PATH=./bin:$PATH:/usr/local/rvm/rubies/ruby-2.7.8/bin' >> /root/.bashrc
+RUN echo 'export PATH=./bin:$PATH:/usr/local/rvm/rubies/ruby-2.7.8/bin' >> /home/app/.bashrc
 RUN echo 'alias rspec="bundle exec rspec"' >> /root/.bashrc
 RUN echo 'alias rspec="bundle exec rspec"' >> /home/app/.bashrc
 RUN echo 'alias restart="passenger-config restart-app /home/app/proposals & tail -f log/production.log"' >> /root/.bashrc

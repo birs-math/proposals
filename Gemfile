@@ -1,13 +1,16 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-ruby '2.7.7'
+ruby '2.7.8'
 
 gem 'aasm', '~> 5.1', '>= 5.1.1'
 gem 'acts_as_list'
 gem 'bcrypt_pbkdf'
 gem 'bootsnap', '>= 1.4.4', require: false
 gem 'cancancan'
+# Pin: concurrent-ruby 1.3.5+ drops `require 'logger'`, which breaks Rails <7.1 boot
+# (LoggerThreadSafeLevel NameError). Remove when on Rails 7.1+.
+gem 'concurrent-ruby', '1.3.4'
 gem 'caxlsx'
 gem 'caxlsx_rails'
 gem 'countries', require: 'countries/global'
