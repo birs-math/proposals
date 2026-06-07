@@ -3,7 +3,7 @@
 <div>
   <h3 class="form-section"><%= I18n.t('proposals.form.add_organizers') %></h3>
   <% unless title_present %>
-    <p class="field-validation">Please, fill in title and save before proceeding</p>
+    <p class="field-validation">Please fill in title and save before proceeding</p>
   <% end %>
   <p><%= @proposal.proposal_type.organizer_description&.html_safe %></p>
   <% if @proposal.invites.organizer %>

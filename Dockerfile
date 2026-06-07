@@ -16,6 +16,11 @@ RUN echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources
 RUN curl -sS https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
 
 # Needed packages
+# The phusion passenger apt repo's signing key (D870AB033FB45BD1) has rotated/expired, so
+# `apt-get update` fails ("NO_PUBKEY ... passenger focal Release is not signed") on any
+# from-scratch build. Passenger is baked into the base image and never apt-installed here, so
+# drop the broken repo. (Pre-existing infra rot, not related to the Ruby/Rails bump.)
+RUN rm -f /etc/apt/sources.list.d/passenger.list
 RUN apt-get update
 RUN apt-get install --yes --fix-missing pkg-config apt-utils build-essential \
               cmake automake tzdata locales curl git gnupg ca-certificates \
@@ -45,8 +50,10 @@ ENV APP_HOME /home/app/proposals
 COPY --chown=app . $APP_HOME
 WORKDIR $APP_HOME
 
-RUN /usr/local/rvm/bin/rvm --default use 2.7.7
-RUN /usr/local/rvm/bin/rvm-exec 2.7.7 gem install bundler -v 2.4.22
+# Base image ships only Ruby 2.7.7; install 2.7.8 on the proven 2.4.1 base
+# (minimal change vs swapping the whole base image — same idiom as workshops).
+RUN /bin/bash -lc "rvm install 2.7.8 && rvm --default use 2.7.8 && rvm cleanup all"
+RUN /usr/local/rvm/bin/rvm-exec 2.7.8 gem install bundler -v 2.4.22
 RUN bundle install --jobs=3 --retry=3
 RUN chown app:app -R /usr/local/rvm/gems
 
@@ -60,8 +67,8 @@ COPY entrypoint.sh /sbin/
 RUN chmod 755 /sbin/entrypoint.sh
 RUN mkdir -p /etc/my_init.d
 RUN ln -s /sbin/entrypoint.sh /etc/my_init.d/entrypoint.sh
-RUN echo 'export PATH=./bin:$PATH:/usr/local/rvm/rubies/ruby-2.7.7/bin' >> /root/.bashrc
-RUN echo 'export PATH=./bin:$PATH:/usr/local/rvm/rubies/ruby-2.7.7/bin' >> /home/app/.bashrc
+RUN echo 'export PATH=./bin:$PATH:/usr/local/rvm/rubies/ruby-2.7.8/bin' >> /root/.bashrc
+RUN echo 'export PATH=./bin:$PATH:/usr/local/rvm/rubies/ruby-2.7.8/bin' >> /home/app/.bashrc
 RUN echo 'alias rspec="bundle exec rspec"' >> /root/.bashrc
 RUN echo 'alias rspec="bundle exec rspec"' >> /home/app/.bashrc
 RUN echo 'alias restart="passenger-config restart-app /home/app/proposals & tail -f log/production.log"' >> /root/.bashrc
