@@ -9,8 +9,12 @@ ENV HOME /root
 CMD ["/sbin/my_init"]
 
 # Yarn package
-RUN curl -sS https://raw.githubusercontent.com/yarnpkg/releases/gh-pages/debian/pubkey.gpg | apt-key add -
-RUN echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
+# The old gh-pages pubkey URL no longer carries Yarn's current signing key (62D54FD4003F6525),
+# so `apt-get update` fails ("NO_PUBKEY ... dl.yarnpkg.com ... is not signed") on a from-scratch
+# build. Fetch the canonical key into a keyring and pin the repo to it with signed-by.
+# (Same class of infra rot as the phusion repo below, not related to the Ruby/Rails bump.)
+RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | gpg --dearmor -o /usr/share/keyrings/yarnkey.gpg
+RUN echo "deb [signed-by=/usr/share/keyrings/yarnkey.gpg] https://dl.yarnpkg.com/debian stable main" > /etc/apt/sources.list.d/yarn.list
 
 # Postgres
 RUN curl -sS https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
