@@ -338,12 +338,13 @@ class Proposal < ApplicationRecord
   end
 
   def next_number
-    codes = Proposal.submitted_type(proposal_type.name).pluck(:code)
-    last_code = codes.reject { |c| c.to_s.empty? }.max
-
-    return '001' if last_code.blank?
-
-    (last_code[-3..].to_i + 1).to_s.rjust(3, '0')
+    prefix = year.to_s[-2..] + (proposal_type.code || 'xx')
+    used = Proposal.where("code LIKE ?", "#{prefix}%")
+                   .pluck(:code)
+                   .map { |c| c.sub(prefix, '').to_i }
+                   .to_set
+    num = (1..).find { |n| !used.include?(n) }
+    num.to_s.rjust(3, '0')
   end
 
   def create_code
