@@ -15,8 +15,25 @@
     <div class="col-lg-8">
       <div class="alert alert-danger" role="alert">
         <h4 class="alert-heading">Action required: draft proposals will be locked</h4>
-        <p>Editing an active form creates a new version and deactivates the current one. <%= t('proposal_forms.stale_drafts.locked_notice', count: @stale_count) %> Their authors will see a message asking them to start a new proposal.</p>
+        <p>Editing an active form creates a new version and deactivates the current one. The following <%= pluralize(@stale_count, 'draft proposal') %> will be locked. Their authors will see a message asking them to start a new proposal.</p>
         <p><strong>This cannot be undone from the UI.</strong> Please confirm you wish to proceed.</p>
+      </div>
+
+      <div class="card mb-3" style="max-height: 300px; overflow-y: auto;">
+        <table class="table table-sm mb-0">
+          <thead>
+            <tr><th>Code</th><th>Title</th><th>Last modified</th></tr>
+          </thead>
+          <tbody>
+            <% @proposals_to_lock.order(updated_at: :desc).each do |p| %>
+              <tr>
+                <td><%= link_to p.code, submitted_proposal_path(p), target: '_blank' %></td>
+                <td><%= p.title %></td>
+                <td><%= p.updated_at.strftime("%Y-%m-%d") %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
       </div>
 
       <div class="d-flex gap-2">

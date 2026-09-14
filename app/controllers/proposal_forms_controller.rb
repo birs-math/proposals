@@ -16,7 +16,8 @@ class ProposalFormsController < ApplicationController
     return if params[:cloned]
 
     if draft_proposals_for(@proposal_form).any? && !params[:confirmed]
-      @stale_count = draft_proposals_for(@proposal_form).count
+      @proposals_to_lock = draft_proposals_for(@proposal_form)
+      @stale_count = @proposals_to_lock.count
       render :confirm_edit_clone
       return
     end
@@ -37,7 +38,8 @@ class ProposalFormsController < ApplicationController
 
   def update
     if deactivating? && draft_proposals_for(@proposal_form).any? && !params[:confirmed]
-      @stale_count = draft_proposals_for(@proposal_form).count
+      @proposals_to_lock = draft_proposals_for(@proposal_form)
+      @stale_count = @proposals_to_lock.count
       @pending_params = proposal_form_params
       @confirm_url = proposal_type_proposal_form_path(@proposal_type, @proposal_form)
       @confirm_method = :patch
@@ -61,7 +63,8 @@ class ProposalFormsController < ApplicationController
 
   def deactivate
     if draft_proposals_for(@proposal_form).any? && !params[:confirmed]
-      @stale_count = draft_proposals_for(@proposal_form).count
+      @proposals_to_lock = draft_proposals_for(@proposal_form)
+      @stale_count = @proposals_to_lock.count
       @confirm_url = deactivate_proposal_type_proposal_form_path(@proposal_type, @proposal_form)
       @confirm_method = :patch
       render :confirm_deactivate
