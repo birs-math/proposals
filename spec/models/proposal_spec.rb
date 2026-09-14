@@ -29,13 +29,18 @@ RSpec.describe Proposal, type: :model do
     let(:year) { Date.current.year.to_i + 2 }
     let(:year_code) { year.to_s[-2..] }
 
-    before { create(:proposal, proposal_type: type, status: :submitted, code: "#{year_code}w5005") }
+    before do
+      (1..5).each do |n|
+        create(:proposal, proposal_type: type, status: :submitted,
+               code: "#{year_code}w5#{n.to_s.rjust(3, '0')}")
+      end
+    end
 
     it 'creates a new code if no code is given' do
       expect(proposal.code).not_to be_empty
     end
 
-    it 'sequences the code' do
+    it 'uses the first unused code number within the year' do
       expect(proposal.code).to eq("#{year_code}w5006")
     end
   end
