@@ -13,6 +13,17 @@
         </ol>
       </nav>
     </div>
+    <% if @proposal_form.new_record? && @stale_drafts&.any? %>
+      <div class="alert alert-warning" role="alert">
+        <strong><%= t('proposal_forms.stale_drafts.warning_title') %></strong>
+        <%= t('proposal_forms.stale_drafts.warning_body', count: @stale_drafts.count) %>
+        <ul class="mb-0 mt-1">
+          <% @stale_drafts.each do |p| %>
+            <li><%= link_to "#{p.code} — #{p.title}", submitted_proposal_path(p) %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
     <div class="col-12 ">
       <div class="card">
         <div class="card-body">
