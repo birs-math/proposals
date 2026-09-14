@@ -27,9 +27,7 @@
           <td class="table-action">
             <%= link_to '<i class="align-middle fas fa-fw fa-eye" data-toggle="tooltip" title="Show"></i>Show'.html_safe, proposal_type_proposal_form_url(@proposal_type, proposal_form) %>
             <% if proposal_form.draft? || proposal_form.active? %>
-             <%= link_to '<i class="align-middle fas fa-fw fa-pen" data-toggle="tooltip" title="Edit"></i>Edit'.html_safe, edit_proposal_type_proposal_form_url(@proposal_type, proposal_form), data: {
-              confirm: 'Are you sure ?'
-             } %>
+             <%= link_to '<i class="align-middle fas fa-fw fa-pen" data-toggle="tooltip" title="Edit"></i>Edit'.html_safe, edit_proposal_type_proposal_form_url(@proposal_type, proposal_form) %>
             <% end %>
           </td>
         </tr>

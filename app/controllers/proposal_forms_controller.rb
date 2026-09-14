@@ -15,6 +15,13 @@ class ProposalFormsController < ApplicationController
     return unless @proposal_form.active?
     return if params[:cloned]
 
+    if draft_proposals_for(@proposal_form).any? && !params[:confirmed]
+      @stale_count = draft_proposals_for(@proposal_form).count
+      render :confirm_edit_clone
+      return
+    end
+
+    lock_draft_proposals_for(@proposal_form)
     @proposal_form.update(status: :inactive)
     form = @proposal_form.deep_clone include: { proposal_fields:
                                                 %i[options validations] }
