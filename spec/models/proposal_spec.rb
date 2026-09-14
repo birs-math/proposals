@@ -32,7 +32,7 @@ RSpec.describe Proposal, type: :model do
     before do
       (1..5).each do |n|
         create(:proposal, proposal_type: type, status: :submitted,
-               code: "#{year_code}w5#{n.to_s.rjust(3, '0')}")
+                          code: "#{year_code}w5#{n.to_s.rjust(3, '0')}")
       end
     end
 
