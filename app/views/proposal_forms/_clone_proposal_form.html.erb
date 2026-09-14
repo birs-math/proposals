@@ -16,7 +16,7 @@
                     <span class="fw-bold">Proposal Type: </span> <%= proposal_form.proposal_type&.name %><br>
                     <span class="fw-bold">Version: </span><%= proposal_form.version %>
                   </div>
-                  <%= link_to 'Clone', clone_proposal_type_proposal_form_path(@proposal_type, proposal_form), class:'btn btn-pill btn-primary float-end', method: :post, data: { confirm: clone_confirm_message(proposal_type_id) } %>
+                  <%= link_to 'Clone', clone_proposal_type_proposal_form_path(@proposal_type, proposal_form), class:'btn btn-pill btn-primary float-end', method: :post %>
                 </div>
               </div>
             </div>

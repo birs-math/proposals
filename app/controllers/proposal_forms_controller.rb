@@ -1,15 +1,13 @@
 class ProposalFormsController < ApplicationController
   load_and_authorize_resource
   before_action :set_proposal_type
-  before_action :set_proposal_form, only: %i[edit update show clone
-                                             proposal_field]
+  before_action :set_proposal_form, only: %i[edit update show clone proposal_field]
 
   def index
     @proposal_forms = @proposal_type.proposal_forms
   end
 
   def new
-    @stale_drafts = stale_drafts_for(@proposal_type)
     @proposal_form = ProposalForm.new
   end
 
@@ -31,11 +29,20 @@ class ProposalFormsController < ApplicationController
   end
 
   def update
+    if deactivating? && draft_proposals_for(@proposal_form).any? && !params[:confirmed]
+      @stale_count = draft_proposals_for(@proposal_form).count
+      @pending_params = proposal_form_params
+      render :confirm_deactivate
+      return
+    end
+    locked_count = deactivating? ? lock_draft_proposals_for(@proposal_form) : 0
     if @proposal_form.update(proposal_form_params)
       version_update_form
+      notice = t('proposal_forms.update.success')
+      notice += " #{t('proposal_forms.stale_drafts.locked_notice', count: locked_count)}" if locked_count > 0
       redirect_to proposal_type_proposal_form_path(@proposal_type,
                                                    @proposal_form),
-                  notice: t('proposal_forms.update.success')
+                  notice: notice
     else
       redirect_to edit_proposal_type_proposal_form_path,
                   status: :unprocessable_entity,
@@ -63,8 +70,6 @@ class ProposalFormsController < ApplicationController
   end
 
   def clone
-    lock_stale_drafts_for(@proposal_type)
-    @proposal_type.proposal_forms.update_all(status: :inactive) # rubocop:disable Rails/SkipsModelValidations
     proposal_form = @proposal_form.deep_clone include:
                                   { proposal_fields: %i[options validations] }
     proposal_form.version = highest_version
@@ -114,24 +119,20 @@ class ProposalFormsController < ApplicationController
 
   def version_form_create
     @proposal_form = ProposalForm.new(proposal_form_params)
-    lock_stale_drafts_for(@proposal_form.proposal_type)
-    forms = @proposal_form.proposal_type.proposal_forms.where(status:
-                                                              %i[active draft])
-    forms.update_all(status: :inactive) # rubocop:disable Rails/SkipsModelValidations
     @proposal_form.created_by = current_user
     @proposal_form.version = highest_version
   end
 
-  def lock_stale_drafts_for(proposal_type)
-    active_form = proposal_type.proposal_forms.find_by(status: :active)
-    return unless active_form
-    Proposal.draft.where(proposal_form_id: active_form.id)
-            .update_all(status: Proposal.statuses[:locked])
+  def deactivating?
+    proposal_form_params[:status] == 'inactive' && @proposal_form.active?
   end
 
-  def stale_drafts_for(proposal_type)
-    active_form = proposal_type.proposal_forms.find_by(status: :active)
-    return Proposal.none unless active_form
-    Proposal.draft.where(proposal_form_id: active_form.id)
+  def draft_proposals_for(form)
+    Proposal.draft.where(proposal_form_id: form.id)
+  end
+
+  def lock_draft_proposals_for(form)
+    Proposal.draft.where(proposal_form_id: form.id)
+            .update_all(status: Proposal.statuses[:locked])
   end
 end

@@ -58,26 +58,9 @@ en:
     limit_per_type_per_year: 'There is a limit of one %{proposal_type} proposal per year.'
   proposal_forms:
     stale_drafts:
-      warning_title: 'Heads up: draft proposals will be locked.'
-      warning_body:
-        one: >
-          There is 1 draft proposal tied to the current active form. Saving this new form
-          will lock that draft — its author will be asked to start a fresh proposal.
-        other: >
-          There are %{count} draft proposals tied to the current active form. Saving this new
-          form will lock those drafts — their authors will be asked to start fresh proposals.
-    clone_confirm:
-      zero: >
-        You already have a form for this proposal type in draft/active state. If you continue,
-        it will be made inactive. Do you want to continue?
-      one: >
-        You already have a form for this proposal type in draft/active state. If you continue,
-        it will be made inactive and 1 draft proposal tied to the current active form will be
-        locked. Do you want to continue?
-      other: >
-        You already have a form for this proposal type in draft/active state. If you continue,
-        it will be made inactive and %{count} draft proposals tied to the current active form
-        will be locked. Do you want to continue?
+      locked_notice:
+        one: '1 draft proposal tied to this form has been locked.'
+        other: '%{count} draft proposals tied to this form have been locked.'
     ui:
       no_proposals: No proposals found
       current_year: 'Current year (%{year})'

@@ -1,0 +1,34 @@
+<main class="content">
+  <div class="container-fluid">
+    <div class="header">
+      <h1 class="header-title">Confirm Deactivation</h1>
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><%= link_to "Dashboard", dashboards_path %></li>
+          <li class="breadcrumb-item"><%= link_to "Proposal Types", proposal_types_path %></li>
+          <li class="breadcrumb-item"><%= link_to @proposal_type.name, proposal_type_proposal_forms_path(@proposal_type) %></li>
+          <li class="breadcrumb-item active">Confirm Deactivation</li>
+        </ol>
+      </nav>
+    </div>
+
+    <div class="col-lg-8">
+      <div class="alert alert-danger" role="alert">
+        <h4 class="alert-heading">Action required: draft proposals will be locked</h4>
+        <p><%= t('proposal_forms.stale_drafts.locked_notice', count: @stale_count) %> Their authors will see a message asking them to start a new proposal.</p>
+        <p><strong>This cannot be undone from the UI.</strong> Please confirm you wish to deactivate this form and lock those drafts.</p>
+      </div>
+
+      <%= form_with url: proposal_type_proposal_form_path(@proposal_type, @proposal_form), method: :patch do |f| %>
+        <% @pending_params.each do |key, value| %>
+          <%= hidden_field_tag "proposal_form[#{key}]", value %>
+        <% end %>
+        <%= hidden_field_tag :confirmed, 1 %>
+        <div class="d-flex gap-2">
+          <%= f.submit "Confirm — deactivate form and lock #{@stale_count} draft proposal(s)", class: 'btn btn-danger' %>
+          <%= link_to "Cancel", edit_proposal_type_proposal_form_path(@proposal_type, @proposal_form, cloned: true), class: 'btn btn-secondary' %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</main>
