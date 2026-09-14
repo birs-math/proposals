@@ -68,7 +68,8 @@ class Proposal < ApplicationRecord
     revision_requested_after_review: 10,
     revision_submitted_spc: 11,
     in_progress_spc: 12,
-    shortlisted: 13
+    shortlisted: 13,
+    locked: 14
   }
 
   aasm column: :status, enum: true do
@@ -84,6 +85,7 @@ class Proposal < ApplicationRecord
     state :decision_pending
     state :decision_email_sent
     state :shortlisted
+    state :locked
 
     event :active do
       transitions from: :draft, to: :submitted

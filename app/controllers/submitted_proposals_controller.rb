@@ -181,6 +181,16 @@ class SubmittedProposalsController < ApplicationController
     end
   end
 
+  def unlock
+    unless @proposal.locked?
+      redirect_to submitted_proposal_path(@proposal), alert: t('proposals.locked.not_locked')
+      return
+    end
+
+    @proposal.update!(status: :draft)
+    redirect_to submitted_proposal_path(@proposal), notice: t('proposals.locked.unlocked', title: @proposal.title)
+  end
+
   def update_location
     location = params[:location]
     if @proposal.update(assigned_location_id: location)

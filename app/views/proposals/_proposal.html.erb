@@ -27,6 +27,11 @@
         </ol>
       </nav>
     </div>
+    <% if proposal.locked? %>
+      <div class="alert alert-warning" role="alert">
+        <%= t('proposals.locked.notice') %>
+      </div>
+    <% end %>
     <%= form_with(url: submit_proposals_path(proposal: @proposal.id), html: {'data-turbo':false, id: 'submit_proposal' }) do  |f| %>
       <div class="row" data-controller="auto-save-proposal">
         <div class="col-12">

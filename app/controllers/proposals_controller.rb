@@ -2,7 +2,7 @@ class ProposalsController < ApplicationController
   before_action :authenticate_user!
   before_action :set_proposal, except: %i[index create new latex_input]
   before_action :check_status, only: %i[edit]
-  before_action :authorize_user, only: %i[show edit]
+  before_action :authorize_user, only: %i[show edit destroy]
   before_action :set_careers, only: %i[show edit]
 
   def index
@@ -160,6 +160,11 @@ class ProposalsController < ApplicationController
   def check_status
     return if @proposal.editable?
 
+    if @proposal.locked?
+      redirect_to proposal_path(@proposal), alert: t('proposals.locked.alert')
+      return
+    end
+
     raise CanCan::AccessDenied
   end
 
@@ -177,6 +182,10 @@ class ProposalsController < ApplicationController
 
     return if params[:action] == 'edit' &&
               (current_user.staff_member? || current_user.lead_organizer?(@proposal))
+
+    return if params[:action] == 'destroy' &&
+              (current_user.staff_member? ||
+               (current_user.lead_organizer?(@proposal) && (@proposal.draft? || @proposal.locked?)))
 
     raise CanCan::AccessDenied
   end
