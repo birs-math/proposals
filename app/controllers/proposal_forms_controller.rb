@@ -1,7 +1,7 @@
 class ProposalFormsController < ApplicationController
   load_and_authorize_resource
   before_action :set_proposal_type
-  before_action :set_proposal_form, only: %i[edit update show clone proposal_field]
+  before_action :set_proposal_form, only: %i[edit update show clone deactivate proposal_field]
 
   def index
     @proposal_forms = @proposal_type.proposal_forms
@@ -39,6 +39,8 @@ class ProposalFormsController < ApplicationController
     if deactivating? && draft_proposals_for(@proposal_form).any? && !params[:confirmed]
       @stale_count = draft_proposals_for(@proposal_form).count
       @pending_params = proposal_form_params
+      @confirm_url = proposal_type_proposal_form_path(@proposal_type, @proposal_form)
+      @confirm_method = :patch
       render :confirm_deactivate
       return
     end
@@ -55,6 +57,21 @@ class ProposalFormsController < ApplicationController
                   status: :unprocessable_entity,
                   alert: t('proposal_forms.update.failure')
     end
+  end
+
+  def deactivate
+    if draft_proposals_for(@proposal_form).any? && !params[:confirmed]
+      @stale_count = draft_proposals_for(@proposal_form).count
+      @confirm_url = deactivate_proposal_type_proposal_form_path(@proposal_type, @proposal_form)
+      @confirm_method = :patch
+      render :confirm_deactivate
+      return
+    end
+    locked_count = lock_draft_proposals_for(@proposal_form)
+    @proposal_form.update!(status: :inactive)
+    notice = t('proposal_forms.update.success')
+    notice += " #{t('proposal_forms.stale_drafts.locked_notice', count: locked_count)}" if locked_count > 0
+    redirect_to proposal_type_proposal_forms_path(@proposal_type), notice: notice
   end
 
   def create

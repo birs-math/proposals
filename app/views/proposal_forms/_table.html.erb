@@ -27,7 +27,10 @@
           <td class="table-action">
             <%= link_to '<i class="align-middle fas fa-fw fa-eye" data-toggle="tooltip" title="Show"></i>Show'.html_safe, proposal_type_proposal_form_url(@proposal_type, proposal_form) %>
             <% if proposal_form.draft? || proposal_form.active? %>
-             <%= link_to '<i class="align-middle fas fa-fw fa-pen" data-toggle="tooltip" title="Edit"></i>Edit'.html_safe, edit_proposal_type_proposal_form_url(@proposal_type, proposal_form) %>
+              <%= link_to '<i class="align-middle fas fa-fw fa-pen" data-toggle="tooltip" title="Edit"></i>Edit'.html_safe, edit_proposal_type_proposal_form_url(@proposal_type, proposal_form) %>
+            <% end %>
+            <% if proposal_form.active? %>
+              <%= button_to "Deactivate", deactivate_proposal_type_proposal_form_path(@proposal_type, proposal_form), method: :patch, class: 'btn btn-sm btn-warning d-inline' %>
             <% end %>
           </td>
         </tr>

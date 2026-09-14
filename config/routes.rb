@@ -118,6 +118,7 @@ Rails.application.routes.draw do
     resources :proposal_forms do
       member do
         post :clone
+        patch :deactivate
         delete :proposal_field
         get :proposal_field_edit
       end
