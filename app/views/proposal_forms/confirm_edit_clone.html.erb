@@ -12,14 +12,18 @@
       </nav>
     </div>
 
-    <div class="col-lg-8">
+    <div class="col-lg-12">
       <div class="alert alert-danger" role="alert">
-        <h4 class="alert-heading">Action required: draft proposals will be locked</h4>
-        <p>Editing an active form creates a new version and deactivates the current one. The following <%= pluralize(@stale_count, 'draft proposal') %> will be locked. Their authors will see a message asking them to start a new proposal.</p>
-        <p><strong>This cannot be undone from the UI.</strong> Please confirm you wish to proceed.</p>
+        <strong>Attention:</strong> Editing this form will lock the following <%= pluralize(@stale_count, 'draft proposal') %>.
       </div>
 
-      <div class="card mb-3" style="max-height: 300px; overflow-y: auto;">
+      <div class="card mb-3">
+        <div class="card-body">
+          <p class="mb-0">Editing an active form creates a new draft version and deactivates the current one (<strong><%= @proposal_form.title %></strong>, ID #<%= @proposal_form.id %>). The authors of these drafts will no longer be able to edit or submit them. They will see a message explaining that the call for proposals has been updated and asking them to start a new proposal. <strong>This cannot be undone from the UI.</strong></p>
+        </div>
+      </div>
+
+      <div class="card mb-3" style="max-height: 400px; overflow-y: auto;">
         <table class="table table-sm mb-0">
           <thead>
             <tr><th>Code</th><th>Title</th><th>Last modified</th></tr>

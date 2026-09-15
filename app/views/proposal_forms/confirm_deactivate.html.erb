@@ -12,14 +12,18 @@
       </nav>
     </div>
 
-    <div class="col-lg-8">
+    <div class="col-lg-12">
       <div class="alert alert-danger" role="alert">
-        <h4 class="alert-heading">Action required: draft proposals will be locked</h4>
-        <p>Deactivating <strong><%= @proposal_form.title %></strong> (ID #<%= @proposal_form.id %>) will lock the following <%= pluralize(@stale_count, 'draft proposal') %>. Their authors will see a message asking them to start a new proposal.</p>
-        <p><strong>This cannot be undone from the UI.</strong> Please confirm you wish to proceed.</p>
+        <strong>Attention:</strong> Deactivating this form will lock the following <%= pluralize(@stale_count, 'draft proposal') %>.
       </div>
 
-      <div class="card mb-3" style="max-height: 300px; overflow-y: auto;">
+      <div class="card mb-3">
+        <div class="card-body">
+          <p class="mb-0">Deactivating <strong><%= @proposal_form.title %></strong> (ID #<%= @proposal_form.id %>) will prevent the authors of these drafts from editing or submitting them. They will see a message explaining that the call for proposals has been updated and asking them to start a new proposal. <strong>This cannot be undone from the UI.</strong></p>
+        </div>
+      </div>
+
+      <div class="card mb-3" style="max-height: 400px; overflow-y: auto;">
         <table class="table table-sm mb-0">
           <thead>
             <tr><th>Code</th><th>Title</th><th>Last modified</th></tr>
@@ -36,7 +40,7 @@
         </table>
       </div>
 
-      <%= form_with url: @confirm_url, method: @confirm_method do |f| %>
+      <%= form_with url: @confirm_url, method: @confirm_method, data: { turbo: false } do |f| %>
         <% (@pending_params || {}).each do |key, value| %>
           <%= hidden_field_tag "proposal_form[#{key}]", value %>
         <% end %>

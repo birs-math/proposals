@@ -30,7 +30,9 @@
               <%= link_to '<i class="align-middle fas fa-fw fa-pen" data-toggle="tooltip" title="Edit"></i>Edit'.html_safe, edit_proposal_type_proposal_form_url(@proposal_type, proposal_form) %>
             <% end %>
             <% if proposal_form.active? %>
-              <%= button_to "Deactivate", deactivate_proposal_type_proposal_form_path(@proposal_type, proposal_form), method: :patch, class: 'btn btn-sm btn-warning d-inline' %>
+              <%= form_with url: deactivate_proposal_type_proposal_form_path(@proposal_type, proposal_form), method: :patch, data: { turbo: false }, class: 'd-inline' do |f| %>
+                <%= f.submit "Deactivate", class: 'btn btn-sm btn-warning' %>
+              <% end %>
             <% end %>
           </td>
         </tr>

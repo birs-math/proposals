@@ -56,11 +56,6 @@ en:
       unlocked: 'Proposal "%{title}" has been unlocked and set back to draft.'
       not_locked: 'This proposal is not locked.'
     limit_per_type_per_year: 'There is a limit of one %{proposal_type} proposal per year.'
-  proposal_forms:
-    stale_drafts:
-      locked_notice:
-        one: '1 draft proposal tied to this form has been locked.'
-        other: '%{count} draft proposals tied to this form have been locked.'
     ui:
       no_proposals: No proposals found
       current_year: 'Current year (%{year})'
@@ -78,3 +73,8 @@ en:
       bibliography: Bibliography
       bibliography_note: If you have a LaTeX bibliography, please enter it in this field. It will be included when you click the "Print Proposal" button.
       see_guidelines: See Guidelines for more information
+  proposal_forms:
+    stale_drafts:
+      locked_notice:
+        one: '1 draft proposal tied to this form has been locked.'
+        other: '%{count} draft proposals tied to this form have been locked.'
