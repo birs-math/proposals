@@ -119,6 +119,7 @@ Rails.application.routes.draw do
       member do
         post :clone
         patch :deactivate
+        get :export_stale_drafts
         delete :proposal_field
         get :proposal_field_edit
       end

@@ -1,7 +1,7 @@
 class ProposalFormsController < ApplicationController
   load_and_authorize_resource
   before_action :set_proposal_type
-  before_action :set_proposal_form, only: %i[edit update show clone deactivate proposal_field]
+  before_action :set_proposal_form, only: %i[edit update show clone deactivate export_stale_drafts proposal_field]
 
   def index
     @proposal_forms = @proposal_type.proposal_forms
@@ -94,6 +94,21 @@ class ProposalFormsController < ApplicationController
     @proposal_field.fieldable.destroy
     redirect_to edit_proposal_type_proposal_form_path(@proposal_type,
                                                       @proposal_form)
+  end
+
+  def export_stale_drafts
+    require 'csv'
+    proposals = draft_proposals_for(@proposal_form).order(updated_at: :desc)
+    csv_data = CSV.generate(headers: true) do |csv|
+      csv << %w[Code Title Last\ Modified]
+      proposals.each do |p|
+        csv << [p.code, p.title, p.updated_at.strftime('%Y-%m-%d')]
+      end
+    end
+    send_data csv_data,
+              filename: "stale_drafts_form_#{@proposal_form.id}.csv",
+              type: 'text/csv',
+              disposition: 'attachment'
   end
 
   def clone

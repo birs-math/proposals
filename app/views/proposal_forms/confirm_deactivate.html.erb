@@ -23,7 +23,7 @@
         </div>
       </div>
 
-      <div class="card mb-3" style="max-height: 400px; overflow-y: auto;">
+      <div class="card mb-3">
         <table class="table table-sm mb-0">
           <thead>
             <tr><th>Code</th><th>Title</th><th>Last modified</th></tr>
@@ -47,6 +47,7 @@
         <%= hidden_field_tag :confirmed, 1 %>
         <div class="d-flex gap-2">
           <%= f.submit "Confirm — deactivate and lock #{@stale_count} draft proposal(s)", class: 'btn btn-danger' %>
+          <%= link_to "Export CSV", export_stale_drafts_proposal_type_proposal_form_path(@proposal_type, @proposal_form), class: 'btn btn-outline-secondary' %>
           <%= link_to "Cancel", proposal_type_proposal_forms_path(@proposal_type), class: 'btn btn-secondary' %>
         </div>
       <% end %>

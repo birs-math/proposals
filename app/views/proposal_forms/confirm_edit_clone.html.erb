@@ -14,16 +14,23 @@
 
     <div class="col-lg-12">
       <div class="alert alert-danger" role="alert">
-        <strong>Attention:</strong> Editing this form will lock the following <%= pluralize(@stale_count, 'draft proposal') %>.
+        <strong>Warning: this is a destructive action.</strong> Editing an active form cannot be undone from the UI.
+        Proceeding will:
+        <ul class="mb-0 mt-2">
+          <li>Create a new draft copy of <strong><%= @proposal_form.title %></strong> (ID #<%= @proposal_form.id %>) for you to edit</li>
+          <li>Deactivate the current form immediately</li>
+          <li>Update the <%= pluralize(@stale_count, 'draft proposal') %> listed below to reference the new form — their existing answers will carry over, but:
+            <ul class="mt-1">
+              <li><strong>Adding a required field</strong> — migrated drafts will be missing it and cannot be submitted until filled in</li>
+              <li><strong>Deleting a field</strong> — any answer already saved to that field is permanently lost</li>
+              <li><strong>Removing options from a dropdown or checkbox group</strong> — drafts that selected a removed option will display a blank or invalid value</li>
+              <li><strong>Making an optional field required</strong> — drafts that left it blank will fail validation on submission</li>
+            </ul>
+          </li>
+        </ul>
       </div>
 
       <div class="card mb-3">
-        <div class="card-body">
-          <p class="mb-0">Editing an active form creates a new draft version and deactivates the current one (<strong><%= @proposal_form.title %></strong>, ID #<%= @proposal_form.id %>). The authors of these drafts will no longer be able to edit or submit them. They will see a message explaining that the call for proposals has been updated and asking them to start a new proposal. <strong>This cannot be undone from the UI.</strong></p>
-        </div>
-      </div>
-
-      <div class="card mb-3" style="max-height: 400px; overflow-y: auto;">
         <table class="table table-sm mb-0">
           <thead>
             <tr><th>Code</th><th>Title</th><th>Last modified</th></tr>
@@ -40,12 +47,25 @@
         </table>
       </div>
 
-      <div class="d-flex gap-2">
-        <%= link_to "Confirm — edit form and lock #{@stale_count} draft proposal(s)",
-              edit_proposal_type_proposal_form_path(@proposal_type, @proposal_form, confirmed: 1),
-              class: 'btn btn-danger' %>
-        <%= link_to "Cancel", proposal_type_proposal_forms_path(@proposal_type), class: 'btn btn-secondary' %>
+      <div class="card mb-3">
+        <div class="card-body">
+          <label for="confirm-input" class="form-label fw-bold">Type <code>CONFIRM</code> to proceed:</label>
+          <input type="text" id="confirm-input" class="form-control" placeholder="CONFIRM" autocomplete="off"
+                 oninput="document.getElementById('confirm-edit-btn').disabled = this.value !== 'CONFIRM'">
+        </div>
       </div>
+
+      <%= form_with url: edit_proposal_type_proposal_form_path(@proposal_type, @proposal_form), method: :get, data: { turbo: false } do |f| %>
+        <%= hidden_field_tag :confirmed, 1 %>
+        <div class="d-flex gap-2">
+          <%= f.submit "Proceed — clone form and update #{@stale_count} draft proposal(s)",
+                id: 'confirm-edit-btn',
+                class: 'btn btn-danger',
+                disabled: true %>
+          <%= link_to "Export CSV", export_stale_drafts_proposal_type_proposal_form_path(@proposal_type, @proposal_form), class: 'btn btn-outline-secondary' %>
+          <%= link_to "Cancel", proposal_type_proposal_forms_path(@proposal_type), class: 'btn btn-secondary' %>
+        </div>
+      <% end %>
     </div>
   </div>
 </main>
