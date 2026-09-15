@@ -14,13 +14,7 @@
 
     <div class="col-lg-12">
       <div class="alert alert-danger" role="alert">
-        <strong>Attention:</strong> Deactivating this form will lock the following <%= pluralize(@stale_count, 'draft proposal') %>.
-      </div>
-
-      <div class="card mb-3">
-        <div class="card-body">
-          <p class="mb-0">Deactivating <strong><%= @proposal_form.title %></strong> (ID #<%= @proposal_form.id %>) will prevent the authors of these drafts from editing or submitting them. They will see a message explaining that the call for proposals has been updated and asking them to start a new proposal. <strong>This cannot be undone from the UI.</strong></p>
-        </div>
+        <strong>Attention:</strong> Deactivating <strong><%= @proposal_form.title %></strong> (ID #<%= @proposal_form.id %>) will affect the following <%= pluralize(@stale_count, 'draft proposal') %>.
       </div>
 
       <div class="card mb-3">
@@ -40,13 +34,65 @@
         </table>
       </div>
 
+      <div class="card mb-3">
+        <div class="card-body">
+          <% if @other_active_forms.any? %>
+            <p class="fw-bold mb-3">What should happen to these draft proposals?</p>
+            <div class="form-check mb-2">
+              <input class="form-check-input" type="radio" name="draft_action" id="action-migrate" value="migrate" checked
+                     onchange="syncMigrateField(this)">
+              <label class="form-check-label" for="action-migrate">
+                <strong>Migrate</strong> — move them to another active form so authors can continue editing and submitting
+              </label>
+            </div>
+            <div class="ms-4 mb-3" id="migrate-target">
+              <% if @other_active_forms.count == 1 %>
+                <span class="text-muted">Target: <strong><%= @other_active_forms.first.title %></strong> (ID #<%= @other_active_forms.first.id %>)</span>
+              <% else %>
+                <label for="migrate-select" class="form-label text-muted small">Target form:</label>
+                <select id="migrate-select" class="form-select" style="max-width: 420px;"
+                        onchange="document.getElementById('migrate-form-id').value = this.value">
+                  <% @other_active_forms.order(updated_at: :desc).each do |f| %>
+                    <option value="<%= f.id %>"><%= f.title %> (ID #<%= f.id %>, last edited <%= f.updated_at.strftime('%Y-%m-%d') %>)</option>
+                  <% end %>
+                </select>
+              <% end %>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="draft_action" id="action-lock" value="lock"
+                     onchange="syncMigrateField(this)">
+              <label class="form-check-label" for="action-lock">
+                <strong>Lock</strong> — proposals cannot be edited or submitted; authors will be told the call for proposals has closed
+              </label>
+            </div>
+          <% else %>
+            <div class="alert alert-warning mb-0" role="alert">
+              <strong>No replacement form available.</strong>
+              There is no other active form for <%= @proposal_type.name %> proposals.
+              <%= link_to "Activate a draft form first", proposal_type_proposal_forms_path(@proposal_type) %>
+              if you want authors to be able to continue — or proceed below to lock these proposals.
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="card mb-3">
+        <div class="card-body">
+          <label for="confirm-input" class="form-label fw-bold">Type <code>CONFIRM</code> to proceed:</label>
+          <input type="text" id="confirm-input" class="form-control" style="max-width: 300px;"
+                 placeholder="CONFIRM" autocomplete="off"
+                 oninput="document.getElementById('confirm-deactivate-btn').disabled = this.value !== 'CONFIRM'">
+        </div>
+      </div>
+
       <%= form_with url: @confirm_url, method: @confirm_method, data: { turbo: false } do |f| %>
         <% (@pending_params || {}).each do |key, value| %>
           <%= hidden_field_tag "proposal_form[#{key}]", value %>
         <% end %>
         <%= hidden_field_tag :confirmed, 1 %>
+        <%= hidden_field_tag :migrate_to_form_id, @other_active_forms.first&.id, id: 'migrate-form-id' %>
         <div class="d-flex gap-2">
-          <%= f.submit "Confirm — deactivate and lock #{@stale_count} draft proposal(s)", class: 'btn btn-danger' %>
+          <%= f.submit "Confirm deactivation", id: 'confirm-deactivate-btn', class: 'btn btn-danger', disabled: true %>
           <%= link_to "Export CSV", export_stale_drafts_proposal_type_proposal_form_path(@proposal_type, @proposal_form), class: 'btn btn-outline-secondary' %>
           <%= link_to "Cancel", proposal_type_proposal_forms_path(@proposal_type), class: 'btn btn-secondary' %>
         </div>
@@ -54,3 +100,18 @@
     </div>
   </div>
 </main>
+
+<script>
+  var migrateId = document.getElementById('migrate-form-id');
+  var savedMigrateId = migrateId ? migrateId.value : '';
+
+  function syncMigrateField(radio) {
+    if (!migrateId) return;
+    if (radio.value === 'migrate') {
+      var sel = document.getElementById('migrate-select');
+      migrateId.value = sel ? sel.value : savedMigrateId;
+    } else {
+      migrateId.value = '';
+    }
+  }
+</script>

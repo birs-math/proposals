@@ -13,23 +13,11 @@ class ProposalFormsController < ApplicationController
 
   def edit
     return unless @proposal_form.active?
-    return if params[:cloned]
 
-    if draft_proposals_for(@proposal_form).any? && !params[:confirmed]
-      @proposals_to_lock = draft_proposals_for(@proposal_form)
-      @stale_count = @proposals_to_lock.count
-      render :confirm_edit_clone
-      return
-    end
-
-    lock_draft_proposals_for(@proposal_form)
-    @proposal_form.update(status: :inactive)
-    form = @proposal_form.deep_clone include: { proposal_fields:
-                                                %i[options validations] }
-    form.status = :active
+    form = @proposal_form.deep_clone include: { proposal_fields: %i[options validations] }
+    form.status = :draft
     form.save
-
-    redirect_to edit_proposal_type_proposal_form_path(@proposal_type, form, cloned: true)
+    redirect_to edit_proposal_type_proposal_form_path(@proposal_type, form)
   end
 
   def show
@@ -41,19 +29,18 @@ class ProposalFormsController < ApplicationController
       @proposals_to_lock = draft_proposals_for(@proposal_form)
       @stale_count = @proposals_to_lock.count
       @pending_params = proposal_form_params
+      @other_active_forms = @proposal_type.proposal_forms.active.where.not(id: @proposal_form.id)
       @confirm_url = proposal_type_proposal_form_path(@proposal_type, @proposal_form)
       @confirm_method = :patch
       render :confirm_deactivate
       return
     end
-    locked_count = deactivating? ? lock_draft_proposals_for(@proposal_form) : 0
+    action_notice = deactivating? ? apply_draft_proposals_action(@proposal_form) : nil
     if @proposal_form.update(proposal_form_params)
       version_update_form
       notice = t('proposal_forms.update.success')
-      notice += " #{t('proposal_forms.stale_drafts.locked_notice', count: locked_count)}" if locked_count > 0
-      redirect_to proposal_type_proposal_form_path(@proposal_type,
-                                                   @proposal_form),
-                  notice: notice
+      notice += " #{action_notice}" if action_notice.present?
+      redirect_to proposal_type_proposal_form_path(@proposal_type, @proposal_form), notice: notice
     else
       redirect_to edit_proposal_type_proposal_form_path,
                   status: :unprocessable_entity,
@@ -65,15 +52,16 @@ class ProposalFormsController < ApplicationController
     if draft_proposals_for(@proposal_form).any? && !params[:confirmed]
       @proposals_to_lock = draft_proposals_for(@proposal_form)
       @stale_count = @proposals_to_lock.count
+      @other_active_forms = @proposal_type.proposal_forms.active.where.not(id: @proposal_form.id)
       @confirm_url = deactivate_proposal_type_proposal_form_path(@proposal_type, @proposal_form)
       @confirm_method = :patch
       render :confirm_deactivate
       return
     end
-    locked_count = lock_draft_proposals_for(@proposal_form)
+    action_notice = apply_draft_proposals_action(@proposal_form)
     @proposal_form.update!(status: :inactive)
     notice = t('proposal_forms.update.success')
-    notice += " #{t('proposal_forms.stale_drafts.locked_notice', count: locked_count)}" if locked_count > 0
+    notice += " #{action_notice}" if action_notice.present?
     redirect_to proposal_type_proposal_forms_path(@proposal_type), notice: notice
   end
 
@@ -173,8 +161,22 @@ class ProposalFormsController < ApplicationController
     Proposal.draft.where(proposal_form_id: form.id)
   end
 
-  def lock_draft_proposals_for(form)
-    Proposal.draft.where(proposal_form_id: form.id)
-            .update_all(status: Proposal.statuses[:locked])
+  def apply_draft_proposals_action(form)
+    proposals = draft_proposals_for(form)
+    return nil if proposals.none?
+
+    if params[:migrate_to_form_id].present?
+      target = @proposal_type.proposal_forms.active.find_by(id: params[:migrate_to_form_id])
+      if target
+        count = proposals.update_all(proposal_form_id: target.id)
+        "#{count} #{count == 1 ? 'draft proposal' : 'draft proposals'} migrated to \"#{target.title}\"."
+      else
+        count = proposals.update_all(status: Proposal.statuses[:locked])
+        t('proposal_forms.stale_drafts.locked_notice', count: count) if count > 0
+      end
+    else
+      count = proposals.update_all(status: Proposal.statuses[:locked])
+      t('proposal_forms.stale_drafts.locked_notice', count: count) if count > 0
+    end
   end
 end
