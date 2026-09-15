@@ -19,7 +19,9 @@
                     <span class="ms-2">Last edited: <%= proposal_form.updated_at.strftime("%Y-%m-%d") %></span>
                   </small>
                 </div>
-                <%= link_to 'Clone', clone_proposal_type_proposal_form_path(@proposal_type, proposal_form), class: 'btn btn-sm btn-primary', method: :post %>
+                <%= form_with url: clone_proposal_type_proposal_form_path(@proposal_type, proposal_form), method: :post, data: { turbo: false }, class: 'd-inline' do |f| %>
+                  <%= f.submit 'Clone', class: 'btn btn-sm btn-primary' %>
+                <% end %>
               </div>
             </div>
           </div>
