@@ -29,7 +29,7 @@ class ProposalType < ApplicationRecord
   FIVE_DAY_WORKSHOP_AND_SUMMER_SCHOOL = "#{FIVE_DAY_WORKSHOP} and #{SUMMER_SCHOOL}".freeze
 
   def active_form
-    proposal_forms.where('proposal_forms.status =?', 1).last
+    proposal_forms.where('proposal_forms.status =?', 1).order(created_at: :asc).last
   end
 
   def not_lead_organizer?(person_id)

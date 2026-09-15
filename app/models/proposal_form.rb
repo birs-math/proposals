@@ -8,7 +8,7 @@ class ProposalForm < ApplicationRecord
            inverse_of: :proposal_form, dependent: :destroy)
   enum status: { draft: 0, active: 1, inactive: 2 }
 
-  scope :active_form, ->(id) { where(proposal_type_id: id, status: :active)&.last }
+  scope :active_form, ->(id) { where(proposal_type_id: id, status: :active).order(created_at: :asc).last }
   default_scope { order(created_at: :desc) }
 
   def highest_field_position
