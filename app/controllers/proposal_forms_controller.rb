@@ -14,6 +14,13 @@ class ProposalFormsController < ApplicationController
   def edit
     return unless @proposal_form.active?
 
+    unless params[:confirmed]
+      @confirm_url = edit_proposal_type_proposal_form_path(@proposal_type, @proposal_form)
+      @confirm_method = :get
+      render :confirm_clone
+      return
+    end
+
     form = @proposal_form.deep_clone include: { proposal_fields: %i[options validations] }
     form.status = :draft
     form.save
@@ -100,6 +107,14 @@ class ProposalFormsController < ApplicationController
   end
 
   def clone
+    if @proposal_form.active? && !params[:confirmed]
+      @confirm_url = clone_proposal_type_proposal_form_path(@proposal_type, @proposal_form)
+      @confirm_method = :post
+      @clone_params = { proposal_type_id: params[:proposal_type_id] }
+      render :confirm_clone
+      return
+    end
+
     proposal_form = @proposal_form.deep_clone include:
                                   { proposal_fields: %i[options validations] }
     proposal_form.version = highest_version

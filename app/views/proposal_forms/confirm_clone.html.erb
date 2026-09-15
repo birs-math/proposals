@@ -1,0 +1,44 @@
+<main class="content">
+  <div class="container-fluid">
+    <div class="header">
+      <h1 class="header-title">Confirm Clone</h1>
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><%= link_to "Dashboard", dashboards_path %></li>
+          <li class="breadcrumb-item"><%= link_to "Proposal Types", proposal_types_path %></li>
+          <li class="breadcrumb-item"><%= link_to @proposal_type.name, proposal_type_proposal_forms_path(@proposal_type) %></li>
+          <li class="breadcrumb-item active">Confirm Clone</li>
+        </ol>
+      </nav>
+    </div>
+
+    <div class="col-lg-8">
+      <div class="alert alert-info" role="alert">
+        <strong>You are about to clone an active form.</strong>
+      </div>
+
+      <div class="card mb-3">
+        <div class="card-body">
+          <p>Cloning <strong><%= @proposal_form.title %></strong> (ID #<%= @proposal_form.id %>) will create a new <strong>draft</strong> copy. The original form will remain active and unchanged.</p>
+          <p class="mb-0">You are responsible for managing the original form after cloning. In particular:</p>
+          <ul class="mt-2 mb-0">
+            <li>Any draft proposals tied to the original form will remain attached to it — they will <strong>not</strong> be moved to the clone automatically.</li>
+            <li>When you are ready to retire the original form, use the <strong>Deactivate</strong> button on it. That step will give you the option to migrate or lock any remaining draft proposals.</li>
+            <li>New proposals will continue to use the original (active) form until you activate the clone and deactivate the original.</li>
+          </ul>
+        </div>
+      </div>
+
+      <%= form_with url: @confirm_url, method: @confirm_method, data: { turbo: false } do |f| %>
+        <%= hidden_field_tag :confirmed, 1 %>
+        <% (@clone_params || {}).each do |key, value| %>
+          <%= hidden_field_tag key, value %>
+        <% end %>
+        <div class="d-flex gap-2">
+          <%= f.submit "Proceed — create draft clone", class: 'btn btn-primary' %>
+          <%= link_to "Cancel", proposal_type_proposal_forms_path(@proposal_type), class: 'btn btn-secondary' %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</main>
